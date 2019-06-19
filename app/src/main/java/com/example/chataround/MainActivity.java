@@ -114,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
             editText.setText("");
         }else
         {
+            //check
             Toast.makeText(MainActivity.this, "Empty message", Toast.LENGTH_SHORT).show();
         }
 
