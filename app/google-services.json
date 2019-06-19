@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "561624256003",
+    "firebase_url": "https://chataround-892b5.firebaseio.com",
+    "project_id": "chataround-892b5",
+    "storage_bucket": "chataround-892b5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:561624256003:android:effffcd6bf85024a",
+        "android_client_info": {
+          "package_name": "com.example.chataround"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "561624256003-94o6fvkuc7fnrjov9lq7rl0dgqgg2ggs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD5ciNYldxMtcFh0n5l_vwXJIyCSnv1Eig"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "561624256003-94o6fvkuc7fnrjov9lq7rl0dgqgg2ggs.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
