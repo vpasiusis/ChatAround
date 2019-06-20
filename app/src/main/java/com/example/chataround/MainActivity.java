@@ -48,11 +48,24 @@ public class MainActivity extends AppCompatActivity {
                 arrayList.clear();
                 listView.clearChoices();
                 for (DataSnapshot dst : dataSnapshot.getChildren()) {
+
                     String message = dst.child("message").getValue(String.class);
                     String username = dst.child("username").getValue(String.class);
                     String time = dst.child("time").getValue(String.class);
-                    arrayList.add(time + "\n" + username + "\n" + message);
-                    arrayAdapter.notifyDataSetChanged();
+                    if(message!=null&&username!=null&&time!=null) {
+                        Bundle bundle = getIntent().getExtras();
+                        String username1 = bundle.getString("username");
+
+                        if(username.contains(username1)) {
+                            arrayList.add(time + "\n" + username + "\n" + message);
+                            arrayAdapter.notifyDataSetChanged();
+
+                        }else{
+                            arrayList.add(time + "\n" + username + "\n" + message);
+                            arrayAdapter.notifyDataSetChanged();
+                        }
+
+                    }
                 }
             }
 
@@ -106,7 +119,9 @@ public class MainActivity extends AppCompatActivity {
         String edittext = editText.getText().toString().trim();
         if(!TextUtils.isEmpty(edittext)) {
             final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child("Messages");
-            DatabaseReference currentUserDB = mDatabase.child(currentDateTimeString+"__"+username1);
+            String newMessageId  =currentDateTimeString+"__"+username1;
+            newMessageId=newMessageId.replace(".","");
+            DatabaseReference currentUserDB = mDatabase.child(newMessageId);
             currentUserDB.child("username").setValue(username1);
             currentUserDB.child("message").setValue(edittext);
             currentUserDB.child("type").setValue("Unknown");
