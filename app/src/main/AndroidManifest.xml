@@ -12,6 +12,9 @@
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".CreateAccountActivity"
+            android:screenOrientation="portrait"></activity>
         <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
