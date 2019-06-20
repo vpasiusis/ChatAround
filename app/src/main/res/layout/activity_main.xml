@@ -41,9 +41,9 @@
 
     <ListView
         android:id="@+id/listview1"
-        android:layout_width="335dp"
-        android:layout_height="635dp"
+        android:layout_width="396dp"
+        android:layout_height="wrap_content"
         android:layout_above="@+id/enterTextid"
-        android:layout_marginBottom="19dp" />
+        android:layout_marginBottom="16dp" />
 
 </RelativeLayout>

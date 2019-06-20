@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
                         if(username.contains(username1)) {
                             arrayList.add(time + "\n" + username + "\n" + message);
                             arrayAdapter.notifyDataSetChanged();
-                            listView.setBackgroundColor(Color.parseColor("#e7eecc"));
+                            arrayAdapter.getContext().setTheme(0);
 
                         }else{
                             arrayList.add(time + "\n" + username + "\n" + message);
