@@ -11,35 +11,35 @@ import android.widget.Toast;
 
 public class LoginActivity extends AppCompatActivity {
 
-    EditText editText;
+    private EditText editText;
+    private Button enterChat;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_activity);
 
-
-        Button enterChat = findViewById(R.id.enterChat1);
+        editText = findViewById(R.id.editText11);
+        enterChat = findViewById(R.id.enterChat1);
         enterChat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 doCheck();
             }
         });
-
-
     }
+
     private void doCheck(){
-        editText = findViewById(R.id.editText11);
-        String edittext = editText.getText().toString().trim();
-        if(TextUtils.isEmpty(edittext)){
+        String text = editText.getText().toString().trim();
+
+        if(TextUtils.isEmpty(text)){
             Toast.makeText(LoginActivity.this, "Please enter username!", Toast.LENGTH_SHORT).show();
 
         }else{
             Toast.makeText(LoginActivity.this, "Jungiamasi...", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-            intent.putExtra("username", edittext);
+            intent.putExtra("username", text);
             startActivity(intent);
         }
-
     }
 }

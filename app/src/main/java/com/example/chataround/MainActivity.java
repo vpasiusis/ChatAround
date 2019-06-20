@@ -23,9 +23,10 @@ import java.util.Date;
 public class MainActivity extends AppCompatActivity {
 
     private DatabaseReference myDatabase;
-    EditText editText;
-    ArrayList<String> arrayList = new ArrayList<>();
-    ListView listView;
+    private EditText editText;
+    private ArrayList<String> arrayList = new ArrayList<>();
+    private ListView listView;
+    private String username;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,8 +35,12 @@ public class MainActivity extends AppCompatActivity {
 
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this,android.R.layout.simple_list_item_1, arrayList);
 
+        Bundle bundle = getIntent().getExtras();
+        username = bundle.getString("username");
+
         myDatabase = FirebaseDatabase.getInstance().getReference("Messages");
-        listView = (ListView)findViewById(R.id.listview1);
+        listView = findViewById(R.id.listview1);
+        editText = findViewById(R.id.enterTextid);
         listView.setAdapter(arrayAdapter);
         myDatabase.addValueEventListener(new ValueEventListener() {
             @Override
@@ -46,21 +51,12 @@ public class MainActivity extends AppCompatActivity {
                 for (DataSnapshot dst : dataSnapshot.getChildren()) {
 
                     String message = dst.child("message").getValue(String.class);
-                    String username = dst.child("username").getValue(String.class);
+                    String username1 = dst.child("username").getValue(String.class);
                     String time = dst.child("time").getValue(String.class);
-                    if(message!=null&&username!=null&&time!=null) {
-                        Bundle bundle = getIntent().getExtras();
-                        String username1 = bundle.getString("username");
 
-                        if(username.contains(username1)) {
-                            arrayList.add(time + "\n" + username + "\n" + message);
-                            arrayAdapter.notifyDataSetChanged();
-                            listView.setBackgroundColor(Color.parseColor("#e7eecc"));
-
-                        }else{
-                            arrayList.add(time + "\n" + username + "\n" + message);
-                            arrayAdapter.notifyDataSetChanged();
-                        }
+                    if(message!=null&&username1!=null&&time!=null) {
+                        arrayList.add(time + "\n" + username1 + "\n" + message);
+                        arrayAdapter.notifyDataSetChanged();
                     }
                 }
             }
@@ -74,25 +70,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void sendMessage(View view) {
-
-        Bundle bundle = getIntent().getExtras();
-        String username1 = bundle.getString("username");
         String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
         currentDateTimeString = currentDateTimeString.replaceAll("\\s+", " ");
-        editText = findViewById(R.id.enterTextid);
-        String edittext = editText.getText().toString().trim();
-        if(!TextUtils.isEmpty(edittext)) {
-            final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child("Messages");
-            String newMessageId  =currentDateTimeString+"__"+username1;
+        String text = editText.getText().toString().trim();
+
+        if(!TextUtils.isEmpty(text)) {
+            String newMessageId  = currentDateTimeString+"__"+username;
             newMessageId=newMessageId.replace(".","");
-            DatabaseReference currentUserDB = mDatabase.child(newMessageId);
-            currentUserDB.child("username").setValue(username1);
-            currentUserDB.child("message").setValue(edittext);
+            DatabaseReference currentUserDB = myDatabase.child(newMessageId);
+            currentUserDB.child("username").setValue(username);
+            currentUserDB.child("message").setValue(text);
             currentUserDB.child("type").setValue("Unknown");
             currentUserDB.child("time").setValue(currentDateTimeString);
             editText.setText("");
-        }else
-        {
+        }else{
             //check
             Toast.makeText(MainActivity.this, "Empty message", Toast.LENGTH_SHORT).show();
         }
