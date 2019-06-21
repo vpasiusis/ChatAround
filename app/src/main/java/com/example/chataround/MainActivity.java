@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
 
         firebaseController = FirebaseController.getInstance();
         firebaseController.initialize();
-
         listView = findViewById(R.id.listview1);
         editText = findViewById(R.id.enterTextid);
         listView.setAdapter(arrayAdapter);
@@ -106,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(i);
             return;
         } else {
-            backToast = Toast.makeText(getBaseContext(), "Paspauskite dar kartą, jog išeiti", Toast.LENGTH_SHORT);
+            backToast = Toast.makeText(getBaseContext(), "Press one more time to exit", Toast.LENGTH_SHORT);
             backToast.show();
         }
         backPressedTime = System.currentTimeMillis();

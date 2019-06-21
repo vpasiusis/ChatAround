@@ -10,7 +10,6 @@ public class ImageController {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 40, outputStream);
         byte[] byteArray = outputStream.toByteArray();
-
         String encodedString = Base64.encodeToString(byteArray, Base64.DEFAULT);
         return encodedString;
     }

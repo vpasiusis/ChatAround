@@ -15,11 +15,25 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInStatusCodes;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthCredential;
+import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -32,7 +46,8 @@ public class LoginActivity extends AppCompatActivity {
     private Button Register;
     private ProgressBar pbbar;
     private FirebaseAuth mAuth;
-
+    private GoogleSignInClient mGoogleSignInClient;
+    private SignInButton signInButton;
     private ProgressDialog progressDialog;
     private FirebaseAuth.AuthStateListener mAuthListener;
 
@@ -44,9 +59,8 @@ public class LoginActivity extends AppCompatActivity {
         Password = (EditText)findViewById(R.id.etPass);
         Login = (Button)findViewById(R.id.btnLogin) ;
         Register = (Button)findViewById(R.id.btnRegister) ;
+        signInButton =(SignInButton) findViewById(R.id.googleSignIn);
         mAuth = FirebaseAuth.getInstance();
-       // Info = (TextView)findViewById(R.id.twCheck) ;
-       // pbbar = (ProgressBar) findViewById(R.id.pbbar);
         Login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -57,6 +71,12 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 doRegister();
+            }
+        });
+        signInButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signInGoogle();
             }
         });
 
@@ -71,6 +91,12 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         };
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+
+        mGoogleSignInClient  = GoogleSignIn.getClient(this, gso);
     }
     @Override
     protected void onStart() {
@@ -81,6 +107,51 @@ public class LoginActivity extends AppCompatActivity {
     private void doRegister() {
         Intent intent = new Intent(this, CreateAccountActivity.class);
         startActivity(intent);
+    }
+    private void signInGoogle() {
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, 101);
+    }
+    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+
+        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child("users");
+                            DatabaseReference currentUserDB = mDatabase.child(mAuth.getCurrentUser().getUid());
+                            Toast.makeText(LoginActivity.this, " Acount "+user.getEmail()+" was created ", Toast.LENGTH_SHORT).show();
+                            currentUserDB.child("Type").setValue("0");
+                            currentUserDB.child("Email").setValue(user.getEmail());
+                            System.out.println("Prisijunge");
+                            Toast.makeText(LoginActivity.this, "Joined", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(LoginActivity.this, "Something went wrong..", Toast.LENGTH_SHORT).show();
+
+                        }
+
+
+                    }
+                });
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == 101) {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            try {
+                // Google Sign In was successful, authenticate with Firebase
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                firebaseAuthWithGoogle(account);
+            } catch (ApiException e) {
+                Toast.makeText(LoginActivity.this, "Something went terribly wrong..", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private void doLogin() {
@@ -102,7 +173,7 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     });
         }else
-            Toast.makeText(LoginActivity.this, "Įveskite visus laukus", Toast.LENGTH_SHORT).show();
+            Toast.makeText(LoginActivity.this, "Enter all fields", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -113,7 +184,7 @@ public class LoginActivity extends AppCompatActivity {
             System.exit(1);
             return;
         } else {
-            backToast = Toast.makeText(getBaseContext(), "Paspauskite dar kartą jog išeiti", Toast.LENGTH_SHORT);
+            backToast = Toast.makeText(getBaseContext(), "Press one more time to exit", Toast.LENGTH_SHORT);
             backToast.show();
         }
         backPressedTime = System.currentTimeMillis();
