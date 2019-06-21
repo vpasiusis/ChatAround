@@ -3,7 +3,6 @@ package com.example.chataround;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
@@ -23,9 +22,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -76,18 +75,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void sendMessage(View view) {
-        String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
-        currentDateTimeString = currentDateTimeString.replaceAll("\\s+", " ");
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String date = df.format(c.getTime());
+
         String text = editText.getText().toString().trim();
         String username= currentFirebaseUser.getEmail();
+
         if(!TextUtils.isEmpty(text)) {
-            String newMessageId  = currentDateTimeString+"__"+username;
+            String newMessageId  = date+"__"+username;
             newMessageId=newMessageId.replace(".","");
             DatabaseReference currentUserDB = myDatabase.child(newMessageId);
             currentUserDB.child("username").setValue(username);
             currentUserDB.child("message").setValue(text);
             currentUserDB.child("type").setValue("Unknown");
-            currentUserDB.child("time").setValue(currentDateTimeString);
+            currentUserDB.child("time").setValue(date);
             editText.setText("");
         }else{
             //check
@@ -111,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
                     try{
                         Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
                         String imageBase64 = ImageController.BitmapToBase64(bitmap);
+                        //editText.setText(imageBase64);
                     }catch (Exception e){
                         Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
