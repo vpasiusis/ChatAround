@@ -1,7 +1,11 @@
 package com.example.chataround;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -39,8 +43,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this,android.R.layout.simple_list_item_1, arrayList);
-
-
 
         myDatabase = FirebaseDatabase.getInstance().getReference("Messages");
         listView = findViewById(R.id.listview1);
@@ -93,6 +95,29 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
+    public void uploadImage(View view){
+        Intent i = new Intent(Intent.ACTION_PICK);
+        i.setType("image/*");
+        startActivityForResult(i, 1);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
+                final Uri imageUri = data.getData();
+                if (imageUri != null) {
+                    try{
+                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+                        String imageBase64 = ImageController.BitmapToBase64(bitmap);
+                    }catch (Exception e){
+                        Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+    }
+
     @Override
     public void onBackPressed() {
         if (backPressedTime + 1000 > System.currentTimeMillis() ) {
