@@ -1,15 +1,9 @@
 package com.example.chataround;
 
-import android.content.ContentResolver;
-import android.graphics.Bitmap;
 import android.net.Uri;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -21,14 +15,14 @@ import com.google.firebase.storage.UploadTask;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 public class FirebaseController {
     private static FirebaseController instance = null;
     private FirebaseUser currentFirebaseUser;
     private DatabaseReference myDatabase;
     private StorageReference myStorage;
-    private Bitmap image;
-
 
     private FirebaseController(){ }
 
@@ -58,11 +52,14 @@ public class FirebaseController {
         String key = time + "__" + currentFirebaseUser.getEmail();
         key=key.replace(".","");
 
+        Map<String, Object> newMessage = new HashMap<>();
+        newMessage.put("message", message);
+        newMessage.put("type", type);
+        newMessage.put("time", time);
+        newMessage.put("username", currentFirebaseUser.getEmail());
+
         DatabaseReference currentUserDB = myDatabase.child(key);
-        currentUserDB.child("username").setValue(currentFirebaseUser.getEmail());
-        currentUserDB.child("message").setValue(message);
-        currentUserDB.child("type").setValue(type);
-        currentUserDB.child("time").setValue(time);
+        currentUserDB.setValue(newMessage);
     }
 
     public void sendImage(Uri imageUri){

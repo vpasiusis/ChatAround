@@ -1,16 +1,13 @@
 package com.example.chataround;
 
 import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -18,14 +15,11 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.StorageReference;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,14 +32,12 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseController firebaseController;
     private ListViewAdapter adapter;
     private List<ListViewItem> list;
-    private ContentResolver contentResolver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        contentResolver = this.getContentResolver();
         firebaseController = FirebaseController.getInstance();
         firebaseController.initialize();
         listView = findViewById(R.id.listview1);
@@ -58,39 +50,49 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateFeed(){
-        firebaseController.getMyDatabase().addValueEventListener(new ValueEventListener() {
+        firebaseController.getMyDatabase().addChildEventListener(new ChildEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                list.clear();
-                listView.clearChoices();
+            public void onChildAdded(DataSnapshot dst, String s) {
+                final String key = dst.getKey();
+                final String message = dst.child("message").getValue(String.class);
+                final String username1 = dst.child("username").getValue(String.class);
+                final String time = dst.child("time").getValue(String.class);
+                final String type = dst.child("type").getValue(String.class);
 
-                for (DataSnapshot dst : dataSnapshot.getChildren()) {
-                    final String key = dst.getKey();
-                    final String message = dst.child("message").getValue(String.class);
-                    final String username1 = dst.child("username").getValue(String.class);
-                    final String time = dst.child("time").getValue(String.class);
-                    final String type = dst.child("type").getValue(String.class);
-
-                    if(type!=null && type.equals("image")){
-                        StorageReference ref = firebaseController.getMyStorage().child(message);
-                        final long megabyte = 1024*1024;
-                        final ListViewItem item1 = new ListViewItem(key,username1,null,message,time);
-                        ref.getBytes(megabyte).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                            @Override
-                            public void onSuccess(byte[] bytes) {
-                                Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                                item1.setImage(image);
-                                adapter.notifyDataSetChanged();
-                            }
-                        });
-                        list.add(item1);
-                        adapter.notifyDataSetChanged();
-                    }else if(type!= null && type.equals("message")){
-                        ListViewItem item1 = new ListViewItem(key,username1,null,message,time);
-                        list.add(item1);
-                        adapter.notifyDataSetChanged();
-                    }
+                if(type.equals("image")){
+                    StorageReference ref = firebaseController.getMyStorage().child(message);
+                    final long megabyte = 1024*1024;
+                    final ListViewItem item1 = new ListViewItem(key,username1,null,message,time);
+                    ref.getBytes(megabyte).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                        @Override
+                        public void onSuccess(byte[] bytes) {
+                            Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                            item1.setImage(image);
+                            adapter.notifyDataSetChanged();
+                        }
+                    });
+                    list.add(item1);
+                    adapter.notifyDataSetChanged();
+                }else if(type.equals("message")){
+                    ListViewItem item1 = new ListViewItem(key,username1,null,message,time);
+                    list.add(item1);
+                    adapter.notifyDataSetChanged();
                 }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
             }
 
             @Override
@@ -98,7 +100,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
     }
 
     public void sendMessage(View view) {
