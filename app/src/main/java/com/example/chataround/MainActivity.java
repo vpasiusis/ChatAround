@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
                     final String time = dst.child("time").getValue(String.class);
                     final String type = dst.child("type").getValue(String.class);
 
-                    if(type.equals("image")){
+                    if(type!=null && type.equals("image")){
                         StorageReference ref = firebaseController.getMyStorage().child(message);
                         final long megabyte = 1024*1024;
                         final ListViewItem item1 = new ListViewItem(key,username1,null,message,time);
@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
                         });
                         list.add(item1);
                         adapter.notifyDataSetChanged();
-                    }else if(type.equals("message")){
+                    }else if(type!= null && type.equals("message")){
                         ListViewItem item1 = new ListViewItem(key,username1,null,message,time);
                         list.add(item1);
                         adapter.notifyDataSetChanged();
