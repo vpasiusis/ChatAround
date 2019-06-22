@@ -1,9 +1,15 @@
 package com.example.chataround;
 
+import android.content.ContentResolver;
+import android.graphics.Bitmap;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -21,6 +27,7 @@ public class FirebaseController {
     private FirebaseUser currentFirebaseUser;
     private DatabaseReference myDatabase;
     private StorageReference myStorage;
+    private Bitmap image;
 
 
     private FirebaseController(){ }
@@ -42,7 +49,11 @@ public class FirebaseController {
         return myDatabase;
     }
 
-    public void sendMessage(String message, int type){
+    public StorageReference getMyStorage(){
+        return myStorage;
+    }
+
+    public void sendMessage(String message, String type){
         String time = getTIme();
         String key = time + "__" + currentFirebaseUser.getEmail();
         key=key.replace(".","");
@@ -64,7 +75,7 @@ public class FirebaseController {
             @Override
             public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                 if(task.isSuccessful()){
-                    sendMessage(key, 2);
+                    sendMessage(key, "image");
                 }
             }
         });
