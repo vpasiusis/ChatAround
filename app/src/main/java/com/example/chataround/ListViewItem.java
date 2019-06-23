@@ -2,17 +2,21 @@ package com.example.chataround;
 
 import android.graphics.Bitmap;
 
+import java.util.List;
+
 public class ListViewItem {
     private String id, name, message, time;
     private Bitmap image;
+    private List<ListViewComment> comments;
 
-    public ListViewItem(String id, String name, Bitmap image, String message, String time) {
+    public ListViewItem(String id, String name, Bitmap image, String message, String time, List<ListViewComment> comments) {
         super();
         this.id = id;
         this.name = name;
         this.image = image;
         this.message = message;
         this.time = time;
+        this.comments = comments;
     }
 
     public String getId() {
@@ -53,5 +57,13 @@ public class ListViewItem {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public List<ListViewComment> getComments(){
+        return comments;
+    }
+
+    public void setComments(List<ListViewComment> comments){
+        this.comments = comments;
     }
 }

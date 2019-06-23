@@ -43,8 +43,12 @@
         android:onClick="sendMessage"
         android:text="Send" />
 
-    <ListView
+    <ExpandableListView
         android:id="@+id/listview1"
+        android:groupIndicator="@null"
+        android:divider="@color/feed_item_border"
+        android:dividerHeight="@dimen/feed_item_border_width"
+        android:childDivider="@color/feed_item_border"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/enterTextid"

@@ -10,7 +10,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ListView;
+import android.widget.ExpandableListView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -26,12 +26,12 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private EditText editText;
-    private ListView listView;
+    private ExpandableListView listView;
     private long backPressedTime;
     private Toast backToast;
     private FirebaseController firebaseController;
-    private ListViewAdapter adapter;
     private List<ListViewItem> list;
+    private ListViewAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,10 +59,15 @@ public class MainActivity extends AppCompatActivity {
                 final String time = dst.child("time").getValue(String.class);
                 final String type = dst.child("type").getValue(String.class);
 
+                //comments to be added to this list
+                final List<ListViewComment> comments = new ArrayList<>();
+                ListViewComment comment = new ListViewComment(null,null,"el comentario");
+                comments.add(comment);
+
                 if(type.equals("image")){
                     StorageReference ref = firebaseController.getMyStorage().child(message);
                     final long megabyte = 1024*1024;
-                    final ListViewItem item1 = new ListViewItem(key,username1,null,message,time);
+                    final ListViewItem item1 = new ListViewItem(key,username1,null,message,time, comments);
                     ref.getBytes(megabyte).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                         @Override
                         public void onSuccess(byte[] bytes) {
@@ -74,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
                     list.add(item1);
                     adapter.notifyDataSetChanged();
                 }else if(type.equals("message")){
-                    ListViewItem item1 = new ListViewItem(key,username1,null,message,time);
+                    ListViewItem item1 = new ListViewItem(key,username1,null,message,time, comments);
                     list.add(item1);
                     adapter.notifyDataSetChanged();
                 }
