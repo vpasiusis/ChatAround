@@ -39,6 +39,10 @@ public class ListViewAdapter extends BaseExpandableListAdapter {
         return itemList.get(groupPosition);
     }
 
+    public ListViewItem getItem(int groupPosition){
+        return itemList.get(groupPosition);
+    }
+
     @Override
     public Object getChild(int groupPosition, int childPosition) {
         List<ListViewComment> comments = itemList.get(groupPosition).getComments();

@@ -10,8 +10,10 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -19,6 +21,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.Query;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.FileNotFoundException;
@@ -35,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseController firebaseController;
     private List<ListViewItem> list;
     private ListViewAdapter adapter;
+    private int lastItemNumber = 10;
+    private String lastItemTime="2019-06-24 15:00:44";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,11 +54,12 @@ public class MainActivity extends AppCompatActivity {
         list = new ArrayList<>();
         adapter = new ListViewAdapter(this, list);
         listView.setAdapter(adapter);
-        updateFeed();
+        loadItems(0, 20);
     }
 
-    public void updateFeed(){
-        firebaseController.getMyDatabase().addChildEventListener(new ChildEventListener() {
+    public void loadItems(final int start, int amount) {
+        Query query = firebaseController.getMyDatabase().orderByKey().limitToLast(amount);
+        query.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dst, String s) {
                 final String key = dst.getKey();
@@ -81,11 +87,11 @@ public class MainActivity extends AppCompatActivity {
                             adapter.notifyDataSetChanged();
                         }
                     });
-                    list.add(item1);
+                    list.add(start,item1);
                     adapter.notifyDataSetChanged();
                 }else if(type.equals("message")){
                     ListViewItem item1 = new ListViewItem(key,username1,null,message,time, comments);
-                    list.add(item1);
+                    list.add(start,item1);
                     adapter.notifyDataSetChanged();
                 }
             }
