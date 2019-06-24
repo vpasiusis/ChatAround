@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 
+import com.facebook.login.LoginManager;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -139,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
         if (backPressedTime + 1000 > System.currentTimeMillis() ) {
             backToast.cancel();
             FirebaseAuth.getInstance().signOut();
+            LoginManager.getInstance().logOut();
             Intent i = new Intent(this, LoginActivity.class); //if under this dialog you do not have your MainActivity
             i.addFlags(i.FLAG_ACTIVITY_CLEAR_TOP);
             i.addFlags(i.FLAG_ACTIVITY_CLEAR_TASK);
