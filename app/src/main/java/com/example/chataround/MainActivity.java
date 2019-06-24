@@ -156,6 +156,7 @@ public class MainActivity extends AppCompatActivity {
             i.addFlags(i.FLAG_ACTIVITY_CLEAR_TOP);
             i.addFlags(i.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(i);
+            finish();
             return;
         } else {
             backToast = Toast.makeText(getBaseContext(), "Press one more time to exit", Toast.LENGTH_SHORT);
