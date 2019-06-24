@@ -2,5 +2,7 @@
     <string name="app_name">ChatAround</string>
     <string name="facebook_app_id">345387146134480</string>
     <string name="fb_login_protocol_scheme">fb345387146134480</string>
-
+    <string name="item1">Events</string>
+    <string name="item2">Settings</string>
+    <string name="sign_out">Sign out</string>
 </resources>

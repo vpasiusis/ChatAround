@@ -7,8 +7,10 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
@@ -26,6 +28,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import android.view.Menu;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,16 +44,45 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        Toolbar mainToolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        setSupportActionBar(mainToolbar);
         firebaseController = FirebaseController.getInstance();
         firebaseController.initialize();
         listView = findViewById(R.id.listview1);
         editText = findViewById(R.id.enterTextid);
-
         list = new ArrayList<>();
         adapter = new ListViewAdapter(this, list);
         listView.setAdapter(adapter);
         updateFeed();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.temporary_menu,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId()==R.id.item1){
+            Toast.makeText(MainActivity.this, "Sorry, not available yet..",
+                    Toast.LENGTH_SHORT).show();
+        }
+        if(item.getItemId()==R.id.item2) {
+            Toast.makeText(MainActivity.this, "Sorry, not available yet..",
+                    Toast.LENGTH_SHORT).show();
+        }
+        if(item.getItemId()==R.id.quit){
+            FirebaseAuth.getInstance().signOut();
+            LoginManager.getInstance().logOut();
+            Intent i = new Intent(this, LoginActivity.class); //if under this dialog you do not have your MainActivity
+            i.addFlags(i.FLAG_ACTIVITY_CLEAR_TOP);
+            i.addFlags(i.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(i);
+            finish();
+
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public void updateFeed(){
