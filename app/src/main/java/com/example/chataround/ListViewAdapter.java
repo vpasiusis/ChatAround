@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import java.util.List;
 
@@ -82,6 +83,14 @@ public class ListViewAdapter extends BaseExpandableListAdapter {
         } else {
             // message is empty, remove from view
             message.setVisibility(View.GONE);
+        }
+
+        ProgressBar progressBar = view.findViewById(R.id.progressBar);
+
+        if(item.getIsLoading()){
+            progressBar.setVisibility(View.VISIBLE);
+        }else{
+            progressBar.setVisibility(View.GONE);
         }
 
         // Check image
