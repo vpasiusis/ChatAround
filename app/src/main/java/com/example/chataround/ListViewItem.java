@@ -8,6 +8,7 @@ public class ListViewItem {
     private String id, name, message, time;
     private Bitmap image;
     private List<ListViewComment> comments;
+    private boolean isLoading=false;
 
     public ListViewItem(String id, String name, Bitmap image, String message, String time, List<ListViewComment> comments) {
         super();
@@ -41,6 +42,14 @@ public class ListViewItem {
 
     public void setImage(Bitmap image) {
         this.image = image;
+    }
+
+    public boolean getIsLoading(){
+        return isLoading;
+    }
+
+    public void setIsLoading(boolean value){
+        isLoading = value;
     }
 
     public String getMessage() {

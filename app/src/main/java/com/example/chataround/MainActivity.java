@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
@@ -20,6 +21,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.storage.StorageReference;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,11 +71,13 @@ public class MainActivity extends AppCompatActivity {
                     StorageReference ref = firebaseController.getMyStorage().child(message);
                     final long megabyte = 1024*1024;
                     final ListViewItem item1 = new ListViewItem(key,username1,null,message,time, comments);
+                    item1.setIsLoading(true);
                     ref.getBytes(megabyte).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                         @Override
                         public void onSuccess(byte[] bytes) {
                             Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                             item1.setImage(image);
+                            item1.setIsLoading(false);
                             adapter.notifyDataSetChanged();
                         }
                     });
