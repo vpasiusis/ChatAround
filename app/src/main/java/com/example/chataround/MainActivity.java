@@ -135,7 +135,15 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
             final Uri imageUri = data.getData();
-            firebaseController.sendImage(imageUri);
+            try{
+                InputStream imageStream = getContentResolver().openInputStream(imageUri);
+                Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                selectedImage = ImageController.ResizeImage(selectedImage,1300);
+                byte[] image = ImageController.BitmapToBytes(selectedImage);
+                firebaseController.sendImage(image);
+            }catch (FileNotFoundException e){
+                Log.d("Exception", e.getMessage());
+            }
         }
     }
 

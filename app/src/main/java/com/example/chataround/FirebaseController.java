@@ -62,13 +62,13 @@ public class FirebaseController {
         currentUserDB.setValue(newMessage);
     }
 
-    public void sendImage(Uri imageUri){
+    public void sendImage(byte[] image){
         String time = getTIme();
         String key1 = time+"__"+currentFirebaseUser.getEmail();
         final String key=key1.replace(".","");
 
         StorageReference file = myStorage.child(key);
-        file.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+        file.putBytes(image).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                 if(task.isSuccessful()){
