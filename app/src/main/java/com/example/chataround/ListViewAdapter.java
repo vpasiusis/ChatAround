@@ -1,21 +1,30 @@
 package com.example.chataround;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.storage.StorageReference;
+
 import java.util.List;
 
 public class ListViewAdapter extends BaseExpandableListAdapter {
     private Activity activity;
     private LayoutInflater inflater;
     private List<ListViewItem> itemList;
+    private FirebaseController firebaseController;
 
     public ListViewAdapter(Activity activity, List<ListViewItem> itemList){
         this.activity = activity;
@@ -70,9 +79,9 @@ public class ListViewAdapter extends BaseExpandableListAdapter {
         TextView time = view.findViewById(R.id.itemTime);
         TextView message = view.findViewById(R.id.itemMessage);
         ImageView image = view.findViewById(R.id.itemImage);
-
-        ListViewItem item = itemList.get(groupPosition);
-
+        Button deleteButton = view.findViewById(R.id.deleteButton);
+        final Context activity = view.getContext();
+        final ListViewItem item = itemList.get(groupPosition);
         name.setText(item.getName());
         time.setText(item.getTime());
 
@@ -100,8 +109,39 @@ public class ListViewAdapter extends BaseExpandableListAdapter {
         } else {
             image.setVisibility(View.GONE);
         }
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                android.app.AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                builder.setTitle("Delete message...");
+                builder.setMessage("Do you want to delete this message?");
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        firebaseController = FirebaseController.getInstance();
+                        firebaseController.initialize();
+                        firebaseController.getMyDatabase().child(item.getId()).removeValue();
+                        if(item.getImage()!=null) {
+                            firebaseController.getMyStorage().child(item.getId()).delete();
+                        }
+                        itemList.remove(item.getId());
+
+                    }
+                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                builder.show();
+            }
+        });
 
         return view;
+
+
+
+
     }
 
     @Override
@@ -122,6 +162,7 @@ public class ListViewAdapter extends BaseExpandableListAdapter {
 
         return view;
     }
+
 
     @Override
     public boolean hasStableIds() {

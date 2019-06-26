@@ -14,9 +14,16 @@
         android:layout_marginBottom="@dimen/feed_item_margin_top_bottom"
         android:orientation="vertical">
 
+        <Button
+            android:id="@+id/deleteButton"
+            android:layout_width="22dp"
+            android:layout_height="18dp"
+            android:layout_gravity="bottom|right"
+            android:background="@drawable/com_facebook_close" />
+
         <TextView
             android:id="@+id/itemName"
-            android:layout_width="fill_parent"
+            android:layout_width="648dp"
             android:layout_height="wrap_content"
             android:textSize="@dimen/feed_item_name"
             android:textStyle="bold" />
@@ -46,11 +53,13 @@
         <ImageView
             android:id="@+id/itemImage"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="267dp"
             android:background="@color/white"
+            android:paddingTop="@dimen/feed_item_padding_image"
             android:scaleType="fitCenter"
-            android:visibility="visible"
-            android:paddingTop="@dimen/feed_item_padding_image"/>
+            android:visibility="visible" />
+
+
     </LinearLayout>
 
 </LinearLayout>
