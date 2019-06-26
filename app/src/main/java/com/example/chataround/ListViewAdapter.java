@@ -130,7 +130,6 @@ public class ListViewAdapter extends BaseExpandableListAdapter {
                         firebaseController.initialize();
                         firebaseController.getMyDatabase().child(item.getId()).removeValue();
                         if(item.getImage()!=null) {
-                            System.out.println( item.getId());
                             StorageReference ref = firebaseController.getMyStorage().child(item.getMessage());
                             ref.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override

@@ -6,11 +6,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
@@ -19,7 +21,6 @@ import android.widget.ExpandableListView;
 import android.widget.Toast;
 
 import com.facebook.login.LoginManager;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private List<ListViewItem> list;
     private ListViewAdapter adapter;
     private int loadedItems = 0;
+    private Activity activity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,39 +58,34 @@ public class MainActivity extends AppCompatActivity {
         listView = findViewById(R.id.listview1);
         editText = findViewById(R.id.enterTextid);
         list = new ArrayList<>();
+        activity=MainActivity.this;
         adapter = new ListViewAdapter(this, list);
         listView.setAdapter(adapter);
-
-        Query query = firebaseController.getMyDatabase().orderByKey().limitToLast(20);
+        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
+        bottomNav.setOnNavigationItemSelectedListener(navListener);
+        Query query = firebaseController.getMyDatabase().orderByKey().limitToLast(10);
         loadItems(loadedItems, query);
-        loadedItems+=20;
+        loadedItems+=10;
         updateFeed();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.temporary_menu,menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.topbar_menu, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId()==R.id.item1){
-            Toast.makeText(MainActivity.this, "Sorry, not available yet..",
-                    Toast.LENGTH_SHORT).show();
+        if(item.getItemId()==R.id.postButton){
+           Intent intent = new Intent(this, PostingActivity.class);
+           startActivity(intent);
         }
-        if(item.getItemId()==R.id.item2) {
-            Toast.makeText(MainActivity.this, "Sorry, not available yet..",
-                    Toast.LENGTH_SHORT).show();
-        }
+
         if(item.getItemId()==R.id.quit){
-            FirebaseAuth.getInstance().signOut();
-            LoginManager.getInstance().logOut();
-            Intent i = new Intent(this, LoginActivity.class); //if under this dialog you do not have your MainActivity
-            i.addFlags(i.FLAG_ACTIVITY_CLEAR_TOP);
-            i.addFlags(i.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(i);
-            finish();
+            LogOffDialog logOffDialog = new LogOffDialog();
+            logOffDialog.show(getSupportFragmentManager(),"Log Off");
 
         }
         return super.onOptionsItemSelected(item);
@@ -105,9 +102,9 @@ public class MainActivity extends AppCompatActivity {
             public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 if(adapter.getGroupCount()==loadedItems && firstVisibleItem+visibleItemCount==totalItemCount){
                     String oldestItemTime = adapter.getItem(loadedItems-1).getTime();
-                    Query query = firebaseController.getMyDatabase().orderByKey().endAt(oldestItemTime).limitToLast(20);
+                    Query query = firebaseController.getMyDatabase().orderByKey().endAt(oldestItemTime).limitToLast(10);
                     loadItems(loadedItems, query);
-                    loadedItems+=20;
+                    loadedItems+=10;
                 }
             }
         });
@@ -128,14 +125,26 @@ public class MainActivity extends AppCompatActivity {
                 ListViewComment comment = new ListViewComment(null,null,"el comentario");
                 comments.add(comment);
 
-                final ListViewItem item = new ListViewItem(key,username1,null,message,time, comments);
+                final ListViewItem item1 = new ListViewItem(key,username1,null,message,time, comments);
 
                 if(type.equals("image")){
-                    getImage(item,message);
-                    list.add(start,item);
+                    StorageReference ref = firebaseController.getMyStorage().child(message);
+                    final long megabyte = 1024*1024;
+                    item1.setIsLoading(true);
+                    ref.getBytes(megabyte).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                        @Override
+                        public void onSuccess(byte[] bytes) {
+                            Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                            item1.setImage(image);
+                            item1.setIsLoading(false);
+                            adapter.notifyDataSetChanged();
+                        }
+                    });
+                    list.add(start,item1);
+
                     adapter.notifyDataSetChanged();
                 }else if(type.equals("message")){
-                    list.add(start,item);
+                    list.add(start,item1);
                     adapter.notifyDataSetChanged();
                 }
             }
@@ -147,7 +156,13 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-
+                for (int i = 0; i < list.size(); i++) {
+                    if (list.get(i).getId().equals(dataSnapshot.getKey())) {
+                        list.remove(i);
+                        break;
+                    }
+                }
+                adapter.notifyDataSetChanged();
             }
 
             @Override
@@ -172,26 +187,6 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "Empty message", Toast.LENGTH_SHORT).show();
         }
 
-    }
-
-    public void getImage(final ListViewItem item, final String message){
-        StorageReference ref = firebaseController.getMyStorage().child(message);
-        final long megabyte = 1024*1024;
-        item.setIsLoading(true);
-        ref.getBytes(megabyte).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-            @Override
-            public void onSuccess(byte[] bytes) {
-                Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                item.setImage(image);
-                item.setIsLoading(false);
-                adapter.notifyDataSetChanged();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                getImage(item,message);
-            }
-        });
     }
 
     public void uploadImage(View view){
@@ -235,6 +230,31 @@ public class MainActivity extends AppCompatActivity {
         }
         backPressedTime = System.currentTimeMillis();
     }
+    private BottomNavigationView.OnNavigationItemSelectedListener navListener =
+            new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    Activity selectedActivity = null;
+
+                    switch (item.getItemId()) {
+                        case R.id.nav_home:
+
+                            break;
+                        case R.id.nav_events:
+                            Intent intent1 = new Intent(activity, EventsActivity.class);
+                            startActivity(intent1);
+                            break;
+                        case R.id.nav_settings:
+                            Intent intent = new Intent(activity, SettingsActivity.class);
+                            startActivity(intent);
+                            break;
+                    }
+
+
+
+                    return true;
+                }
+            };
 
 
 }

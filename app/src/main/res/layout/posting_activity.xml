@@ -4,18 +4,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".MainActivity"
+    tools:context=".PostingActivity"
     android:background="@color/feed_bg">
 
 
     <android.support.v7.widget.Toolbar
-        android:id="@+id/main_toolbar"
+        android:id="@+id/posting_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/com_facebook_button_background_color_disabled"/>
 
+
+
+
+
     <EditText
-        android:id="@+id/enterTextid"
+        android:id="@+id/enterTextid2"
         android:layout_width="233dp"
         android:layout_height="wrap_content"
         android:layout_above="@+id/bottom_navigation"
@@ -42,7 +46,6 @@
         android:layout_marginStart="12dp"
         android:layout_marginLeft="12dp"
         android:layout_marginBottom="8dp"
-        android:onClick="uploadImage"
         android:text="+" />
 
     <Button
@@ -55,20 +58,7 @@
         android:layout_marginEnd="0dp"
         android:layout_marginRight="0dp"
         android:layout_marginBottom="5dp"
-        android:onClick="sendMessage"
         android:text="Send" />
-
-    <ExpandableListView
-        android:id="@+id/listview1"
-        android:layout_width="match_parent"
-        android:layout_height="551dp"
-        android:layout_above="@+id/enterTextid"
-        android:layout_below="@+id/main_toolbar"
-        android:layout_marginBottom="6dp"
-        android:childDivider="@color/feed_item_border"
-        android:divider="@color/feed_item_border"
-        android:dividerHeight="@dimen/feed_item_border_width"
-        android:groupIndicator="@null" />
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/bottom_navigation"
@@ -77,6 +67,26 @@
         android:layout_alignParentBottom="true"
         app:menu="@menu/bottom_menu"
         android:background="@color/com_facebook_button_background_color_disabled"/>
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="336dp"
+        android:layout_height="442dp"
+        android:layout_above="@+id/enterTextid2"
+        android:layout_below="@+id/posting_toolbar"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="40dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginTop="77dp"
+        android:layout_marginEnd="35dp"
+        android:layout_marginRight="35dp"
+        android:layout_marginBottom="43dp"
+        android:text="ARKA CIA TU TVARKAI BLET"
+        android:textSize="36sp"
+        android:textStyle="bold" />
 
 
 </RelativeLayout>
