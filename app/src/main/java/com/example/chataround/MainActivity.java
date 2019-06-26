@@ -12,7 +12,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
@@ -23,6 +23,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.Query;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.FileNotFoundException;
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseController firebaseController;
     private List<ListViewItem> list;
     private ListViewAdapter adapter;
+    private int loadedItems = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +57,9 @@ public class MainActivity extends AppCompatActivity {
         adapter = new ListViewAdapter(this, list);
         listView.setAdapter(adapter);
 
+        Query query = firebaseController.getMyDatabase().orderByKey().limitToLast(10);
+        loadItems(loadedItems, query);
+        loadedItems+=10;
         updateFeed();
     }
 
@@ -88,7 +93,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateFeed(){
-        firebaseController.getMyDatabase().addChildEventListener(new ChildEventListener() {
+        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView absListView, int i) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                if(adapter.getGroupCount()==loadedItems && firstVisibleItem+visibleItemCount==totalItemCount){
+                    String oldestItemTime = adapter.getItem(loadedItems-1).getTime();
+                    Query query = firebaseController.getMyDatabase().orderByKey().endAt(oldestItemTime).limitToLast(10);
+                    loadItems(loadedItems, query);
+                    loadedItems+=10;
+                }
+            }
+        });
+    }
+
+    public void loadItems(final int start, Query query) {
+        query.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dst, String s) {
                 final String key = dst.getKey();
@@ -102,10 +126,11 @@ public class MainActivity extends AppCompatActivity {
                 ListViewComment comment = new ListViewComment(null,null,"el comentario");
                 comments.add(comment);
 
+                final ListViewItem item1 = new ListViewItem(key,username1,null,message,time, comments);
+
                 if(type.equals("image")){
                     StorageReference ref = firebaseController.getMyStorage().child(message);
                     final long megabyte = 1024*1024;
-                    final ListViewItem item1 = new ListViewItem(key,username1,null,message,time, comments);
                     item1.setIsLoading(true);
                     ref.getBytes(megabyte).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                         @Override
@@ -116,23 +141,29 @@ public class MainActivity extends AppCompatActivity {
                             adapter.notifyDataSetChanged();
                         }
                     });
-                    list.add(item1);
+                    list.add(start,item1);
+
                     adapter.notifyDataSetChanged();
                 }else if(type.equals("message")){
-                    ListViewItem item1 = new ListViewItem(key,username1,null,message,time, comments);
-                    list.add(item1);
+                    list.add(start,item1);
                     adapter.notifyDataSetChanged();
                 }
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                adapter.notifyDataSetChanged();
+
             }
 
             @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
+            public void onChildRemoved(DataSnapshot dataSnapshot) {/*
+                for (int i = 0; i < list.size(); i++) {
+                    if (list.get(i).getId().equals(dataSnapshot.getKey())) {
+                        list.remove(i);
+                        break;
+                    }
+                }
+                list.remove(dataSnapshot.getChildren().iterator());*/
                 adapter.notifyDataSetChanged();
             }
 

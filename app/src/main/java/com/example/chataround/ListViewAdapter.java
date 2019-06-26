@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +15,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.storage.StorageReference;
 
@@ -45,6 +49,10 @@ public class ListViewAdapter extends BaseExpandableListAdapter {
 
     @Override
     public Object getGroup(int groupPosition) {
+        return itemList.get(groupPosition);
+    }
+
+    public ListViewItem getItem(int groupPosition){
         return itemList.get(groupPosition);
     }
 
@@ -122,9 +130,25 @@ public class ListViewAdapter extends BaseExpandableListAdapter {
                         firebaseController.initialize();
                         firebaseController.getMyDatabase().child(item.getId()).removeValue();
                         if(item.getImage()!=null) {
-                            firebaseController.getMyStorage().child(item.getId()).delete();
+                            System.out.println( item.getId());
+                            StorageReference ref = firebaseController.getMyStorage();
+                            StorageReference desertRef = ref.child(item.getMessage());
+                            desertRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception exception) {
+                                    Toast.makeText(activity, "Error deleting an image", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
                         }
-                        itemList.remove(item.getId());
+                        itemList.remove(item);
+                        notifyDataSetChanged();
+
 
                     }
                 }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
