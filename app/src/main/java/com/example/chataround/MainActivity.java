@@ -13,7 +13,6 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -38,8 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseController firebaseController;
     private List<ListViewItem> list;
     private ListViewAdapter adapter;
-    private int lastItemNumber = 10;
-    private String lastItemTime="2019-06-24 15:00:44";
+    private int loadedItems = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,11 +52,33 @@ public class MainActivity extends AppCompatActivity {
         list = new ArrayList<>();
         adapter = new ListViewAdapter(this, list);
         listView.setAdapter(adapter);
-        loadItems(0, 20);
+
+        Query query = firebaseController.getMyDatabase().orderByKey().limitToLast(10);
+        loadItems(loadedItems, query);
+        loadedItems+=10;
+        updateFeed();
     }
 
-    public void loadItems(final int start, int amount) {
-        Query query = firebaseController.getMyDatabase().orderByKey().limitToLast(amount);
+    public void updateFeed(){
+        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView absListView, int i) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                if(adapter.getGroupCount()==loadedItems && firstVisibleItem+visibleItemCount==totalItemCount){
+                    String oldestItemTime = adapter.getItem(loadedItems-1).getTime();
+                    Query query = firebaseController.getMyDatabase().orderByKey().endAt(oldestItemTime).limitToLast(10);
+                    loadItems(loadedItems, query);
+                    loadedItems+=10;
+                }
+            }
+        });
+    }
+
+    public void loadItems(final int start, Query query) {
         query.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dst, String s) {
@@ -73,10 +93,11 @@ public class MainActivity extends AppCompatActivity {
                 ListViewComment comment = new ListViewComment(null,null,"el comentario");
                 comments.add(comment);
 
+                final ListViewItem item1 = new ListViewItem(key,username1,null,message,time, comments);
+
                 if(type.equals("image")){
                     StorageReference ref = firebaseController.getMyStorage().child(message);
                     final long megabyte = 1024*1024;
-                    final ListViewItem item1 = new ListViewItem(key,username1,null,message,time, comments);
                     item1.setIsLoading(true);
                     ref.getBytes(megabyte).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                         @Override
@@ -90,7 +111,6 @@ public class MainActivity extends AppCompatActivity {
                     list.add(start,item1);
                     adapter.notifyDataSetChanged();
                 }else if(type.equals("message")){
-                    ListViewItem item1 = new ListViewItem(key,username1,null,message,time, comments);
                     list.add(start,item1);
                     adapter.notifyDataSetChanged();
                 }
