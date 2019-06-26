@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -18,6 +19,7 @@ import android.widget.ExpandableListView;
 import android.widget.Toast;
 
 import com.facebook.login.LoginManager;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -57,9 +59,9 @@ public class MainActivity extends AppCompatActivity {
         adapter = new ListViewAdapter(this, list);
         listView.setAdapter(adapter);
 
-        Query query = firebaseController.getMyDatabase().orderByKey().limitToLast(10);
+        Query query = firebaseController.getMyDatabase().orderByKey().limitToLast(20);
         loadItems(loadedItems, query);
-        loadedItems+=10;
+        loadedItems+=20;
         updateFeed();
     }
 
@@ -103,9 +105,9 @@ public class MainActivity extends AppCompatActivity {
             public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 if(adapter.getGroupCount()==loadedItems && firstVisibleItem+visibleItemCount==totalItemCount){
                     String oldestItemTime = adapter.getItem(loadedItems-1).getTime();
-                    Query query = firebaseController.getMyDatabase().orderByKey().endAt(oldestItemTime).limitToLast(10);
+                    Query query = firebaseController.getMyDatabase().orderByKey().endAt(oldestItemTime).limitToLast(20);
                     loadItems(loadedItems, query);
-                    loadedItems+=10;
+                    loadedItems+=20;
                 }
             }
         });
@@ -126,26 +128,14 @@ public class MainActivity extends AppCompatActivity {
                 ListViewComment comment = new ListViewComment(null,null,"el comentario");
                 comments.add(comment);
 
-                final ListViewItem item1 = new ListViewItem(key,username1,null,message,time, comments);
+                final ListViewItem item = new ListViewItem(key,username1,null,message,time, comments);
 
                 if(type.equals("image")){
-                    StorageReference ref = firebaseController.getMyStorage().child(message);
-                    final long megabyte = 1024*1024;
-                    item1.setIsLoading(true);
-                    ref.getBytes(megabyte).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                        @Override
-                        public void onSuccess(byte[] bytes) {
-                            Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                            item1.setImage(image);
-                            item1.setIsLoading(false);
-                            adapter.notifyDataSetChanged();
-                        }
-                    });
-                    list.add(start,item1);
-
+                    getImage(item,message);
+                    list.add(start,item);
                     adapter.notifyDataSetChanged();
                 }else if(type.equals("message")){
-                    list.add(start,item1);
+                    list.add(start,item);
                     adapter.notifyDataSetChanged();
                 }
             }
@@ -156,15 +146,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {/*
-                for (int i = 0; i < list.size(); i++) {
-                    if (list.get(i).getId().equals(dataSnapshot.getKey())) {
-                        list.remove(i);
-                        break;
-                    }
-                }
-                list.remove(dataSnapshot.getChildren().iterator());*/
-                adapter.notifyDataSetChanged();
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
             }
 
             @Override
@@ -189,6 +172,26 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "Empty message", Toast.LENGTH_SHORT).show();
         }
 
+    }
+
+    public void getImage(final ListViewItem item, final String message){
+        StorageReference ref = firebaseController.getMyStorage().child(message);
+        final long megabyte = 1024*1024;
+        item.setIsLoading(true);
+        ref.getBytes(megabyte).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                item.setImage(image);
+                item.setIsLoading(false);
+                adapter.notifyDataSetChanged();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                getImage(item,message);
+            }
+        });
     }
 
     public void uploadImage(View view){

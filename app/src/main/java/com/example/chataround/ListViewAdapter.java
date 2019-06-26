@@ -131,9 +131,8 @@ public class ListViewAdapter extends BaseExpandableListAdapter {
                         firebaseController.getMyDatabase().child(item.getId()).removeValue();
                         if(item.getImage()!=null) {
                             System.out.println( item.getId());
-                            StorageReference ref = firebaseController.getMyStorage();
-                            StorageReference desertRef = ref.child(item.getMessage());
-                            desertRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            StorageReference ref = firebaseController.getMyStorage().child(item.getMessage());
+                            ref.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
 
@@ -148,8 +147,6 @@ public class ListViewAdapter extends BaseExpandableListAdapter {
                         }
                         itemList.remove(item);
                         notifyDataSetChanged();
-
-
                     }
                 }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
@@ -162,10 +159,6 @@ public class ListViewAdapter extends BaseExpandableListAdapter {
         });
 
         return view;
-
-
-
-
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.example.chataround;
 
-import android.net.Uri;
 import android.support.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -68,14 +67,8 @@ public class FirebaseController {
         final String key=key1.replace(".","");
 
         StorageReference file = myStorage.child(key);
-        file.putBytes(image).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                if(task.isSuccessful()){
-                    sendMessage(key, "image");
-                }
-            }
-        });
+        sendMessage(key, "image");
+        file.putBytes(image);
     }
 
     public String getTIme(){
