@@ -1,0 +1,78 @@
+package com.example.chataround;
+
+import android.graphics.Bitmap;
+
+import java.util.List;
+
+public class ListViewItem {
+    private String id, name, message, time;
+    private Bitmap image;
+    private List<ListViewComment> comments;
+    private boolean isLoading=false;
+
+    public ListViewItem(String id, String name, Bitmap image, String message, String time, List<ListViewComment> comments) {
+        super();
+        this.id = id;
+        this.name = name;
+        this.image = image;
+        this.message = message;
+        this.time = time;
+        this.comments = comments;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Bitmap getImage() {
+        return image;
+    }
+
+    public void setImage(Bitmap image) {
+        this.image = image;
+    }
+
+    public boolean getIsLoading(){
+        return isLoading;
+    }
+
+    public void setIsLoading(boolean value){
+        isLoading = value;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public List<ListViewComment> getComments(){
+        return comments;
+    }
+
+    public void setComments(List<ListViewComment> comments){
+        this.comments = comments;
+    }
+}

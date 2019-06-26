@@ -1,68 +1,158 @@
 package com.example.chataround;
 
+import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Color;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
+import android.widget.AbsListView;
 import android.widget.EditText;
-import android.widget.ListView;
+import android.widget.ExpandableListView;
 import android.widget.Toast;
 
+import com.facebook.login.LoginManager;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.Query;
+import com.google.firebase.storage.StorageReference;
 
-import java.text.DateFormat;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.List;
+import android.view.Menu;
 
 public class MainActivity extends AppCompatActivity {
 
-    private DatabaseReference myDatabase;
     private EditText editText;
-    private ArrayList<String> arrayList = new ArrayList<>();
-    private ListView listView;
+    private ExpandableListView listView;
     private long backPressedTime;
     private Toast backToast;
-    private FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser() ;
+    private FirebaseController firebaseController;
+    private List<ListViewItem> list;
+    private ListViewAdapter adapter;
+    private int loadedItems = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this,android.R.layout.simple_list_item_1, arrayList);
-
-
-
-        myDatabase = FirebaseDatabase.getInstance().getReference("Messages");
+        Toolbar mainToolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        setSupportActionBar(mainToolbar);
+        firebaseController = FirebaseController.getInstance();
+        firebaseController.initialize();
         listView = findViewById(R.id.listview1);
         editText = findViewById(R.id.enterTextid);
-        listView.setAdapter(arrayAdapter);
-        myDatabase.addValueEventListener(new ValueEventListener() {
+        list = new ArrayList<>();
+        adapter = new ListViewAdapter(this, list);
+        listView.setAdapter(adapter);
+
+        Query query = firebaseController.getMyDatabase().orderByKey().limitToLast(20);
+        loadItems(loadedItems, query);
+        loadedItems+=20;
+        updateFeed();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.temporary_menu,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId()==R.id.item1){
+            Toast.makeText(MainActivity.this, "Sorry, not available yet..",
+                    Toast.LENGTH_SHORT).show();
+        }
+        if(item.getItemId()==R.id.item2) {
+            Toast.makeText(MainActivity.this, "Sorry, not available yet..",
+                    Toast.LENGTH_SHORT).show();
+        }
+        if(item.getItemId()==R.id.quit){
+            FirebaseAuth.getInstance().signOut();
+            LoginManager.getInstance().logOut();
+            Intent i = new Intent(this, LoginActivity.class); //if under this dialog you do not have your MainActivity
+            i.addFlags(i.FLAG_ACTIVITY_CLEAR_TOP);
+            i.addFlags(i.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(i);
+            finish();
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void updateFeed(){
+        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                arrayAdapter.clear();
-                arrayList.clear();
-                listView.clearChoices();
-                for (DataSnapshot dst : dataSnapshot.getChildren()) {
+            public void onScrollStateChanged(AbsListView absListView, int i) {
 
-                    String message = dst.child("message").getValue(String.class);
-                    String username1 = dst.child("username").getValue(String.class);
-                    String time = dst.child("time").getValue(String.class);
+            }
 
-                    if(message!=null&&username1!=null&&time!=null) {
-                        arrayList.add(time + "\n" + username1 + "\n" + message);
-                        arrayAdapter.notifyDataSetChanged();
-                    }
+            @Override
+            public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                if(adapter.getGroupCount()==loadedItems && firstVisibleItem+visibleItemCount==totalItemCount){
+                    String oldestItemTime = adapter.getItem(loadedItems-1).getTime();
+                    Query query = firebaseController.getMyDatabase().orderByKey().endAt(oldestItemTime).limitToLast(20);
+                    loadItems(loadedItems, query);
+                    loadedItems+=20;
                 }
+            }
+        });
+    }
+
+    public void loadItems(final int start, Query query) {
+        query.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dst, String s) {
+                final String key = dst.getKey();
+                final String message = dst.child("message").getValue(String.class);
+                final String username1 = dst.child("username").getValue(String.class);
+                final String time = dst.child("time").getValue(String.class);
+                final String type = dst.child("type").getValue(String.class);
+
+                //comments to be added to this list
+                final List<ListViewComment> comments = new ArrayList<>();
+                ListViewComment comment = new ListViewComment(null,null,"el comentario");
+                comments.add(comment);
+
+                final ListViewItem item = new ListViewItem(key,username1,null,message,time, comments);
+
+                if(type.equals("image")){
+                    getImage(item,message);
+                    list.add(start,item);
+                    adapter.notifyDataSetChanged();
+                }else if(type.equals("message")){
+                    list.add(start,item);
+                    adapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
             }
 
             @Override
@@ -70,22 +160,12 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
     }
 
     public void sendMessage(View view) {
-        String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
-        currentDateTimeString = currentDateTimeString.replaceAll("\\s+", " ");
         String text = editText.getText().toString().trim();
-        String username= currentFirebaseUser.getEmail();
         if(!TextUtils.isEmpty(text)) {
-            String newMessageId  = currentDateTimeString+"__"+username;
-            newMessageId=newMessageId.replace(".","");
-            DatabaseReference currentUserDB = myDatabase.child(newMessageId);
-            currentUserDB.child("username").setValue(username);
-            currentUserDB.child("message").setValue(text);
-            currentUserDB.child("type").setValue("Unknown");
-            currentUserDB.child("time").setValue(currentDateTimeString);
+            firebaseController.sendMessage(text,"message");
             editText.setText("");
         }else{
             //check
@@ -93,18 +173,64 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
+    public void getImage(final ListViewItem item, final String message){
+        StorageReference ref = firebaseController.getMyStorage().child(message);
+        final long megabyte = 1024*1024;
+        item.setIsLoading(true);
+        ref.getBytes(megabyte).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                item.setImage(image);
+                item.setIsLoading(false);
+                adapter.notifyDataSetChanged();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                getImage(item,message);
+            }
+        });
+    }
+
+    public void uploadImage(View view){
+        Intent i = new Intent(Intent.ACTION_PICK);
+        i.setType("image/*");
+        startActivityForResult(i, 1);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
+            final Uri imageUri = data.getData();
+            try{
+                InputStream imageStream = getContentResolver().openInputStream(imageUri);
+                Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                selectedImage = ImageController.ResizeImage(selectedImage,1300);
+                byte[] image = ImageController.BitmapToBytes(selectedImage);
+                firebaseController.sendImage(image);
+            }catch (FileNotFoundException e){
+                Log.d("Exception", e.getMessage());
+            }
+        }
+    }
+
     @Override
     public void onBackPressed() {
         if (backPressedTime + 1000 > System.currentTimeMillis() ) {
             backToast.cancel();
             FirebaseAuth.getInstance().signOut();
+            LoginManager.getInstance().logOut();
             Intent i = new Intent(this, LoginActivity.class); //if under this dialog you do not have your MainActivity
             i.addFlags(i.FLAG_ACTIVITY_CLEAR_TOP);
             i.addFlags(i.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(i);
+            finish();
             return;
         } else {
-            backToast = Toast.makeText(getBaseContext(), "Paspauskite dar kartą, jog išeiti", Toast.LENGTH_SHORT);
+            backToast = Toast.makeText(getBaseContext(), "Press one more time to exit", Toast.LENGTH_SHORT);
             backToast.show();
         }
         backPressedTime = System.currentTimeMillis();

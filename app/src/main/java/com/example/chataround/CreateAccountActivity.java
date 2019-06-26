@@ -42,10 +42,8 @@ public class CreateAccountActivity extends AppCompatActivity {
     private String Type = "";
     private Button Create;
     private FirebaseAuth mAuth;
-    private Spinner spinner;
     private ProgressDialog mProgress;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    private static final String[] paths = {"Pasirinkti", "Cecho vadovas", "Administratorius", "Inžinierius"};
 
 
     @Override
@@ -64,8 +62,7 @@ public class CreateAccountActivity extends AppCompatActivity {
                 startRegister();
             }
         });
-        getSupportActionBar().setTitle("Register");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
     }
     @Override
     protected void onStart() {
