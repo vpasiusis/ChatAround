@@ -5,8 +5,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -15,7 +13,6 @@ import android.widget.Toast;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 
 import java.util.ArrayList;
@@ -55,9 +52,57 @@ public class CommentsActivity extends AppCompatActivity {
         time.setText(item.getTime());
         user.setText(item.getName());
 
+        loadComments();
+    }
+
+    public void loadComments(){
+        Query query = firebaseController.getMyDatabase().child("Comments").orderByKey();
+        query.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dst, String s) {
+                final String postId = dst.child("postId").getValue(String.class);
+                if(postId.equals(item.getId())){
+                    final String key = dst.getKey();
+                    final String message = dst.child("message").getValue(String.class);
+                    final String username = dst.child("username").getValue(String.class);
+                    final String time = dst.child("time").getValue(String.class);
+
+                    ListViewComment comment = new ListViewComment(key,username,message,time);
+                    comments.add(comment);
+                    adapter.notifyDataSetChanged();
+                }
+            }
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     public void sendComment(View view) {
+        String text = editMessage.getText().toString().trim();
+        if(!TextUtils.isEmpty(text)) {
+            firebaseController.sendComment(text,item.getId());
+            editMessage.setText("");
+        }else{
+            //check
+            Toast.makeText(CommentsActivity.this, "Empty message", Toast.LENGTH_SHORT).show();
+        }
 
     }
 }

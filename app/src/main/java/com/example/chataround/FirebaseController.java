@@ -1,17 +1,11 @@
 package com.example.chataround;
 
-import android.support.annotation.NonNull;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
-
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -58,6 +52,20 @@ public class FirebaseController {
 
         DatabaseReference currentUserDB = myDatabase.child("Messages").child(key);
         currentUserDB.setValue(newMessage);
+    }
+
+    public void sendComment(String message, String postId){
+        String time = getTime();
+        String key = getKey(time);
+
+        Map<String, Object> newMessage = new HashMap<>();
+        newMessage.put("message", message);
+        newMessage.put("time", time);
+        newMessage.put("username", currentFirebaseUser.getEmail());
+        newMessage.put("postId", postId);
+
+        DatabaseReference currentUserDb = myDatabase.child("Comments").child(key);
+        currentUserDb.setValue(newMessage);
     }
 
     public void sendImage(byte[] image){
