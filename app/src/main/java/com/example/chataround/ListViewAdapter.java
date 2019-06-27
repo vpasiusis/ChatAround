@@ -4,13 +4,12 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseExpandableListAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -19,12 +18,11 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.List;
 
-public class ListViewAdapter extends BaseExpandableListAdapter {
+public class ListViewAdapter extends BaseAdapter {
     private Activity activity;
     private LayoutInflater inflater;
     private List<ListViewItem> itemList;
@@ -36,45 +34,24 @@ public class ListViewAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public int getGroupCount() {
+    public int getCount() {
         return itemList.size();
     }
 
     @Override
-    public int getChildrenCount(int groupPosition) {
+    public Object getItem(int i) {
+        return itemList.get(i);
+    }
 
-        List<ListViewComment> comments = itemList.get(groupPosition).getComments();
-        return comments.size();
+    public ListViewItem getListViewItem(int i){ return itemList.get(i); }
+
+    @Override
+    public long getItemId(int i) {
+        return i;
     }
 
     @Override
-    public Object getGroup(int groupPosition) {
-        return itemList.get(groupPosition);
-    }
-
-    public ListViewItem getItem(int groupPosition){
-        return itemList.get(groupPosition);
-    }
-
-    @Override
-    public Object getChild(int groupPosition, int childPosition) {
-        List<ListViewComment> comments = itemList.get(groupPosition).getComments();
-        return comments.get(childPosition);
-    }
-
-    @Override
-    public long getGroupId(int groupPosition) {
-        return groupPosition;
-    }
-
-    @Override
-    public long getChildId(int groupPosition, int childPosition) {
-        return childPosition;
-    }
-
-    @Override
-    public View getGroupView(int groupPosition, boolean isLastChild, View view,
-                             ViewGroup parent) {
+    public View getView(int i, View view, ViewGroup viewGroup) {
 
         if (inflater == null){
             inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -89,7 +66,7 @@ public class ListViewAdapter extends BaseExpandableListAdapter {
         ImageView image = view.findViewById(R.id.itemImage);
         Button deleteButton = view.findViewById(R.id.deleteButton);
         final Context activity = view.getContext();
-        final ListViewItem item = itemList.get(groupPosition);
+        final ListViewItem item = itemList.get(i);
         name.setText(item.getName());
         time.setText(item.getTime());
 
@@ -158,35 +135,5 @@ public class ListViewAdapter extends BaseExpandableListAdapter {
         });
 
         return view;
-    }
-
-    @Override
-    public View getChildView(int groupPosition, int childPosition, boolean isLastChild,
-                             View view, ViewGroup parent) {
-
-        if (inflater == null){
-            inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        }
-        if (view == null){
-            view = inflater.inflate(R.layout.listview_comment, null);
-        }
-
-        ListViewComment comment = itemList.get(groupPosition).getComments().get(childPosition);
-
-        TextView comment1 = view.findViewById(R.id.comment);
-        comment1.setText(comment.getMessage());
-
-        return view;
-    }
-
-
-    @Override
-    public boolean hasStableIds() {
-        return true;
-    }
-
-    @Override
-    public boolean isChildSelectable(int groupPosition, int childPosition) {
-        return true;
     }
 }

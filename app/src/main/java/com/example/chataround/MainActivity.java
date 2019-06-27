@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.facebook.login.LoginManager;
@@ -38,7 +39,7 @@ import android.view.Menu;
 public class MainActivity extends AppCompatActivity {
 
     private EditText editText;
-    private ExpandableListView listView;
+    private ListView listView;
     private long backPressedTime;
     private Toast backToast;
     private FirebaseController firebaseController;
@@ -100,8 +101,8 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                if(adapter.getGroupCount()==loadedItems && firstVisibleItem+visibleItemCount==totalItemCount){
-                    String oldestItemTime = adapter.getItem(loadedItems-1).getTime();
+                if(adapter.getCount()==loadedItems && firstVisibleItem+visibleItemCount==totalItemCount){
+                    String oldestItemTime = adapter.getListViewItem(loadedItems-1).getTime();
                     Query query = firebaseController.getMyDatabase().orderByKey().endAt(oldestItemTime).limitToLast(10);
                     loadItems(loadedItems, query);
                     loadedItems+=10;

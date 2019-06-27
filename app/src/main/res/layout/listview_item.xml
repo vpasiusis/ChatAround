@@ -19,6 +19,8 @@
             android:layout_width="22dp"
             android:layout_height="18dp"
             android:layout_gravity="bottom|right"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
             android:background="@drawable/com_facebook_close" />
 
         <TextView
