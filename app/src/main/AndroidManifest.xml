@@ -16,6 +16,9 @@
             android:name=".MainActivity"
             android:screenOrientation="portrait"></activity>
         <activity
+            android:name=".CommentsActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity
             android:name=".CreateAccountActivity"
             android:screenOrientation="portrait"></activity>
         <activity

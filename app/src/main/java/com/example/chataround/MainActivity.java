@@ -16,8 +16,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.ExpandableListView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -52,22 +52,34 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         Toolbar mainToolbar = (Toolbar) findViewById(R.id.main_toolbar);
-        setSupportActionBar(mainToolbar);
-        firebaseController = FirebaseController.getInstance();
-        firebaseController.initialize();
         listView = findViewById(R.id.listview1);
         editText = findViewById(R.id.enterTextid);
+        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
+
+        firebaseController = FirebaseController.getInstance();
+        firebaseController.initialize();
+        setSupportActionBar(mainToolbar);
         list = new ArrayList<>();
         activity=MainActivity.this;
         adapter = new ListViewAdapter(this, list);
         listView.setAdapter(adapter);
-        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
+
         Query query = firebaseController.getMyDatabase().orderByKey().limitToLast(10);
         loadItems(loadedItems, query);
         loadedItems+=10;
         updateFeed();
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intent = new Intent(MainActivity.this, CommentsActivity.class);
+                intent.putExtra("Item", adapter.getListViewItem(i));
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -124,7 +136,9 @@ public class MainActivity extends AppCompatActivity {
                 //comments to be added to this list
                 final List<ListViewComment> comments = new ArrayList<>();
                 ListViewComment comment = new ListViewComment(null,null,"el comentario");
+                ListViewComment comment1 = new ListViewComment(null,null,"el mensaje");
                 comments.add(comment);
+                comments.add(comment1);
 
                 final ListViewItem item1 = new ListViewItem(key,username1,null,message,time, comments);
 

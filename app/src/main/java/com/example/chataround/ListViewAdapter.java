@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -59,7 +61,6 @@ public class ListViewAdapter extends BaseAdapter {
         if (view == null){
             view = inflater.inflate(R.layout.listview_item, null);
         }
-
         TextView name = view.findViewById(R.id.itemName);
         TextView time = view.findViewById(R.id.itemTime);
         TextView message = view.findViewById(R.id.itemMessage);
@@ -94,6 +95,7 @@ public class ListViewAdapter extends BaseAdapter {
         } else {
             image.setVisibility(View.GONE);
         }
+
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

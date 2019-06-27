@@ -2,9 +2,10 @@ package com.example.chataround;
 
 import android.graphics.Bitmap;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class ListViewItem {
+public class ListViewItem implements Serializable {
     private String id, name, message, time;
     private Bitmap image;
     private List<ListViewComment> comments;

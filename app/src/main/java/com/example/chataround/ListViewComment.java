@@ -1,6 +1,8 @@
 package com.example.chataround;
 
-public class ListViewComment {
+import java.io.Serializable;
+
+public class ListViewComment implements Serializable {
     private String name, message, id;
 
     public ListViewComment(String id, String name, String message){
