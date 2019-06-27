@@ -24,13 +24,13 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.List;
 
-public class ListViewAdapter extends BaseAdapter {
+public class ItemAdapter extends BaseAdapter {
     private Activity activity;
     private LayoutInflater inflater;
     private List<ListViewItem> itemList;
     private FirebaseController firebaseController;
 
-    public ListViewAdapter(Activity activity, List<ListViewItem> itemList){
+    public ItemAdapter(Activity activity, List<ListViewItem> itemList){
         this.activity = activity;
         this.itemList = itemList;
     }

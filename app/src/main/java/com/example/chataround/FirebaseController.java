@@ -34,7 +34,7 @@ public class FirebaseController {
 
     public void initialize(){
         currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        myDatabase = FirebaseDatabase.getInstance().getReference("Messages");
+        myDatabase = FirebaseDatabase.getInstance().getReference();
         myStorage = FirebaseStorage.getInstance().getReference().child("Messages");
     }
 
@@ -47,9 +47,8 @@ public class FirebaseController {
     }
 
     public void sendMessage(String message, String type){
-        String time = getTIme();
-        String key = time + "__" + currentFirebaseUser.getEmail();
-        key=key.replace(".","");
+        String time = getTime();
+        String key = getKey(time);
 
         Map<String, Object> newMessage = new HashMap<>();
         newMessage.put("message", message);
@@ -57,24 +56,29 @@ public class FirebaseController {
         newMessage.put("time", time);
         newMessage.put("username", currentFirebaseUser.getEmail());
 
-        DatabaseReference currentUserDB = myDatabase.child(key);
+        DatabaseReference currentUserDB = myDatabase.child("Messages").child(key);
         currentUserDB.setValue(newMessage);
     }
 
     public void sendImage(byte[] image){
-        String time = getTIme();
-        String key1 = time+"__"+currentFirebaseUser.getEmail();
-        final String key=key1.replace(".","");
+        String time = getTime();
+        String key = getKey(time);
 
         StorageReference file = myStorage.child(key);
         sendMessage(key, "image");
         file.putBytes(image);
     }
 
-    public String getTIme(){
+    public String getTime(){
         Calendar c = Calendar.getInstance();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String date = df.format(c.getTime());
-        return date;
+        String time = df.format(c.getTime());
+        return time;
+    }
+
+    public String getKey(String time){
+        String key = time + "__" + currentFirebaseUser.getEmail();
+        key=key.replace(".","");
+        return key;
     }
 }

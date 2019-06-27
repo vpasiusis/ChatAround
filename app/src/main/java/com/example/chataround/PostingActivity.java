@@ -83,5 +83,37 @@ public class PostingActivity extends AppCompatActivity {
                 }
             };
 
+    /*public void sendMessage(View view) {
+        String text = editText.getText().toString().trim();
+        if(!TextUtils.isEmpty(text)) {
+            firebaseController.sendMessage(text,"message");
+            editText.setText("");
+        }else{
+            //check
+            Toast.makeText(MainActivity.this, "Empty message", Toast.LENGTH_SHORT).show();
+        }
 
+    }
+    public void uploadImage(View view){
+        Intent i = new Intent(Intent.ACTION_PICK);
+        i.setType("image/*");
+        startActivityForResult(i, 1);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
+            final Uri imageUri = data.getData();
+            try{
+                InputStream imageStream = getContentResolver().openInputStream(imageUri);
+                Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                selectedImage = ImageController.ResizeImage(selectedImage,1300);
+                byte[] image = ImageController.BitmapToBytes(selectedImage);
+                firebaseController.sendImage(image);
+            }catch (FileNotFoundException e){
+                Log.d("Exception", e.getMessage());
+            }
+        }
+    }*/
 }
