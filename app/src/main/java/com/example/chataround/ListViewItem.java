@@ -7,12 +7,13 @@ import java.util.List;
 
 public class ListViewItem implements Serializable {
     private String id, name, message, time,imageId;
+    private int comments, likes;
     private Bitmap image;
     private boolean isLoading=false;
 
 
 
-    public ListViewItem(String id, String name, Bitmap image, String message, String imageId, String time) {
+    public ListViewItem(String id, String name, Bitmap image, String message, String imageId, String time, int comments, int likes) {
         super();
         this.id = id;
         this.name = name;
@@ -20,6 +21,7 @@ public class ListViewItem implements Serializable {
         this.message = message;
         this.imageId = imageId;
         this.time = time;
+        this.comments = comments;
     }
     public String getImageId() {
         return imageId;
@@ -77,4 +79,19 @@ public class ListViewItem implements Serializable {
         this.time = time;
     }
 
+    public void setComments(int comments){
+        this.comments = comments;
+    }
+
+    public int getComments(){
+        return comments;
+    }
+
+    public void setLikes(int likes){
+        this.likes = likes;
+    }
+
+    public int getLikes(){
+        return likes;
+    }
 }

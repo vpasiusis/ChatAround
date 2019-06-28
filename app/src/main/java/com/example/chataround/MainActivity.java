@@ -125,24 +125,35 @@ public class MainActivity extends AppCompatActivity {
                 final String imageId = dst.child("imageId").getValue(String.class);
                 final String username1 = dst.child("username").getValue(String.class);
                 final String time = dst.child("time").getValue(String.class);
-                final String type = dst.child("type").getValue(String.class);
+                final int commentCount = dst.child("comments").getValue(Integer.class);
+                final int likeCount = dst.child("likes").getValue(Integer.class);
 
-                final ListViewItem item1 = new ListViewItem(key,username1,null,message,imageId,time);
+                final ListViewItem item1 = new ListViewItem(key,username1,
+                        null,message,imageId,time,commentCount, likeCount);
 
-                if(type.equals("image")){
+                if(imageId!=null){
                     getImage(item1,imageId);
                     list.add(start,item1);
-
                     adapter.notifyDataSetChanged();
-                }else if(type.equals("message")){
+                }else{
                     list.add(start,item1);
                     adapter.notifyDataSetChanged();
                 }
             }
 
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
+            public void onChildChanged(DataSnapshot dst, String s) {
+                final String key = dst.getKey();
+                final int commentCount = dst.child("comments").getValue(Integer.class);
+                final int likeCount = dst.child("likes").getValue(Integer.class);
+                for(int i = 0; i< list.size();i++){
+                    if(list.get(i).getId().equals(key)){
+                        ListViewItem item = list.get(i);
+                        item.setComments(commentCount);
+                        item.setLikes(likeCount);
+                        adapter.notifyDataSetChanged();
+                    }
+                }
             }
 
             @Override

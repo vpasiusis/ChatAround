@@ -100,7 +100,7 @@ public class PostingActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, MainActivity.class);
                 startActivity(intent);
             } else {
-                firebaseController.sendMessage(text, "message", "NoPicture");
+                firebaseController.sendMessage(text, null);
                 editPostText.setText("");
                 Intent intent = new Intent(this, MainActivity.class);
                 startActivity(intent);

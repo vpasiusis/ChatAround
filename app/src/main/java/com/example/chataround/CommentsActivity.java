@@ -97,7 +97,7 @@ public class CommentsActivity extends AppCompatActivity {
     public void sendComment(View view) {
         String text = editMessage.getText().toString().trim();
         if(!TextUtils.isEmpty(text)) {
-            firebaseController.sendComment(text,item.getId());
+            firebaseController.sendComment(text,item.getId(), item.getComments());
             editMessage.setText("");
         }else{
             //check

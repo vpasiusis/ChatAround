@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -20,9 +21,12 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ItemAdapter extends BaseAdapter {
     private Activity activity;
@@ -64,12 +68,18 @@ public class ItemAdapter extends BaseAdapter {
         TextView name = view.findViewById(R.id.itemName);
         TextView time = view.findViewById(R.id.itemTime);
         TextView message = view.findViewById(R.id.itemMessage);
+        TextView commentCount = view.findViewById(R.id.commentCount);
+        TextView likeCount = view.findViewById(R.id.likeCount);
         ImageView image = view.findViewById(R.id.itemImage);
         Button deleteButton = view.findViewById(R.id.deleteButton);
+        Button likeButton = view.findViewById(R.id.likeButton);
+
         final Context activity = view.getContext();
         final ListViewItem item = itemList.get(i);
         name.setText(item.getName());
         time.setText(item.getTime());
+        if(item.getComments()!=0) commentCount.setText(String.valueOf(item.getComments()));
+        if(item.getLikes()!=0) likeCount.setText(String.valueOf(item.getLikes()));
 
         // Check for empty message
         if (!TextUtils.isEmpty(item.getMessage())) {

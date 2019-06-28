@@ -5,7 +5,7 @@
     android:background="@color/feed_bg"
     android:orientation="vertical">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_marginLeft="@dimen/feed_item_margin_sides"
@@ -16,10 +16,10 @@
 
         <Button
             android:id="@+id/deleteButton"
-            android:layout_width="22dp"
+            android:layout_width="18dp"
             android:layout_height="18dp"
-            android:layout_gravity="bottom|right"
-            android:background="@drawable/com_facebook_close"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/cancel"
             android:focusable="false"
             android:focusableInTouchMode="false" />
 
@@ -27,6 +27,7 @@
             android:id="@+id/itemName"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/deleteButton"
             android:textSize="@dimen/feed_item_name"
             android:textStyle="bold" />
 
@@ -34,34 +35,80 @@
             android:id="@+id/itemTime"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="@dimen/feed_item_padding_time"
+            android:layout_below="@+id/itemName"
+            android:layout_marginBottom="@dimen/feed_item_padding_time"
             android:textColor="@color/timestamp"
             android:textSize="@dimen/feed_item_time" />
 
         <TextView
             android:id="@+id/itemMessage"
+            android:layout_below="@+id/itemTime"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:textSize="@dimen/feed_item_message" />
 
         <ProgressBar
             android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
+            android:layout_below="@+id/itemTime"
+            android:layout_marginTop="10dp"
             android:indeterminate="true"
             android:visibility="gone" />
 
         <ImageView
             android:id="@+id/itemImage"
             android:layout_width="match_parent"
-            android:layout_height="267dp"
+            android:layout_height="250dp"
+            android:layout_below="@+id/itemMessage"
+            android:layout_marginTop="10dp"
             android:background="@color/white"
-            android:paddingTop="@dimen/feed_item_padding_image"
-            android:scaleType="fitCenter"
+            android:scaleType="centerCrop"
             android:visibility="visible" />
 
+        <Button
+            android:id="@+id/commentButton"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_below="@+id/itemImage"
+            android:layout_marginTop="10dp"
+            android:layout_alignParentLeft="true"
+            android:background="@drawable/comment"
+            android:focusable="false"
+            android:focusableInTouchMode="false" />
 
-    </LinearLayout>
+        <Button
+            android:id="@+id/likeButton"
+            style="@style/Widget.AppCompat.Button"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_below="@+id/itemImage"
+            android:layout_marginLeft="60dp"
+            android:layout_marginTop="10dp"
+            android:layout_toRightOf="@+id/commentButton"
+            android:background="@drawable/like"
+            android:focusable="false"
+            android:focusableInTouchMode="false" />
+
+        <TextView
+            android:id="@+id/commentCount"
+            android:layout_width="wrap_content"
+            android:layout_below="@+id/itemImage"
+            android:layout_toRightOf="@+id/commentButton"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="5dp"
+            android:layout_height="wrap_content"
+            android:text="" />
+        <TextView
+            android:id="@+id/likeCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/itemImage"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@+id/likeButton"
+            android:layout_marginTop="10dp"
+            android:text="" />
+    </RelativeLayout>
 
 </LinearLayout>
