@@ -40,12 +40,13 @@ public class FirebaseController {
         return myStorage;
     }
 
-    public void sendMessage(String message, String type){
+    public void sendMessage(String message, String type, String imageId){
         String time = getTime();
         String key = getKey(time);
 
         Map<String, Object> newMessage = new HashMap<>();
         newMessage.put("message", message);
+        newMessage.put("imageId",imageId);
         newMessage.put("type", type);
         newMessage.put("time", time);
         newMessage.put("username", currentFirebaseUser.getEmail());
@@ -68,12 +69,11 @@ public class FirebaseController {
         currentUserDb.setValue(newMessage);
     }
 
-    public void sendImage(byte[] image){
+    public void sendImage(byte[] image,String message){
         String time = getTime();
         String key = getKey(time);
-
         StorageReference file = myStorage.child(key);
-        sendMessage(key, "image");
+        sendMessage(message,"image",key);
         file.putBytes(image);
     }
 

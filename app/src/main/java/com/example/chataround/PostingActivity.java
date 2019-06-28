@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,30 +13,37 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
+import android.text.style.ImageSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 public class PostingActivity extends AppCompatActivity {
-    private EditText editText;
-    FirebaseController firebaseController;
-    Activity activity;
-
+    private EditText editPostText;
+    private FirebaseController firebaseController;
+    private Activity activity;
+    private byte[] image;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        editText = findViewById(R.id.enterTextid2);
+
         setContentView(R.layout.posting_activity);
         Toolbar postingToolbar = (Toolbar) findViewById(R.id.posting_toolbar);
         setSupportActionBar(postingToolbar);
         activity=PostingActivity.this;
+        firebaseController = FirebaseController.getInstance();
+        editPostText = findViewById(R.id.enterTextidpost);
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
         bottomNav.setSelectedItemId(0);
@@ -83,21 +92,47 @@ public class PostingActivity extends AppCompatActivity {
                 }
             };
 
-    /*public void sendMessage(View view) {
-        String text = editText.getText().toString().trim();
+    public void sendMessage(View view) {
+        String text = editPostText.getText().toString().trim();
         if(!TextUtils.isEmpty(text)) {
-            firebaseController.sendMessage(text,"message");
-            editText.setText("");
-        }else{
-            //check
-            Toast.makeText(MainActivity.this, "Empty message", Toast.LENGTH_SHORT).show();
+            if (hasImageSpan(editPostText)) {
+                firebaseController.sendImage(image,editPostText.getText().toString().trim());
+                Intent intent = new Intent(this, MainActivity.class);
+                startActivity(intent);
+            } else {
+                firebaseController.sendMessage(text, "message", "NoPicture");
+                editPostText.setText("");
+                Intent intent = new Intent(this, MainActivity.class);
+                startActivity(intent);
+            }
         }
-
+        else {
+            //check
+            Toast.makeText(PostingActivity.this, "Empty message", Toast.LENGTH_SHORT).show();
+        }
+    }
+    public boolean hasImageSpan(EditText edit) {
+        Editable edittextimage  = edit.getEditableText();
+        ImageSpan[] spans = edittextimage.getSpans(0, edittextimage.length(), ImageSpan.class);
+        return !(spans.length == 0);
     }
     public void uploadImage(View view){
         Intent i = new Intent(Intent.ACTION_PICK);
         i.setType("image/*");
         startActivityForResult(i, 1);
+
+    }
+    private void addImageInEditText(Drawable drawable) {
+
+        drawable.setBounds(0, 0, (int)(drawable.getIntrinsicWidth()*0.2), (int)(drawable.getIntrinsicHeight()*0.2));
+        int selectionCursorPos = editPostText.getSelectionStart();
+        editPostText.getText().insert(selectionCursorPos, ".");
+        selectionCursorPos = editPostText.getSelectionStart();
+        SpannableStringBuilder builder = new SpannableStringBuilder(editPostText.getText());
+        int startPos = selectionCursorPos - ".".length();
+        builder.setSpan(new ImageSpan(drawable), startPos, selectionCursorPos, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        editPostText.setText(builder);
+        editPostText.setSelection(selectionCursorPos);
     }
 
     @Override
@@ -108,12 +143,14 @@ public class PostingActivity extends AppCompatActivity {
             try{
                 InputStream imageStream = getContentResolver().openInputStream(imageUri);
                 Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                Drawable d = new BitmapDrawable(getResources(),selectedImage);
                 selectedImage = ImageController.ResizeImage(selectedImage,1300);
-                byte[] image = ImageController.BitmapToBytes(selectedImage);
-                firebaseController.sendImage(image);
+                image = ImageController.BitmapToBytes(selectedImage);
+                addImageInEditText(d);
+
             }catch (FileNotFoundException e){
                 Log.d("Exception", e.getMessage());
             }
         }
-    }*/
+    }
 }

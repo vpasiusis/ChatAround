@@ -121,14 +121,15 @@ public class MainActivity extends AppCompatActivity {
             public void onChildAdded(DataSnapshot dst, String s) {
                 final String key = dst.getKey();
                 final String message = dst.child("message").getValue(String.class);
+                final String imageId = dst.child("imageId").getValue(String.class);
                 final String username1 = dst.child("username").getValue(String.class);
                 final String time = dst.child("time").getValue(String.class);
                 final String type = dst.child("type").getValue(String.class);
 
-                final ListViewItem item1 = new ListViewItem(key,username1,null,message,time);
+                final ListViewItem item1 = new ListViewItem(key,username1,null,message,imageId,time);
 
                 if(type.equals("image")){
-                    StorageReference ref = firebaseController.getMyStorage().child(message);
+                    StorageReference ref = firebaseController.getMyStorage().child(imageId);
                     final long megabyte = 1024*1024;
                     item1.setIsLoading(true);
                     ref.getBytes(megabyte).addOnSuccessListener(new OnSuccessListener<byte[]>() {

@@ -6,17 +6,27 @@ import java.io.Serializable;
 import java.util.List;
 
 public class ListViewItem implements Serializable {
-    private String id, name, message, time;
+    private String id, name, message, time,imageId;
     private Bitmap image;
     private boolean isLoading=false;
 
-    public ListViewItem(String id, String name, Bitmap image, String message, String time) {
+
+
+    public ListViewItem(String id, String name, Bitmap image, String message, String imageId, String time) {
         super();
         this.id = id;
         this.name = name;
         this.image = image;
         this.message = message;
+        this.imageId = imageId;
         this.time = time;
+    }
+    public String getImageId() {
+        return imageId;
+    }
+
+    public void setImageId(String imageId) {
+        this.imageId = imageId;
     }
 
     public String getId() {

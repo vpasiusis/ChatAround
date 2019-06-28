@@ -9,8 +9,8 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_marginLeft="@dimen/feed_item_margin_sides"
-        android:layout_marginRight="@dimen/feed_item_margin_sides"
         android:layout_marginTop="@dimen/feed_item_margin_top_bottom"
+        android:layout_marginRight="@dimen/feed_item_margin_sides"
         android:layout_marginBottom="@dimen/feed_item_margin_top_bottom"
         android:orientation="vertical">
 
@@ -19,9 +19,9 @@
             android:layout_width="22dp"
             android:layout_height="18dp"
             android:layout_gravity="bottom|right"
+            android:background="@drawable/com_facebook_close"
             android:focusable="false"
-            android:focusableInTouchMode="false"
-            android:background="@drawable/com_facebook_close" />
+            android:focusableInTouchMode="false" />
 
         <TextView
             android:id="@+id/itemName"
@@ -34,8 +34,8 @@
             android:id="@+id/itemTime"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/timestamp"
             android:paddingBottom="@dimen/feed_item_padding_time"
+            android:textColor="@color/timestamp"
             android:textSize="@dimen/feed_item_time" />
 
         <TextView
@@ -46,11 +46,11 @@
 
         <ProgressBar
             android:id="@+id/progressBar"
-            android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:indeterminate="true" />
+            android:layout_gravity="center"
+            android:indeterminate="true"
+            android:visibility="gone" />
 
         <ImageView
             android:id="@+id/itemImage"

@@ -109,7 +109,7 @@ public class ItemAdapter extends BaseAdapter {
                         firebaseController.initialize();
                         firebaseController.getMyDatabase().child(item.getId()).removeValue();
                         if(item.getImage()!=null) {
-                            StorageReference ref = firebaseController.getMyStorage().child(item.getMessage());
+                            StorageReference ref = firebaseController.getMyStorage().child(item.getImageId());
                             ref.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
