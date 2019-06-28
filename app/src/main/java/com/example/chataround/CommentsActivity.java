@@ -37,7 +37,7 @@ public class CommentsActivity extends AppCompatActivity {
         setSupportActionBar(mainToolbar);
         firebaseController = FirebaseController.getInstance();
 
-        item = (ListViewItem) getIntent().getSerializableExtra("Item");
+        item = firebaseController.getCurrentSelectedItem();
         listView = findViewById(R.id.listViewComments);
         message = findViewById(R.id.itemMessage1);
         time = findViewById(R.id.itemTime1);

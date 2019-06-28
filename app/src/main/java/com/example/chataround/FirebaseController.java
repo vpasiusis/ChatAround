@@ -16,6 +16,7 @@ public class FirebaseController {
     private FirebaseUser currentFirebaseUser;
     private DatabaseReference myDatabase;
     private StorageReference myStorage;
+    private ListViewItem currentSelectedItem = null;
 
     private FirebaseController(){ }
 
@@ -88,5 +89,12 @@ public class FirebaseController {
         String key = time + "__" + currentFirebaseUser.getEmail();
         key=key.replace(".","");
         return key;
+    }
+
+    public ListViewItem getCurrentSelectedItem(){
+        return currentSelectedItem;
+    }
+    public void setCurrentSelectedItem(ListViewItem item){
+        currentSelectedItem = item;
     }
 }

@@ -107,7 +107,7 @@ public class ItemAdapter extends BaseAdapter {
                     public void onClick(DialogInterface dialog, int which) {
                         firebaseController = FirebaseController.getInstance();
                         firebaseController.initialize();
-                        firebaseController.getMyDatabase().child(item.getId()).removeValue();
+                        firebaseController.getMyDatabase().child("Messages").child(item.getId()).removeValue();
                         if(item.getImage()!=null) {
                             StorageReference ref = firebaseController.getMyStorage().child(item.getImageId());
                             ref.delete().addOnSuccessListener(new OnSuccessListener<Void>() {

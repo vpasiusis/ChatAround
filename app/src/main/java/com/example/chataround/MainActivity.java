@@ -17,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 import com.facebook.login.LoginManager;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -67,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(MainActivity.this, CommentsActivity.class);
-                intent.putExtra("Item", adapter.getListViewItem(i));
+                firebaseController.setCurrentSelectedItem(adapter.getListViewItem(i));
                 startActivity(intent);
             }
         });
@@ -129,18 +130,7 @@ public class MainActivity extends AppCompatActivity {
                 final ListViewItem item1 = new ListViewItem(key,username1,null,message,imageId,time);
 
                 if(type.equals("image")){
-                    StorageReference ref = firebaseController.getMyStorage().child(imageId);
-                    final long megabyte = 1024*1024;
-                    item1.setIsLoading(true);
-                    ref.getBytes(megabyte).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                        @Override
-                        public void onSuccess(byte[] bytes) {
-                            Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                            item1.setImage(image);
-                            item1.setIsLoading(false);
-                            adapter.notifyDataSetChanged();
-                        }
-                    });
+                    getImage(item1,imageId);
                     list.add(start,item1);
 
                     adapter.notifyDataSetChanged();
@@ -177,6 +167,27 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    public void getImage(final ListViewItem item, final String message){
+        StorageReference ref = firebaseController.getMyStorage().child(message);
+        final long megabyte = 1024*1024;
+        item.setIsLoading(true);
+        ref.getBytes(megabyte).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                item.setImage(image);
+                item.setIsLoading(false);
+                adapter.notifyDataSetChanged();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                getImage(item,message);
+            }
+        });
+    }
+
 
     @Override
     public void onBackPressed() {

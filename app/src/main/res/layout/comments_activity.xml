@@ -42,17 +42,6 @@
         android:layout_marginRight="@dimen/feed_item_margin_sides"
         android:textSize="@dimen/feed_item_message" />
 
-    <TextView
-        android:id="@+id/commentCount"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/itemMessage1"
-        android:layout_marginLeft="@dimen/feed_item_margin_sides"
-        android:layout_marginRight="@dimen/feed_item_margin_sides"
-        android:text="Loading comments..."
-        android:textStyle="bold"
-        android:textSize="@dimen/comment_count" />
-
     <EditText
         android:id="@+id/enterTextid"
         android:layout_width="wrap_content"
@@ -80,7 +69,7 @@
         android:id="@+id/listViewComments"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/commentCount"
+        android:layout_below="@+id/itemMessage1"
         android:layout_above="@+id/enterTextid"
         android:childDivider="@color/feed_item_border"
         android:divider="@color/feed_item_border"

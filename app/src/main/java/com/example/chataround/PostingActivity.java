@@ -96,7 +96,7 @@ public class PostingActivity extends AppCompatActivity {
         String text = editPostText.getText().toString().trim();
         if(!TextUtils.isEmpty(text)) {
             if (hasImageSpan(editPostText)) {
-                firebaseController.sendImage(image,editPostText.getText().toString().trim());
+                firebaseController.sendImage(image,text);
                 Intent intent = new Intent(this, MainActivity.class);
                 startActivity(intent);
             } else {
@@ -116,6 +116,7 @@ public class PostingActivity extends AppCompatActivity {
         ImageSpan[] spans = edittextimage.getSpans(0, edittextimage.length(), ImageSpan.class);
         return !(spans.length == 0);
     }
+
     public void uploadImage(View view){
         Intent i = new Intent(Intent.ACTION_PICK);
         i.setType("image/*");
