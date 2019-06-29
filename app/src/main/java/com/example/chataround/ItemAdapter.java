@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.CardView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -71,6 +72,7 @@ public class ItemAdapter extends BaseAdapter {
         TextView commentCount = view.findViewById(R.id.commentCount);
         TextView likeCount = view.findViewById(R.id.likeCount);
         ImageView image = view.findViewById(R.id.itemImage);
+        CardView cardView = view.findViewById(R.id.cardView);
         Button deleteButton = view.findViewById(R.id.deleteButton);
         Button likeButton = view.findViewById(R.id.likeButton);
 
@@ -99,6 +101,12 @@ public class ItemAdapter extends BaseAdapter {
         }
 
         // Check image
+        if(item.getImageId()!=null){
+            cardView.setVisibility(View.VISIBLE);
+        }else{
+            cardView.setVisibility(View.GONE);
+        }
+
         if (item.getImage() != null) {
             image.setImageBitmap(item.getImage());
             image.setVisibility(View.VISIBLE);
