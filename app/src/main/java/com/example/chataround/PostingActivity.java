@@ -23,17 +23,24 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.nio.channels.FileLockInterruptionException;
+import java.nio.file.FileSystemNotFoundException;
 
 public class PostingActivity extends AppCompatActivity {
     private EditText editPostText;
     private FirebaseController firebaseController;
     private Activity activity;
+    private Button cameraButton;
     private byte[] image;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -44,9 +51,17 @@ public class PostingActivity extends AppCompatActivity {
         activity=PostingActivity.this;
         firebaseController = FirebaseController.getInstance();
         editPostText = findViewById(R.id.enterTextidpost);
+        cameraButton  = (Button)findViewById(R.id.PictureButtonId);
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
         bottomNav.setSelectedItemId(0);
+        cameraButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(cameraIntent, 2);
+            }
+        });
         super.onCreate(savedInstanceState);
     }
 
@@ -125,6 +140,18 @@ public class PostingActivity extends AppCompatActivity {
     }
     private void addImageInEditText(Drawable drawable) {
 
+        drawable.setBounds(0, 0, (int)(drawable.getIntrinsicWidth()*2), (int)(drawable.getIntrinsicHeight()*2));
+        int selectionCursorPos = editPostText.getSelectionStart();
+        editPostText.getText().insert(selectionCursorPos, ".");
+        selectionCursorPos = editPostText.getSelectionStart();
+        SpannableStringBuilder builder = new SpannableStringBuilder(editPostText.getText());
+        int startPos = selectionCursorPos - ".".length();
+        builder.setSpan(new ImageSpan(drawable), startPos, selectionCursorPos, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        editPostText.setText(builder);
+        editPostText.setSelection(selectionCursorPos);
+    }
+    private void addImageInEditTextUpload(Drawable drawable) {
+
         drawable.setBounds(0, 0, (int)(drawable.getIntrinsicWidth()*0.2), (int)(drawable.getIntrinsicHeight()*0.2));
         int selectionCursorPos = editPostText.getSelectionStart();
         editPostText.getText().insert(selectionCursorPos, ".");
@@ -147,11 +174,20 @@ public class PostingActivity extends AppCompatActivity {
                 Drawable d = new BitmapDrawable(getResources(),selectedImage);
                 selectedImage = ImageController.ResizeImage(selectedImage,1300);
                 image = ImageController.BitmapToBytes(selectedImage);
-                addImageInEditText(d);
+                addImageInEditTextUpload(d);
 
             }catch (FileNotFoundException e){
                 Log.d("Exception", e.getMessage());
             }
+        }
+        if(requestCode==2 && resultCode == Activity.RESULT_OK) {
+            Bitmap imageBitmap = (Bitmap) data.getExtras().get("data");
+            Drawable d = new BitmapDrawable(getResources(), imageBitmap);
+            imageBitmap = ImageController.ResizeImage(imageBitmap, 1600);
+            image = ImageController.BitmapToBytes(imageBitmap);
+            addImageInEditText(d);
+
+
         }
     }
 }

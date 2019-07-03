@@ -27,29 +27,44 @@
 
     <Button
         android:id="@+id/PostButtonId"
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:layout_below="@id/posting_toolbar"
-        android:layout_marginBottom="21dp"
-        android:onClick="sendMessage"
-        android:text="Post" />
-    <Button
-        android:id="@+id/UploadButtonId"
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:layout_toRightOf="@id/PostButtonId"
-        android:layout_below="@id/posting_toolbar"
-        android:layout_marginBottom="21dp"
-        android:onClick="uploadImage"
-        android:text="Upload" />
-    <Button
-        android:id="@+id/PictureButtonId"
-        android:layout_width="100dp"
-        android:layout_height="50dp"
+        style="@style/Widget.AppCompat.Button"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+
         android:layout_toRightOf="@id/UploadButtonId"
         android:layout_below="@id/posting_toolbar"
         android:layout_marginBottom="21dp"
-        android:text="Picture" />
+        android:onClick="sendMessage"
+        android:background="@drawable/sharp_send_black_48dp"
+        />
+    <Button
+        android:id="@+id/UploadButtonId"
+        style="@style/Widget.AppCompat.Button"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:focusable="false"
+        android:layout_marginRight="10dp"
+        android:focusableInTouchMode="false"
+        android:layout_toRightOf="@id/PictureButtonId"
+        android:layout_below="@id/posting_toolbar"
+        android:layout_marginBottom="21dp"
+        android:background="@drawable/sharp_attach_file_black_48dp"
+        android:onClick="uploadImage" />
+
+    <Button
+        android:id="@+id/PictureButtonId"
+        android:layout_below="@id/posting_toolbar"
+        android:layout_marginBottom="21dp"
+
+        android:layout_marginRight="10dp"
+        android:background="@drawable/sharp_camera_enhance_black_48dp"
+        style="@style/Widget.AppCompat.Button"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:focusable="false"
+        android:focusableInTouchMode="false"/>
 
 
 
