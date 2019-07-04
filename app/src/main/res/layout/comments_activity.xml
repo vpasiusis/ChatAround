@@ -57,13 +57,13 @@
 
     <Button
         android:id="@+id/sendButtonId"
-        android:layout_width="100dp"
+        android:layout_width="48dp"
         android:layout_alignParentBottom="true"
-        android:layout_height="50dp"
+        android:layout_height="48dp"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:onClick="sendComment"
-        android:text="Send" />
+        android:background="@drawable/sharp_send_black_48dp" />
 
     <ListView
         android:id="@+id/listViewComments"

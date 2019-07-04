@@ -63,6 +63,7 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener mAuthListener;
     private CallbackManager callbackManager;
     private LoginButton loginButton1;
+    FirebaseController firebaseController;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

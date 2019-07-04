@@ -62,7 +62,6 @@ public class CommentAdapter extends BaseAdapter {
             // message is empty, remove from view
             message.setVisibility(View.GONE);
         }
-
         return view;
     }
 }

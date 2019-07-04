@@ -39,6 +39,7 @@ public class CreateAccountActivity extends AppCompatActivity {
 
     private EditText Name;
     private EditText Password;
+    private EditText UserName;
     private String Type = "";
     private Button Create;
     private FirebaseAuth mAuth;
@@ -53,6 +54,7 @@ public class CreateAccountActivity extends AppCompatActivity {
         setContentView(R.layout.create_account);
         Name = (EditText) findViewById(R.id.edusername);
         Password = (EditText) findViewById(R.id.atpass);
+        UserName = findViewById(R.id.edusername2);
         mAuth = FirebaseAuth.getInstance();
         Create = (Button) findViewById(R.id.btnCreate);
         mProgress = new ProgressDialog(this);
@@ -77,8 +79,8 @@ public class CreateAccountActivity extends AppCompatActivity {
 
         final String email = Name.getText().toString().trim();
         final String password = Password.getText().toString().trim();
-
-        if (!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
+        final String userName = UserName.getText().toString().trim();
+        if (!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)&& !TextUtils.isEmpty(userName)) {
             mProgress.setMessage("Checking information...");
             mProgress.show();
             mAuth.createUserWithEmailAndPassword(email, password)
@@ -92,6 +94,7 @@ public class CreateAccountActivity extends AppCompatActivity {
                                 Toast.makeText(CreateAccountActivity.this, " Acount "+email+" was created ", Toast.LENGTH_SHORT).show();
                                 currentUserDB.child("Type").setValue("0");
                                 currentUserDB.child("Email").setValue(email);
+                                currentUserDB.child("Username").setValue(userName);
                             } else
                                 Toast.makeText(CreateAccountActivity.this, "error registering user", Toast.LENGTH_SHORT).show();
 

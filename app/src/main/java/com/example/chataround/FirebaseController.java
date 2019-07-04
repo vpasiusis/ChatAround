@@ -2,6 +2,7 @@ package com.example.chataround;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -19,6 +20,7 @@ public class FirebaseController {
     private FirebaseUser currentFirebaseUser;
     private DatabaseReference myDatabase;
     private StorageReference myStorage;
+    private String username;
     private ListViewItem currentSelectedItem = null;
 
     private FirebaseController(){ }
@@ -34,6 +36,10 @@ public class FirebaseController {
         currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         myDatabase = FirebaseDatabase.getInstance().getReference();
         myStorage = FirebaseStorage.getInstance().getReference().child("Messages");
+    }
+    public String currentUser(){
+        username=currentFirebaseUser.getEmail();
+        return username;
     }
 
     public DatabaseReference getMyDatabase(){

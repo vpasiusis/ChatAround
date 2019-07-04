@@ -22,6 +22,7 @@ public class ListViewItem implements Serializable {
         this.imageId = imageId;
         this.time = time;
         this.comments = comments;
+        this.likes=likes;
     }
     public String getImageId() {
         return imageId;
