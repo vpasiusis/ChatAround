@@ -130,11 +130,11 @@ public class ItemAdapter extends BaseAdapter {
                 firebaseController.getMyDatabase().child("Liked").child(item.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        if(dataSnapshot.child(firebaseController.currentUser().replace(".",",")).getValue()==null){
+                        if(dataSnapshot.child(firebaseController.getUsername()).getValue()==null){
                             item.setLikes(item.getLikes()+1);
                             firebaseController.getMyDatabase().child("Messages").child(item.getId()).child("likes").setValue(item.getLikes());
                             firebaseController.getMyDatabase().
-                                    child("Liked").child(item.getId()).child(firebaseController.currentUser().replace(".",",")).setValue("+");
+                                    child("Liked").child(item.getId()).child(firebaseController.getUsername()).setValue("+");
                         }
                     }
 

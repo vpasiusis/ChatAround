@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(mainToolbar);
         list = new ArrayList<>();
         activity=MainActivity.this;
+        firebaseController.getUsername();
         adapter = new ItemAdapter(this, list);
         listView.setAdapter(adapter);
         bottomNav.setOnNavigationItemSelectedListener(navListener);

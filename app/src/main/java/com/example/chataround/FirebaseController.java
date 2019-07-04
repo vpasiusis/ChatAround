@@ -20,6 +20,7 @@ public class FirebaseController {
     private FirebaseUser currentFirebaseUser;
     private DatabaseReference myDatabase;
     private StorageReference myStorage;
+    private String Email;
     private String username;
     private ListViewItem currentSelectedItem = null;
 
@@ -38,7 +39,21 @@ public class FirebaseController {
         myStorage = FirebaseStorage.getInstance().getReference().child("Messages");
     }
     public String currentUser(){
-        username=currentFirebaseUser.getEmail();
+        Email=currentFirebaseUser.getEmail();
+        return Email;
+    }
+    public String getUsername(){
+        getMyDatabase().child("users").child(currentFirebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                username = dataSnapshot.child("Username").getValue(String.class);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
         return username;
     }
 
@@ -53,14 +68,14 @@ public class FirebaseController {
     public void sendMessage(String message, String imageId){
         String time = getTime();
         String key = getKey(time);
-
+        String name= getUsername();
         Map<String, Object> newMessage = new HashMap<>();
         newMessage.put("message", message);
         newMessage.put("imageId",imageId);
         newMessage.put("time", time);
         newMessage.put("comments", 0);
         newMessage.put("likes", 0);
-        newMessage.put("username", currentFirebaseUser.getEmail());
+        newMessage.put("username", getUsername());
 
         DatabaseReference messageDb = myDatabase.child("Messages").child(key);
         messageDb.setValue(newMessage);
@@ -73,7 +88,7 @@ public class FirebaseController {
         Map<String, Object> newMessage = new HashMap<>();
         newMessage.put("message", message);
         newMessage.put("time", time);
-        newMessage.put("username", currentFirebaseUser.getEmail());
+        newMessage.put("username", getUsername());
         newMessage.put("postId", postId);
 
         DatabaseReference commentDb = myDatabase.child("Comments").child(key);
