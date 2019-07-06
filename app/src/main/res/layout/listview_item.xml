@@ -75,20 +75,20 @@
 
         <Button
             android:id="@+id/commentButton"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
             android:layout_below="@+id/cardView"
             android:layout_marginTop="10dp"
             android:layout_alignParentLeft="true"
-            android:background="@drawable/comment"
+            android:background="@drawable/comment_white"
             android:focusable="false"
             android:focusableInTouchMode="false" />
 
         <Button
             android:id="@+id/likeButton"
             style="@style/Widget.AppCompat.Button"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
             android:layout_below="@+id/cardView"
             android:layout_marginLeft="60dp"
             android:layout_marginTop="10dp"

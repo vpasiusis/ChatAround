@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 import com.facebook.login.LoginManager;
@@ -24,6 +25,7 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private ItemAdapter adapter;
     private int loadedItems = 0;
     private Activity activity;
+    private Button LikeButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar mainToolbar = (Toolbar) findViewById(R.id.main_toolbar);
         listView = findViewById(R.id.listview1);
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
-
+        LikeButton = findViewById(R.id.likeButton);
         firebaseController = FirebaseController.getInstance();
         firebaseController.initialize();
         setSupportActionBar(mainToolbar);
@@ -131,6 +134,8 @@ public class MainActivity extends AppCompatActivity {
 
                 final ListViewItem item1 = new ListViewItem(key,username1,
                         null,message,imageId,time,commentCount, likeCount);
+
+
 
                 if(imageId!=null){
                     getImage(item1,imageId);

@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.provider.ContactsContract;
 import android.renderscript.Sampler;
 import android.support.annotation.NonNull;
@@ -21,6 +22,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.share.internal.LikeButton;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -44,9 +46,11 @@ public class ItemAdapter extends BaseAdapter {
     private FirebaseController firebaseController;
 
 
+
     public ItemAdapter(Activity activity, List<ListViewItem> itemList){
         this.activity = activity;
         this.itemList = itemList;
+
     }
 
     @Override
@@ -68,6 +72,8 @@ public class ItemAdapter extends BaseAdapter {
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
+        firebaseController = FirebaseController.getInstance();
+        firebaseController.initialize();
 
         if (inflater == null){
             inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -83,14 +89,14 @@ public class ItemAdapter extends BaseAdapter {
         ImageView image = view.findViewById(R.id.itemImage);
         CardView cardView = view.findViewById(R.id.cardView);
         Button deleteButton = view.findViewById(R.id.deleteButton);
-        Button likeButton = view.findViewById(R.id.likeButton);
-
+        final Button likeButton = view.findViewById(R.id.likeButton);
+        final Button commentButton = view.findViewById(R.id.commentButton);
         final Context activity = view.getContext();
         final ListViewItem item = itemList.get(i);
         name.setText(item.getName());
         time.setText(item.getTime());
-        if(item.getComments()!=0) commentCount.setText(String.valueOf(item.getComments()));
-        if(item.getLikes()!=0) likeCount.setText(String.valueOf(item.getLikes()));
+        commentCount.setText(String.valueOf(item.getComments()));
+        likeCount.setText(String.valueOf(item.getLikes()));
 
         // Check for empty message
         if (!TextUtils.isEmpty(item.getMessage())) {
@@ -100,7 +106,48 @@ public class ItemAdapter extends BaseAdapter {
             // message is empty, remove from view
             message.setVisibility(View.GONE);
         }
+        firebaseController.getMyDatabase().child("Comments").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                boolean commentIn=false;
+                for(DataSnapshot snapshot:dataSnapshot.getChildren()){
+                    if(item.getId().equals(snapshot.child("postId").getValue())
+                            &&firebaseController.getUsername().equals(snapshot.child("username").getValue())){
 
+                       commentIn=true;
+                    }
+
+                }
+                if(commentIn){
+                    commentButton.setBackgroundResource(R.drawable.comment_black);
+                }else{
+
+                    commentButton.setBackgroundResource(R.drawable.comment_white);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        firebaseController.getMyDatabase().child("Liked").child(item.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                if("+".equals(dataSnapshot.child(firebaseController.getUsername()).getValue())){
+                    likeButton.setBackgroundResource(R.drawable.liked);
+                }
+                else {
+                    likeButton.setBackgroundResource(R.drawable.like);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
         ProgressBar progressBar = view.findViewById(R.id.progressBar);
 
         if(item.getIsLoading()){
@@ -125,16 +172,22 @@ public class ItemAdapter extends BaseAdapter {
         likeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                firebaseController = FirebaseController.getInstance();
-                firebaseController.initialize();
+
                 firebaseController.getMyDatabase().child("Liked").child(item.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if(dataSnapshot.child(firebaseController.getUsername()).getValue()==null){
+                            likeButton.setBackgroundResource(R.drawable.liked);
                             item.setLikes(item.getLikes()+1);
                             firebaseController.getMyDatabase().child("Messages").child(item.getId()).child("likes").setValue(item.getLikes());
                             firebaseController.getMyDatabase().
                                     child("Liked").child(item.getId()).child(firebaseController.getUsername()).setValue("+");
+                        }else {
+                            likeButton.setBackgroundResource(R.drawable.like);
+                            item.setLikes(item.getLikes()-1);
+                            firebaseController.getMyDatabase().child("Messages").child(item.getId()).child("likes").setValue(item.getLikes());
+                            firebaseController.getMyDatabase().
+                                    child("Liked").child(item.getId()).child(firebaseController.getUsername()).removeValue();
                         }
                     }
 

@@ -54,6 +54,7 @@ public class CommentAdapter extends BaseAdapter {
         name.setText(comment.getName());
         time.setText(comment.getTime());
 
+
         // Check for empty message
         if (!TextUtils.isEmpty(comment.getMessage())) {
             message.setText(comment.getMessage());
@@ -63,5 +64,6 @@ public class CommentAdapter extends BaseAdapter {
             message.setVisibility(View.GONE);
         }
         return view;
+
     }
 }
