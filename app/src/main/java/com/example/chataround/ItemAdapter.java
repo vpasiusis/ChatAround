@@ -4,10 +4,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.Color;
-import android.provider.ContactsContract;
-import android.renderscript.Sampler;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.text.TextUtils;
@@ -17,27 +13,18 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.facebook.share.internal.LikeButton;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 
-import java.security.Key;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ItemAdapter extends BaseAdapter {
     private Activity activity;
@@ -97,6 +84,9 @@ public class ItemAdapter extends BaseAdapter {
         time.setText(item.getTime());
         commentCount.setText(String.valueOf(item.getComments()));
         likeCount.setText(String.valueOf(item.getLikes()));
+        //jeigu sita nera, buginasi vaizdas tada kai scrollini greitai.
+        if(item.getLikes()==0){likeButton.setBackgroundResource(R.drawable.like);}
+        if(item.getComments()==0){ commentButton.setBackgroundResource(R.drawable.comment_white); }
 
         // Check for empty message
         if (!TextUtils.isEmpty(item.getMessage())) {
@@ -106,6 +96,7 @@ public class ItemAdapter extends BaseAdapter {
             // message is empty, remove from view
             message.setVisibility(View.GONE);
         }
+
         firebaseController.getMyDatabase().child("Comments").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

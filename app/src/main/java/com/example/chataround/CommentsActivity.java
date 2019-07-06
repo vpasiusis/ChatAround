@@ -66,7 +66,8 @@ public class CommentsActivity extends AppCompatActivity {
                     final String message = dst.child("message").getValue(String.class);
                     final String username = dst.child("username").getValue(String.class);
                     final String time = dst.child("time").getValue(String.class);
-                    ListViewComment comment = new ListViewComment(key,username,message,time);
+                    final String realTime = firebaseController.diffTime(time);
+                    ListViewComment comment = new ListViewComment(key,username,message,realTime);
                     comments.add(comment);
                     adapter.notifyDataSetChanged();
                 }

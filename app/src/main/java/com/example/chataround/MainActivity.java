@@ -4,11 +4,12 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,7 +18,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
-import com.facebook.login.LoginManager;
+
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -25,11 +26,10 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
+
 import java.util.ArrayList;
 import java.util.List;
-import android.view.Menu;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -131,12 +131,9 @@ public class MainActivity extends AppCompatActivity {
                 final String time = dst.child("time").getValue(String.class);
                 final int commentCount = dst.child("comments").getValue(Integer.class);
                 final int likeCount = dst.child("likes").getValue(Integer.class);
-
+                final String realTime = firebaseController.diffTime(time);
                 final ListViewItem item1 = new ListViewItem(key,username1,
-                        null,message,imageId,time,commentCount, likeCount);
-
-
-
+                        null,message,imageId,realTime,commentCount, likeCount);
                 if(imageId!=null){
                     getImage(item1,imageId);
                     list.add(start,item1);
@@ -211,7 +208,7 @@ public class MainActivity extends AppCompatActivity {
         if (backPressedTime + 1000 > System.currentTimeMillis() ) {
             backToast.cancel();
             FirebaseAuth.getInstance().signOut();
-            LoginManager.getInstance().logOut();
+            //LoginManager.getInstance().logOut();
             Intent i = new Intent(this, LoginActivity.class); //if under this dialog you do not have your MainActivity
             i.addFlags(i.FLAG_ACTIVITY_CLEAR_TOP);
             i.addFlags(i.FLAG_ACTIVITY_CLEAR_TASK);
