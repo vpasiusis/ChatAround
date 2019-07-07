@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.text.TextUtils;
@@ -84,7 +85,7 @@ public class ItemAdapter extends BaseAdapter {
         time.setText(item.getTime());
         commentCount.setText(String.valueOf(item.getComments()));
         likeCount.setText(String.valueOf(item.getLikes()));
-        //jeigu sita nera, buginasi vaizdas tada kai scrollini greitai.
+        //jeigu situ nera, buginasi vaizdas tada kai scrollini greitai.
         if(item.getLikes()==0){likeButton.setBackgroundResource(R.drawable.like);}
         if(item.getComments()==0){ commentButton.setBackgroundResource(R.drawable.comment_white); }
 
@@ -152,6 +153,14 @@ public class ItemAdapter extends BaseAdapter {
             cardView.setVisibility(View.VISIBLE);
         }else{
             cardView.setVisibility(View.GONE);
+        }
+        if(item.getName().equals(firebaseController.getUsername())){
+            int crystalBlue = Color.parseColor("#e7eeed");
+            view.setBackgroundColor(crystalBlue);
+        } else
+        {
+            int white = Color.parseColor("#ffffff");
+            view.setBackgroundColor(white);
         }
 
         if (item.getImage() != null) {

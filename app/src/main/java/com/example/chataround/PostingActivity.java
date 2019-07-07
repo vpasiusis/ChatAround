@@ -25,16 +25,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Toast;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.nio.channels.FileLockInterruptionException;
-import java.nio.file.FileSystemNotFoundException;
 
 public class PostingActivity extends AppCompatActivity {
     private EditText editPostText;
@@ -48,6 +42,8 @@ public class PostingActivity extends AppCompatActivity {
         setContentView(R.layout.posting_activity);
         Toolbar postingToolbar = (Toolbar) findViewById(R.id.posting_toolbar);
         setSupportActionBar(postingToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
         activity=PostingActivity.this;
         firebaseController = FirebaseController.getInstance();
         editPostText = findViewById(R.id.enterTextidpost);
@@ -73,7 +69,9 @@ public class PostingActivity extends AppCompatActivity {
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
+        if (item.getItemId() == android.R.id.home) {
+            finish(); // close this activity and return to preview activity (if there is any)
+        }
         if(item.getItemId()==R.id.quit){
             LogOffDialog logOffDialog = new LogOffDialog();
             logOffDialog.show(getSupportFragmentManager(),"Log Off");
