@@ -1,16 +1,22 @@
 package com.example.chataround;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -42,6 +48,7 @@ public class PostingActivity extends AppCompatActivity {
     private Activity activity;
     private Button cameraButton;
     private byte[] image;
+    private Uri imageUri;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
 
@@ -58,8 +65,7 @@ public class PostingActivity extends AppCompatActivity {
         cameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(cameraIntent, 2);
+                requestPermissions();
             }
         });
         super.onCreate(savedInstanceState);
@@ -107,6 +113,47 @@ public class PostingActivity extends AppCompatActivity {
                 }
             };
 
+    public void requestPermissions() {
+        if (ContextCompat.checkSelfPermission(activity,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    1);
+        } else {
+            cameraIntent();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case 1: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    cameraIntent();
+                } else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+        }
+    }
+
+    public void cameraIntent(){
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.TITLE, "New Picture");
+        values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
+        imageUri = getContentResolver().insert(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+        startActivityForResult(intent, 2);
+    }
+
     public void sendMessage(View view) {
         String text = editPostText.getText().toString().trim();
         if(!TextUtils.isEmpty(text)) {
@@ -136,20 +183,8 @@ public class PostingActivity extends AppCompatActivity {
         Intent i = new Intent(Intent.ACTION_PICK);
         i.setType("image/*");
         startActivityForResult(i, 1);
-
     }
-    private void addImageInEditText(Drawable drawable) {
 
-        drawable.setBounds(0, 0, (int)(drawable.getIntrinsicWidth()*2), (int)(drawable.getIntrinsicHeight()*2));
-        int selectionCursorPos = editPostText.getSelectionStart();
-        editPostText.getText().insert(selectionCursorPos, ".");
-        selectionCursorPos = editPostText.getSelectionStart();
-        SpannableStringBuilder builder = new SpannableStringBuilder(editPostText.getText());
-        int startPos = selectionCursorPos - ".".length();
-        builder.setSpan(new ImageSpan(drawable), startPos, selectionCursorPos, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        editPostText.setText(builder);
-        editPostText.setSelection(selectionCursorPos);
-    }
     private void addImageInEditTextUpload(Drawable drawable) {
 
         drawable.setBounds(0, 0, (int)(drawable.getIntrinsicWidth()*0.2), (int)(drawable.getIntrinsicHeight()*0.2));
@@ -181,13 +216,16 @@ public class PostingActivity extends AppCompatActivity {
             }
         }
         if(requestCode==2 && resultCode == Activity.RESULT_OK) {
-            Bitmap imageBitmap = (Bitmap) data.getExtras().get("data");
-            Drawable d = new BitmapDrawable(getResources(), imageBitmap);
-            imageBitmap = ImageController.ResizeImage(imageBitmap, 1600);
-            image = ImageController.BitmapToBytes(imageBitmap);
-            addImageInEditText(d);
-
-
+            try{
+                Bitmap selectedImage = MediaStore.Images.Media.getBitmap(
+                        getContentResolver(), imageUri);
+                Drawable d = new BitmapDrawable(getResources(), selectedImage);
+                selectedImage = ImageController.ResizeImage(selectedImage, 1300);
+                image = ImageController.BitmapToBytes(selectedImage);
+                addImageInEditTextUpload(d);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }
