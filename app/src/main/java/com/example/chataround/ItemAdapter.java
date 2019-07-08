@@ -78,15 +78,16 @@ public class ItemAdapter extends BaseAdapter {
         Button deleteButton = view.findViewById(R.id.deleteButton);
         final Button likeButton = view.findViewById(R.id.likeButton);
         final Button commentButton = view.findViewById(R.id.commentButton);
-        final Context activity = view.getContext();
+
         final ListViewItem item = itemList.get(i);
         name.setText(item.getName());
-        time.setText(item.getTime());
+        String realtime = firebaseController.diffTime(item.getTime());
+        time.setText(realtime);
         commentCount.setText(String.valueOf(item.getComments()));
         likeCount.setText(String.valueOf(item.getLikes()));
+
         //jeigu sita nera, buginasi vaizdas tada kai scrollini greitai.
         if(item.getLikes()==0){likeButton.setBackgroundResource(R.drawable.like);}
-        if(item.getComments()==0){ commentButton.setBackgroundResource(R.drawable.comment_white); }
 
         // Check for empty message
         if (!TextUtils.isEmpty(item.getMessage())) {
@@ -97,31 +98,6 @@ public class ItemAdapter extends BaseAdapter {
             message.setVisibility(View.GONE);
         }
 
-        firebaseController.getMyDatabase().child("Comments").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                boolean commentIn=false;
-                for(DataSnapshot snapshot:dataSnapshot.getChildren()){
-                    if(item.getId().equals(snapshot.child("postId").getValue())
-                            &&firebaseController.getUsername().equals(snapshot.child("username").getValue())){
-
-                       commentIn=true;
-                    }
-
-                }
-                if(commentIn){
-                    commentButton.setBackgroundResource(R.drawable.comment_black);
-                }else{
-
-                    commentButton.setBackgroundResource(R.drawable.comment_white);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
         firebaseController.getMyDatabase().child("Liked").child(item.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

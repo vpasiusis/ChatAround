@@ -40,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
     private List<ListViewItem> list;
     private ItemAdapter adapter;
     private int loadedItems = 0;
-    private Activity activity;
     private Button LikeButton;
 
     @Override
@@ -56,7 +55,6 @@ public class MainActivity extends AppCompatActivity {
         firebaseController.initialize();
         setSupportActionBar(mainToolbar);
         list = new ArrayList<>();
-        activity=MainActivity.this;
         firebaseController.getUsername();
         adapter = new ItemAdapter(this, list);
         listView.setAdapter(adapter);
@@ -109,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                if(adapter.getCount()==loadedItems && firstVisibleItem+visibleItemCount==totalItemCount){
+                if(adapter.getCount()>=loadedItems && firstVisibleItem+visibleItemCount==totalItemCount){
                     String oldestItemTime = adapter.getListViewItem(loadedItems-1).getTime();
                     Query query = firebaseController.getMyDatabase().
                             child("Messages").orderByKey().endAt(oldestItemTime).limitToLast(10);
@@ -131,17 +129,13 @@ public class MainActivity extends AppCompatActivity {
                 final String time = dst.child("time").getValue(String.class);
                 final int commentCount = dst.child("comments").getValue(Integer.class);
                 final int likeCount = dst.child("likes").getValue(Integer.class);
-                final String realTime = firebaseController.diffTime(time);
                 final ListViewItem item1 = new ListViewItem(key,username1,
-                        null,message,imageId,realTime,commentCount, likeCount);
+                        null,message,imageId,time,commentCount, likeCount);
                 if(imageId!=null){
                     getImage(item1,imageId);
-                    list.add(start,item1);
-                    adapter.notifyDataSetChanged();
-                }else{
-                    list.add(start,item1);
-                    adapter.notifyDataSetChanged();
                 }
+                list.add(start,item1);
+                adapter.notifyDataSetChanged();
             }
 
             @Override
@@ -232,11 +226,11 @@ public class MainActivity extends AppCompatActivity {
 
                             break;
                         case R.id.nav_events:
-                            Intent intent1 = new Intent(activity, EventsActivity.class);
+                            Intent intent1 = new Intent(MainActivity.this, EventsActivity.class);
                             startActivity(intent1);
                             break;
                         case R.id.nav_settings:
-                            Intent intent = new Intent(activity, SettingsActivity.class);
+                            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
                             startActivity(intent);
                             break;
                     }
