@@ -4,21 +4,21 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
-import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
-import android.widget.EditText;
-import android.widget.ExpandableListView;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.ListView;
 import android.widget.Toast;
 
-import com.facebook.login.LoginManager;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -28,67 +28,71 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
 import com.google.firebase.storage.StorageReference;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import android.view.Menu;
 
 public class MainActivity extends AppCompatActivity {
 
-    private EditText editText;
-    private ExpandableListView listView;
+    private ListView listView;
     private long backPressedTime;
     private Toast backToast;
     private FirebaseController firebaseController;
     private List<ListViewItem> list;
-    private ListViewAdapter adapter;
+    private ItemAdapter adapter;
     private int loadedItems = 0;
+    private Button LikeButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         Toolbar mainToolbar = (Toolbar) findViewById(R.id.main_toolbar);
-        setSupportActionBar(mainToolbar);
+        listView = findViewById(R.id.listview1);
+        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
+        LikeButton = findViewById(R.id.likeButton);
         firebaseController = FirebaseController.getInstance();
         firebaseController.initialize();
-        listView = findViewById(R.id.listview1);
-        editText = findViewById(R.id.enterTextid);
+        setSupportActionBar(mainToolbar);
         list = new ArrayList<>();
-        adapter = new ListViewAdapter(this, list);
+        firebaseController.getUsername();
+        adapter = new ItemAdapter(this, list);
         listView.setAdapter(adapter);
+        bottomNav.setOnNavigationItemSelectedListener(navListener);
 
-        Query query = firebaseController.getMyDatabase().orderByKey().limitToLast(20);
+        Query query = firebaseController.getMyDatabase().
+                child("Messages").orderByKey().limitToLast(10);
         loadItems(loadedItems, query);
-        loadedItems+=20;
+        loadedItems+=10;
         updateFeed();
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intent = new Intent(MainActivity.this, CommentsActivity.class);
+                firebaseController.setCurrentSelectedItem(adapter.getListViewItem(i));
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.temporary_menu,menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.topbar_menu, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId()==R.id.item1){
-            Toast.makeText(MainActivity.this, "Sorry, not available yet..",
-                    Toast.LENGTH_SHORT).show();
+        if(item.getItemId()==R.id.postButton){
+           Intent intent = new Intent(this, PostingActivity.class);
+           startActivity(intent);
         }
-        if(item.getItemId()==R.id.item2) {
-            Toast.makeText(MainActivity.this, "Sorry, not available yet..",
-                    Toast.LENGTH_SHORT).show();
-        }
+
         if(item.getItemId()==R.id.quit){
-            FirebaseAuth.getInstance().signOut();
-            LoginManager.getInstance().logOut();
-            Intent i = new Intent(this, LoginActivity.class); //if under this dialog you do not have your MainActivity
-            i.addFlags(i.FLAG_ACTIVITY_CLEAR_TOP);
-            i.addFlags(i.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(i);
-            finish();
+            LogOffDialog logOffDialog = new LogOffDialog();
+            logOffDialog.show(getSupportFragmentManager(),"Log Off");
 
         }
         return super.onOptionsItemSelected(item);
@@ -103,11 +107,12 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                if(adapter.getGroupCount()==loadedItems && firstVisibleItem+visibleItemCount==totalItemCount){
-                    String oldestItemTime = adapter.getItem(loadedItems-1).getTime();
-                    Query query = firebaseController.getMyDatabase().orderByKey().endAt(oldestItemTime).limitToLast(20);
+                if(adapter.getCount()>=loadedItems && firstVisibleItem+visibleItemCount==totalItemCount){
+                    String oldestItemTime = adapter.getListViewItem(loadedItems-1).getTime();
+                    Query query = firebaseController.getMyDatabase().
+                            child("Messages").orderByKey().endAt(oldestItemTime).limitToLast(10);
                     loadItems(loadedItems, query);
-                    loadedItems+=20;
+                    loadedItems+=10;
                 }
             }
         });
@@ -119,35 +124,44 @@ public class MainActivity extends AppCompatActivity {
             public void onChildAdded(DataSnapshot dst, String s) {
                 final String key = dst.getKey();
                 final String message = dst.child("message").getValue(String.class);
+                final String imageId = dst.child("imageId").getValue(String.class);
                 final String username1 = dst.child("username").getValue(String.class);
                 final String time = dst.child("time").getValue(String.class);
-                final String type = dst.child("type").getValue(String.class);
+                final int commentCount = dst.child("comments").getValue(Integer.class);
+                final int likeCount = dst.child("likes").getValue(Integer.class);
+                final ListViewItem item1 = new ListViewItem(key,username1,
+                        null,message,imageId,time,commentCount, likeCount);
+                if(imageId!=null){
+                    getImage(item1,imageId);
+                }
+                list.add(start,item1);
+                adapter.notifyDataSetChanged();
+            }
 
-                //comments to be added to this list
-                final List<ListViewComment> comments = new ArrayList<>();
-                ListViewComment comment = new ListViewComment(null,null,"el comentario");
-                comments.add(comment);
-
-                final ListViewItem item = new ListViewItem(key,username1,null,message,time, comments);
-
-                if(type.equals("image")){
-                    getImage(item,message);
-                    list.add(start,item);
-                    adapter.notifyDataSetChanged();
-                }else if(type.equals("message")){
-                    list.add(start,item);
-                    adapter.notifyDataSetChanged();
+            @Override
+            public void onChildChanged(DataSnapshot dst, String s) {
+                final String key = dst.getKey();
+                final int commentCount = dst.child("comments").getValue(Integer.class);
+                final int likeCount = dst.child("likes").getValue(Integer.class);
+                for(int i = 0; i< list.size();i++){
+                    if(list.get(i).getId().equals(key)){
+                        ListViewItem item = list.get(i);
+                        item.setComments(commentCount);
+                        item.setLikes(likeCount);
+                        adapter.notifyDataSetChanged();
+                    }
                 }
             }
 
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-
+                for (int i = 0; i < list.size(); i++) {
+                    if (list.get(i).getId().equals(dataSnapshot.getKey())) {
+                        list.remove(i);
+                        break;
+                    }
+                }
+                adapter.notifyDataSetChanged();
             }
 
             @Override
@@ -160,18 +174,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-    }
-
-    public void sendMessage(View view) {
-        String text = editText.getText().toString().trim();
-        if(!TextUtils.isEmpty(text)) {
-            firebaseController.sendMessage(text,"message");
-            editText.setText("");
-        }else{
-            //check
-            Toast.makeText(MainActivity.this, "Empty message", Toast.LENGTH_SHORT).show();
-        }
-
     }
 
     public void getImage(final ListViewItem item, final String message){
@@ -194,35 +196,13 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void uploadImage(View view){
-        Intent i = new Intent(Intent.ACTION_PICK);
-        i.setType("image/*");
-        startActivityForResult(i, 1);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
-            final Uri imageUri = data.getData();
-            try{
-                InputStream imageStream = getContentResolver().openInputStream(imageUri);
-                Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-                selectedImage = ImageController.ResizeImage(selectedImage,1300);
-                byte[] image = ImageController.BitmapToBytes(selectedImage);
-                firebaseController.sendImage(image);
-            }catch (FileNotFoundException e){
-                Log.d("Exception", e.getMessage());
-            }
-        }
-    }
 
     @Override
     public void onBackPressed() {
         if (backPressedTime + 1000 > System.currentTimeMillis() ) {
             backToast.cancel();
             FirebaseAuth.getInstance().signOut();
-            LoginManager.getInstance().logOut();
+            //LoginManager.getInstance().logOut();
             Intent i = new Intent(this, LoginActivity.class); //if under this dialog you do not have your MainActivity
             i.addFlags(i.FLAG_ACTIVITY_CLEAR_TOP);
             i.addFlags(i.FLAG_ACTIVITY_CLEAR_TASK);
@@ -235,6 +215,27 @@ public class MainActivity extends AppCompatActivity {
         }
         backPressedTime = System.currentTimeMillis();
     }
+    private BottomNavigationView.OnNavigationItemSelectedListener navListener =
+            new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    Activity selectedActivity = null;
 
+                    switch (item.getItemId()) {
+                        case R.id.nav_home:
+
+                            break;
+                        case R.id.nav_events:
+                            Intent intent1 = new Intent(MainActivity.this, EventsActivity.class);
+                            startActivity(intent1);
+                            break;
+                        case R.id.nav_settings:
+                            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                            startActivity(intent);
+                            break;
+                    }
+                    return true;
+                }
+            };
 
 }

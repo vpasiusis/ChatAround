@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".PostingActivity"
+    android:background="@color/feed_bg">
+
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/posting_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/com_facebook_button_background_color_disabled"/>
+
+    <EditText
+        android:id="@+id/enterTextidpost"
+        android:layout_width="match_parent"
+        android:layout_height="521dp"
+        android:layout_above="@id/bottom_navigation"
+        android:layout_below="@+id/PostButtonId"
+        android:hint="Type here.."
+        android:layout_marginTop="17dp"
+        android:layout_marginBottom="13dp"
+        android:fadingEdge="horizontal"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/PostButtonId"
+        style="@style/Widget.AppCompat.Button"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+
+        android:layout_toRightOf="@id/UploadButtonId"
+        android:layout_below="@id/posting_toolbar"
+        android:layout_marginBottom="21dp"
+        android:onClick="sendMessage"
+        android:background="@drawable/sharp_send_black_48dp"
+        />
+    <Button
+        android:id="@+id/UploadButtonId"
+        style="@style/Widget.AppCompat.Button"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:focusable="false"
+        android:layout_marginRight="10dp"
+        android:focusableInTouchMode="false"
+        android:layout_toRightOf="@id/PictureButtonId"
+        android:layout_below="@id/posting_toolbar"
+        android:layout_marginBottom="21dp"
+        android:background="@drawable/sharp_attach_file_black_48dp"
+        android:onClick="uploadImage" />
+
+    <Button
+        android:id="@+id/PictureButtonId"
+        android:layout_below="@id/posting_toolbar"
+        android:layout_marginBottom="21dp"
+
+        android:layout_marginRight="10dp"
+        android:background="@drawable/sharp_camera_enhance_black_48dp"
+        style="@style/Widget.AppCompat.Button"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:focusable="false"
+        android:focusableInTouchMode="false"/>
+
+
+
+    <android.support.design.widget.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        app:menu="@menu/bottom_menu"
+        android:background="@color/com_facebook_button_background_color_disabled"/>
+
+
+</RelativeLayout>

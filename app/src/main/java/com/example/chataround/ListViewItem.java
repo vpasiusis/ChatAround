@@ -2,22 +2,34 @@ package com.example.chataround;
 
 import android.graphics.Bitmap;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class ListViewItem {
-    private String id, name, message, time;
+public class ListViewItem implements Serializable {
+    private String id, name, message, time,imageId;
+    private int comments, likes;
     private Bitmap image;
-    private List<ListViewComment> comments;
     private boolean isLoading=false;
 
-    public ListViewItem(String id, String name, Bitmap image, String message, String time, List<ListViewComment> comments) {
+
+
+    public ListViewItem(String id, String name, Bitmap image, String message, String imageId, String time, int comments, int likes) {
         super();
         this.id = id;
         this.name = name;
         this.image = image;
         this.message = message;
+        this.imageId = imageId;
         this.time = time;
         this.comments = comments;
+        this.likes=likes;
+    }
+    public String getImageId() {
+        return imageId;
+    }
+
+    public void setImageId(String imageId) {
+        this.imageId = imageId;
     }
 
     public String getId() {
@@ -68,11 +80,19 @@ public class ListViewItem {
         this.time = time;
     }
 
-    public List<ListViewComment> getComments(){
+    public void setComments(int comments){
+        this.comments = comments;
+    }
+
+    public int getComments(){
         return comments;
     }
 
-    public void setComments(List<ListViewComment> comments){
-        this.comments = comments;
+    public void setLikes(int likes){
+        this.likes = likes;
+    }
+
+    public int getLikes(){
+        return likes;
     }
 }

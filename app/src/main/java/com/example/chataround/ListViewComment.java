@@ -1,12 +1,15 @@
 package com.example.chataround;
 
-public class ListViewComment {
-    private String name, message, id;
+import java.io.Serializable;
 
-    public ListViewComment(String id, String name, String message){
+public class ListViewComment implements Serializable {
+    private String name, message, id, time;
+
+    public ListViewComment(String id, String name, String message, String time){
         this.id = id;
         this.name = name;
         this.message = message;
+        this.time = time;
     }
 
     public String getName() {
@@ -23,6 +26,14 @@ public class ListViewComment {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
     }
 
     public String getMessage() {

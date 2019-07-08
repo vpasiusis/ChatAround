@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".CommentsActivity"
+    android:background="@color/feed_bg">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/main_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/com_facebook_button_background_color_disabled"/>
+
+    <TextView
+        android:id="@+id/itemName1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/main_toolbar"
+        android:textSize="@dimen/feed_item_name"
+        android:layout_marginLeft="@dimen/feed_item_margin_sides"
+        android:layout_marginRight="@dimen/feed_item_margin_sides"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/itemTime1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/itemName1"
+        android:textColor="@color/timestamp"
+        android:paddingBottom="@dimen/feed_item_padding_time"
+        android:layout_marginLeft="@dimen/feed_item_margin_sides"
+        android:layout_marginRight="@dimen/feed_item_margin_sides"
+        android:textSize="@dimen/feed_item_time" />
+
+    <TextView
+        android:id="@+id/itemMessage1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/itemTime1"
+        android:layout_marginLeft="@dimen/feed_item_margin_sides"
+        android:layout_marginRight="@dimen/feed_item_margin_sides"
+        android:textSize="@dimen/feed_item_message" />
+
+    <EditText
+        android:id="@+id/enterTextid"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_toStartOf="@+id/sendButtonId"
+        android:layout_toLeftOf="@+id/sendButtonId"
+        android:ems="10"
+        android:hint="Type here.."
+        android:inputType="textPersonName" />
+
+    <Button
+        android:id="@+id/sendButtonId"
+        android:layout_width="48dp"
+        android:layout_alignParentBottom="true"
+        android:layout_height="48dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:onClick="sendComment"
+        android:background="@drawable/sharp_send_black_48dp" />
+
+    <ListView
+        android:id="@+id/listViewComments"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/itemMessage1"
+        android:layout_above="@+id/enterTextid"
+        android:childDivider="@color/feed_item_border"
+        android:divider="@color/feed_item_border"
+        android:dividerHeight="@dimen/feed_item_border_width"
+        android:groupIndicator="@null" />
+
+</RelativeLayout>

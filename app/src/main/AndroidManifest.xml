@@ -3,7 +3,7 @@
     package="com.example.chataround">
 
     <uses-permission android:name="android.permission.INTERNET"/>
-
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
         android:allowBackup="true"
@@ -16,14 +16,27 @@
             android:name=".MainActivity"
             android:screenOrientation="portrait"></activity>
         <activity
+            android:name=".CommentsActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity
             android:name=".CreateAccountActivity"
             android:screenOrientation="portrait"></activity>
-        <activity android:name=".LoginActivity">
+        <activity
+            android:name=".PostingActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".SettingsActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".EventsActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".LoginActivity"  android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
 
 
