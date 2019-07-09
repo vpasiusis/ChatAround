@@ -40,7 +40,6 @@ public class CommentAdapter extends BaseAdapter {
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
-
         if (inflater == null){
             inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
@@ -53,7 +52,6 @@ public class CommentAdapter extends BaseAdapter {
         final ListViewComment comment = commentList.get(i);
         name.setText(comment.getName());
         time.setText(comment.getTime());
-
 
         // Check for empty message
         if (!TextUtils.isEmpty(comment.getMessage())) {

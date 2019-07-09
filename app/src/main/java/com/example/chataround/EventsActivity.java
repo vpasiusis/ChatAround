@@ -19,8 +19,9 @@ public class EventsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         setContentView(R.layout.events_activity);
-        Toolbar postingToolbar = (Toolbar) findViewById(R.id.main_toolbar);
-        setSupportActionBar(postingToolbar);
+        Toolbar eventsToolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        eventsToolbar.setTitle("Latest events");
+        setSupportActionBar(eventsToolbar);
         activity = EventsActivity.this;
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);

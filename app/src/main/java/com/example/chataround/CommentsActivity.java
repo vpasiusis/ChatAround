@@ -34,6 +34,7 @@ public class CommentsActivity extends AppCompatActivity {
         setContentView(R.layout.comments_activity);
 
         Toolbar mainToolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        mainToolbar.setTitle("Post");
         setSupportActionBar(mainToolbar);
         firebaseController = FirebaseController.getInstance();
 
@@ -49,7 +50,8 @@ public class CommentsActivity extends AppCompatActivity {
         listView.setAdapter(adapter);
 
         message.setText(item.getMessage());
-        time.setText(item.getTime());
+        String realtime = firebaseController.diffTime(item.getTime());
+        time.setText(realtime);
         user.setText(item.getName());
 
         loadComments();

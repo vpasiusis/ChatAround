@@ -48,6 +48,7 @@ public class PostingActivity extends AppCompatActivity {
 
         setContentView(R.layout.posting_activity);
         Toolbar postingToolbar = (Toolbar) findViewById(R.id.posting_toolbar);
+        postingToolbar.setTitle("New post");
         setSupportActionBar(postingToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -154,7 +155,7 @@ public class PostingActivity extends AppCompatActivity {
 
     public void sendMessage(View view) {
         String text = editPostText.getText().toString().trim();
-        if(!TextUtils.isEmpty(text)) {
+        if(!TextUtils.isEmpty(text)||hasImageSpan(editPostText)) {
             if (hasImageSpan(editPostText)) {
                 firebaseController.sendImage(image,text);
                 Intent intent = new Intent(this, MainActivity.class);
@@ -184,10 +185,9 @@ public class PostingActivity extends AppCompatActivity {
     }
 
     private void addImageInEditTextUpload(Drawable drawable) {
-
         drawable.setBounds(0, 0, (int)(drawable.getIntrinsicWidth()*0.2), (int)(drawable.getIntrinsicHeight()*0.2));
         int selectionCursorPos = editPostText.getSelectionStart();
-        editPostText.getText().insert(selectionCursorPos, ".");
+        editPostText.getText().insert(selectionCursorPos, " ");
         selectionCursorPos = editPostText.getSelectionStart();
         SpannableStringBuilder builder = new SpannableStringBuilder(editPostText.getText());
         int startPos = selectionCursorPos - ".".length();
