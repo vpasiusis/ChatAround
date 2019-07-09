@@ -34,8 +34,6 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private ListView listView;
-    private long backPressedTime;
-    private Toast backToast;
     private FirebaseController firebaseController;
     private List<ListViewItem> list;
     private ItemAdapter adapter;
@@ -72,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(MainActivity.this, CommentsActivity.class);
                 firebaseController.setCurrentSelectedItem(adapter.getListViewItem(i));
+                intent.putExtra("keyboard", false);
                 startActivity(intent);
             }
         });

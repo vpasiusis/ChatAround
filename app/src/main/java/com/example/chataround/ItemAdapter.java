@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.text.TextUtils;
@@ -31,7 +32,6 @@ public class ItemAdapter extends BaseAdapter {
     private LayoutInflater inflater;
     private List<ListViewItem> itemList;
     private FirebaseController firebaseController;
-
 
 
     public ItemAdapter(Activity activity, List<ListViewItem> itemList){
@@ -85,8 +85,11 @@ public class ItemAdapter extends BaseAdapter {
         commentCount.setText(String.valueOf(item.getComments()));
         likeCount.setText(String.valueOf(item.getLikes()));
 
-        //jeigu sita nera, buginasi vaizdas tada kai scrollini greitai.
-        if(item.getLikes()==0){likeButton.setBackgroundResource(R.drawable.like);}
+        if(!item.getLiked()){
+            likeButton.setBackgroundResource(R.drawable.like);
+        }else{
+            likeButton.setBackgroundResource(R.drawable.liked);
+        }
 
         // Check for empty message
         if (!TextUtils.isEmpty(item.getMessage())) {
@@ -103,9 +106,11 @@ public class ItemAdapter extends BaseAdapter {
 
                 if("+".equals(dataSnapshot.child(firebaseController.getUsername()).getValue())){
                     likeButton.setBackgroundResource(R.drawable.liked);
+                    item.setLiked(true);
                 }
                 else {
                     likeButton.setBackgroundResource(R.drawable.like);
+                    item.setLiked(false);
                 }
             }
 
@@ -135,6 +140,15 @@ public class ItemAdapter extends BaseAdapter {
         } else {
             image.setVisibility(View.GONE);
         }
+        commentButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(activity, CommentsActivity.class);
+                firebaseController.setCurrentSelectedItem(item);
+                intent.putExtra("keyboard", true);
+                activity.startActivity(intent);
+            }
+        });
         likeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -144,12 +158,14 @@ public class ItemAdapter extends BaseAdapter {
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if(dataSnapshot.child(firebaseController.getUsername()).getValue()==null){
                             likeButton.setBackgroundResource(R.drawable.liked);
+                            item.setLiked(true);
                             item.setLikes(item.getLikes()+1);
                             firebaseController.getMyDatabase().child("Messages").child(item.getId()).child("likes").setValue(item.getLikes());
                             firebaseController.getMyDatabase().
                                     child("Liked").child(item.getId()).child(firebaseController.getUsername()).setValue("+");
                         }else {
                             likeButton.setBackgroundResource(R.drawable.like);
+                            item.setLiked(false);
                             item.setLikes(item.getLikes()-1);
                             firebaseController.getMyDatabase().child("Messages").child(item.getId()).child("likes").setValue(item.getLikes());
                             firebaseController.getMyDatabase().
@@ -222,6 +238,13 @@ public class ItemAdapter extends BaseAdapter {
                     }
                 });
                 builder.show();
+            }
+        });
+
+        image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //someday, someday...
             }
         });
 

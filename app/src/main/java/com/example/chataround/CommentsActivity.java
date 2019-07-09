@@ -1,10 +1,15 @@
 package com.example.chataround;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -53,6 +58,14 @@ public class CommentsActivity extends AppCompatActivity {
         String realtime = firebaseController.diffTime(item.getTime());
         time.setText(realtime);
         user.setText(item.getName());
+
+        boolean keyboard = getIntent().getExtras().getBoolean("keyboard");
+        if(keyboard){
+            editMessage.requestFocus();
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            Dialog d = builder.create();
+            d.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        }
 
         loadComments();
     }
