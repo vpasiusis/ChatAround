@@ -21,8 +21,8 @@ public class FirebaseController {
     private FirebaseUser currentFirebaseUser;
     private DatabaseReference myDatabase;
     private StorageReference myStorage;
-    private String Email;
     private String username;
+    private int type;
     private ListViewItem currentSelectedItem = null;
 
     private FirebaseController(){ }
@@ -40,6 +40,7 @@ public class FirebaseController {
         myStorage = FirebaseStorage.getInstance().getReference().child("Messages");
     }
     public String currentUser(){
+        String Email;
         Email=currentFirebaseUser.getEmail();
         return Email;
     }
@@ -65,6 +66,22 @@ public class FirebaseController {
     public StorageReference getMyStorage(){
         return myStorage;
     }
+
+    public int getMyType() {
+        getMyDatabase().child("users").child(currentFirebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                type = dataSnapshot.child("Type").getValue(Integer.class);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        return type;
+    }
+
 
     public void sendMessage(String message, String imageId){
         String time = getTime();
