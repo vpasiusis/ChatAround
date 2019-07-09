@@ -140,6 +140,7 @@ public class ItemAdapter extends BaseAdapter {
         } else {
             image.setVisibility(View.GONE);
         }
+
         commentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -149,6 +150,13 @@ public class ItemAdapter extends BaseAdapter {
                 activity.startActivity(intent);
             }
         });
+
+        if(item.getName().equals(firebaseController.getUsername())||99==firebaseController.getMyType()){
+            deleteButton.setVisibility(View.VISIBLE);
+        } else {
+            deleteButton.setVisibility(View.GONE);
+        }
+
         likeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

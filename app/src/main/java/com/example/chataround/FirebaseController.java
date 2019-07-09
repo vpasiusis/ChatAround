@@ -21,8 +21,8 @@ public class FirebaseController {
     private FirebaseUser currentFirebaseUser;
     private DatabaseReference myDatabase;
     private StorageReference myStorage;
-    private String Email;
-    private String username;
+    private String username=null;
+    private int type=-1;
     private ListViewItem currentSelectedItem = null;
 
     private FirebaseController(){ }
@@ -39,23 +39,47 @@ public class FirebaseController {
         myDatabase = FirebaseDatabase.getInstance().getReference();
         myStorage = FirebaseStorage.getInstance().getReference().child("Messages");
     }
+    public void setDefaultData(){
+        username=null;
+        type=-1;
+    }
     public String currentUser(){
+        String Email;
         Email=currentFirebaseUser.getEmail();
         return Email;
     }
     public String getUsername(){
-        getMyDatabase().child("users").child(currentFirebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                username = dataSnapshot.child("Username").getValue(String.class);
-            }
+        if(username==null) {
+            System.out.println(1);
+            getMyDatabase().child("users").child(currentFirebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    username = dataSnapshot.child("Username").getValue(String.class);
+                }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
 
-            }
-        });
+                }
+            });
+        }
         return username;
+    }
+    public int getMyType() {
+        if(type==-1) {
+            getMyDatabase().child("users").child(currentFirebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    type = dataSnapshot.child("Type").getValue(Integer.class);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+        return type;
     }
 
     public DatabaseReference getMyDatabase(){
@@ -65,6 +89,7 @@ public class FirebaseController {
     public StorageReference getMyStorage(){
         return myStorage;
     }
+
 
     public void sendMessage(String message, String imageId){
         String time = getTime();
