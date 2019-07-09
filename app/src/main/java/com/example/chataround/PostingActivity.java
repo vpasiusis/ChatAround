@@ -54,6 +54,7 @@ public class PostingActivity extends AppCompatActivity {
 
         setContentView(R.layout.posting_activity);
         Toolbar postingToolbar = (Toolbar) findViewById(R.id.posting_toolbar);
+        postingToolbar.setTitle("New post");
         setSupportActionBar(postingToolbar);
         activity=PostingActivity.this;
         firebaseController = FirebaseController.getInstance();

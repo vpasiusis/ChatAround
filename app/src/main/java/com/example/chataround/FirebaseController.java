@@ -76,7 +76,7 @@ public class FirebaseController {
         newMessage.put("time", time);
         newMessage.put("comments", 0);
         newMessage.put("likes", 0);
-        newMessage.put("username", getUsername());
+        newMessage.put("username", name);
 
         DatabaseReference messageDb = myDatabase.child("Messages").child(key);
         messageDb.setValue(newMessage);
@@ -122,31 +122,50 @@ public class FirebaseController {
         key=key.replace(".","");
         return key;
     }
-    //Cj galima optimaliau padaryt, bet veikia
+
     public String diffTime(String MessageTime) {
-        long difference ;
-        String time="";
-        String days="", hours="", minute="";
+        long difference;
+        String time = "Just now";
         try {
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Date date1 = df.parse(MessageTime);
             Date date2 = df.parse(getTime());
-            difference = (date2.getTime() - date1.getTime()) / 1000;
+            difference = (date2.getTime() - date1.getTime()) / 1000; // to seconds
+            if(!MessageTime.substring(0,4).equals(getTime().substring(0,4))){
+                SimpleDateFormat df1 = new SimpleDateFormat("dd MMM YY");
+                String date = df1.format(date1);
+                return date;
+            }
             long day = difference / (24 * 3600);
-            if(day==1) {days = day + " day ";}else {days = day + " days ";}
+            if(day==1){
+                String days = day + " day ago";
+                return days;
+            }else if(day>1 && day<7){
+                String days = day + " days ago";
+                return days;
+            }else if(day>=7){
+                SimpleDateFormat df1 = new SimpleDateFormat("dd MMM");
+                String date = df1.format(date1);
+                return date;
+            }
             difference = difference % (24 * 3600);
             long hour = difference / 3600;
-            if(hour==1) {hours = hour + " hour ";}else { hours = hour + " hours ";}
+            if(hour==1){
+                String hours = hour + " hour ago";
+                return hours;
+            }else if(hour>1 && hour<24){
+                String hours = hour + " hours ago";
+                return hours;
+            }
             difference %= 3600;
-            long minutes = difference / 60 ;
-            if(minutes==1) {minute = minutes + " minute ";}else {minute = minutes + " minutes ";}
-            difference %= 60;
-            long seconds = difference;
-            if(day==0){ time = hours + minute +"ago"; }
-            if(day==0&&hour==0){ time = minute + seconds + " Seconds ago";}
-            if(day==0&&hour==0&&minutes==0) { time = seconds + " Seconds ago";}
-            if(day==0&&hour==0&&minutes==0&&seconds<20) { time="Few second ago";}
-            if(day!=0){ time = days + hours + "ago" ;}
+            long minute = difference / 60 ;
+            if(minute==1){
+                String minutes = minute + " minute ago";
+                return minutes;
+            }else if(minute>1 && minute<60){
+                String minutes = minute + " minutes ago";
+                return minutes;
+            }
         } catch (Throwable e) {
             e.printStackTrace();
         }

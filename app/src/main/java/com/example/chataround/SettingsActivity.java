@@ -20,8 +20,9 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         setContentView(R.layout.settings_activity);
-        Toolbar postingToolbar = (Toolbar) findViewById(R.id.posting_toolbar);
-        setSupportActionBar(postingToolbar);
+        Toolbar settingsToolbar = (Toolbar) findViewById(R.id.posting_toolbar);
+        settingsToolbar.setTitle("Settings");
+        setSupportActionBar(settingsToolbar);
         activity = SettingsActivity.this;
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);

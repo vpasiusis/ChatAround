@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Toolbar mainToolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        mainToolbar.setTitle("Latest posts");
         listView = findViewById(R.id.listview1);
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         LikeButton = findViewById(R.id.likeButton);
@@ -196,25 +197,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
-    @Override
-    public void onBackPressed() {
-        if (backPressedTime + 1000 > System.currentTimeMillis() ) {
-            backToast.cancel();
-            FirebaseAuth.getInstance().signOut();
-            //LoginManager.getInstance().logOut();
-            Intent i = new Intent(this, LoginActivity.class); //if under this dialog you do not have your MainActivity
-            i.addFlags(i.FLAG_ACTIVITY_CLEAR_TOP);
-            i.addFlags(i.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(i);
-            finish();
-            return;
-        } else {
-            backToast = Toast.makeText(getBaseContext(), "Press one more time to exit", Toast.LENGTH_SHORT);
-            backToast.show();
-        }
-        backPressedTime = System.currentTimeMillis();
-    }
     private BottomNavigationView.OnNavigationItemSelectedListener navListener =
             new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
