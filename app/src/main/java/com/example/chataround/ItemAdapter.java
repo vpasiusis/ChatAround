@@ -199,8 +199,17 @@ public class ItemAdapter extends BaseAdapter {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         firebaseController = FirebaseController.getInstance();
-                        firebaseController.initialize();
-                        firebaseController.getMyDatabase().child("Messages").child(item.getId()).removeValue();
+                        firebaseController.getMyDatabase().child("Messages").child(item.getId()).
+                                removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                activity.finish();
+                                activity.overridePendingTransition(0, 0);
+                                activity.startActivity(activity.getIntent());
+                                activity.overridePendingTransition(0, 0);
+                            }
+                        });
+
                         if(item.getComments()!=0) {
                             firebaseController.getMyDatabase().child("Comments").addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
@@ -236,8 +245,6 @@ public class ItemAdapter extends BaseAdapter {
                             });
 
                         }
-                        itemList.remove(item);
-                        notifyDataSetChanged();
                     }
                 }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override

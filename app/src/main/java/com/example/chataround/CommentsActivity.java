@@ -29,7 +29,7 @@ public class CommentsActivity extends AppCompatActivity {
     private ListView listView;
     private List<ListViewComment> comments;
     private CommentAdapter adapter;
-    private TextView message,time,user;
+    private TextView message,time,user,commentNumber;
     private EditText editMessage;
     private FirebaseController firebaseController;
 
@@ -49,6 +49,7 @@ public class CommentsActivity extends AppCompatActivity {
         time = findViewById(R.id.itemTime1);
         user = findViewById(R.id.itemName1);
         editMessage = findViewById(R.id.enterTextid);
+        commentNumber = findViewById(R.id.commentNumber);
 
         comments = new ArrayList<>();
         adapter = new CommentAdapter(CommentsActivity.this,comments);
@@ -58,6 +59,11 @@ public class CommentsActivity extends AppCompatActivity {
         String realtime = firebaseController.diffTime(item.getTime());
         time.setText(realtime);
         user.setText(item.getName());
+
+        int comments = item.getComments();
+        if(comments==0) commentNumber.setText("No comments");
+        else if(comments==1) commentNumber.setText("Showing 1 comment");
+        else commentNumber.setText("Showing " + comments + " comments");
 
         boolean keyboard = getIntent().getExtras().getBoolean("keyboard");
         if(keyboard){

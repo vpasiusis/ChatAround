@@ -41,8 +41,8 @@
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/feed_item_name"
                 android:layout_marginTop="@dimen/feed_item_margin_top_bottom"
-                android:layout_marginLeft="@dimen/feed_item_margin_top_bottom"
-                android:layout_marginRight="@dimen/feed_item_margin_top_bottom"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
                 android:textStyle="bold" />
 
             <TextView
@@ -50,9 +50,9 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/itemName1"
-                android:layout_marginLeft="@dimen/feed_item_margin_top_bottom"
+                android:layout_marginLeft="20dp"
                 android:layout_marginTop="5dp"
-                android:layout_marginRight="@dimen/feed_item_margin_top_bottom"
+                android:layout_marginRight="20dp"
                 android:textSize="@dimen/feed_item_message" />
 
             <TextView
@@ -62,23 +62,41 @@
                 android:layout_below="@+id/itemMessage1"
                 android:layout_marginTop="5dp"
                 android:textColor="@color/timestamp"
-                android:layout_marginLeft="@dimen/feed_item_margin_top_bottom"
-                android:layout_marginRight="@dimen/feed_item_margin_top_bottom"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
                 android:layout_marginBottom="@dimen/feed_item_margin_top_bottom"
                 android:textSize="@dimen/feed_item_time" />
 
             <View
-                android:id="@+id/borderMessage"
+                android:id="@+id/borderMessage1"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/feed_item_border_width"
                 android:layout_below="@+id/itemTime1"
+                android:background="@color/feed_item_border"/>
+
+            <TextView
+                android:id="@+id/commentNumber"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/borderMessage1"
+                android:textStyle="bold"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="@dimen/feed_item_margin_top_bottom"
+                android:layout_marginBottom="@dimen/feed_item_margin_top_bottom" />
+
+            <View
+                android:id="@+id/borderMessage2"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/feed_item_border_width"
+                android:layout_below="@+id/commentNumber"
                 android:background="@color/feed_item_border"/>
 
             <ListView
                 android:id="@+id/listViewComments"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@+id/borderMessage"
+                android:layout_below="@+id/borderMessage2"
                 android:childDivider="@color/feed_item_border"
                 android:divider="@color/feed_item_border"
                 android:dividerHeight="@dimen/feed_item_border_width"
@@ -87,6 +105,13 @@
         </RelativeLayout>
 
     </RelativeLayout>
+
+    <View
+        android:id="@+id/borderEdit"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/feed_item_border_width"
+        android:layout_above="@+id/enterTextid"
+        android:background="@color/feed_item_border"/>
 
     <EditText
         android:id="@+id/enterTextid"

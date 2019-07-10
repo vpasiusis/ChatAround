@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private ItemAdapter adapter;
     private int loadedItems = 0;
     private Button LikeButton;
+    private boolean restarting=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,20 +122,22 @@ public class MainActivity extends AppCompatActivity {
         query.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dst, String s) {
-                final String key = dst.getKey();
-                final String message = dst.child("message").getValue(String.class);
-                final String imageId = dst.child("imageId").getValue(String.class);
-                final String username1 = dst.child("username").getValue(String.class);
-                final String time = dst.child("time").getValue(String.class);
-                final int commentCount = dst.child("comments").getValue(Integer.class);
-                final int likeCount = dst.child("likes").getValue(Integer.class);
-                final ListViewItem item1 = new ListViewItem(key,username1,
-                        null,message,imageId,time,commentCount, likeCount);
-                if(imageId!=null){
-                    getImage(item1,imageId);
+                if(!restarting){
+                    final String key = dst.getKey();
+                    final String message = dst.child("message").getValue(String.class);
+                    final String imageId = dst.child("imageId").getValue(String.class);
+                    final String username1 = dst.child("username").getValue(String.class);
+                    final String time = dst.child("time").getValue(String.class);
+                    final int commentCount = dst.child("comments").getValue(Integer.class);
+                    final int likeCount = dst.child("likes").getValue(Integer.class);
+                    final ListViewItem item1 = new ListViewItem(key,username1,
+                            null,message,imageId,time,commentCount, likeCount);
+                    if(imageId!=null){
+                        getImage(item1,imageId);
+                    }
+                    list.add(start,item1);
+                    adapter.notifyDataSetChanged();
                 }
-                list.add(start,item1);
-                adapter.notifyDataSetChanged();
             }
 
             @Override
@@ -154,13 +157,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-                for (int i = 0; i < list.size(); i++) {
-                    if (list.get(i).getId().equals(dataSnapshot.getKey())) {
-                        list.remove(i);
-                        break;
-                    }
-                }
-                adapter.notifyDataSetChanged();
+                restarting=true;
             }
 
             @Override
