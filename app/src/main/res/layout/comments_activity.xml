@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".CommentsActivity"
-    android:background="@color/feed_bg">
+    android:background="@color/white">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/main_toolbar"
@@ -19,35 +19,74 @@
         android:layout_below="@+id/main_toolbar"
         android:background="@color/feed_item_border"/>
 
-    <TextView
-        android:id="@+id/itemName1"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_below="@+id/border"
-        android:textSize="@dimen/feed_item_name"
-        android:layout_marginLeft="@dimen/feed_item_margin_sides"
-        android:layout_marginRight="@dimen/feed_item_margin_sides"
-        android:textStyle="bold" />
+        android:layout_above="@+id/enterTextid"
+        android:background="@color/feedRed">
 
-    <TextView
-        android:id="@+id/itemTime1"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/itemName1"
-        android:textColor="@color/timestamp"
-        android:paddingBottom="@dimen/feed_item_padding_time"
-        android:layout_marginLeft="@dimen/feed_item_margin_sides"
-        android:layout_marginRight="@dimen/feed_item_margin_sides"
-        android:textSize="@dimen/feed_item_time" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/feed_item_margin_top_bottom"
+            android:layout_marginTop="@dimen/feed_item_margin_top_bottom"
+            android:layout_marginRight="@dimen/feed_item_margin_top_bottom"
+            android:layout_marginBottom="@dimen/feed_item_margin_top_bottom"
+            android:background="@color/white">
 
-    <TextView
-        android:id="@+id/itemMessage1"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/itemTime1"
-        android:layout_marginLeft="@dimen/feed_item_margin_sides"
-        android:layout_marginRight="@dimen/feed_item_margin_sides"
-        android:textSize="@dimen/feed_item_message" />
+            <TextView
+                android:id="@+id/itemName1"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/feed_item_name"
+                android:layout_marginTop="@dimen/feed_item_margin_top_bottom"
+                android:layout_marginLeft="@dimen/feed_item_margin_top_bottom"
+                android:layout_marginRight="@dimen/feed_item_margin_top_bottom"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/itemMessage1"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/itemName1"
+                android:layout_marginLeft="@dimen/feed_item_margin_top_bottom"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="@dimen/feed_item_margin_top_bottom"
+                android:textSize="@dimen/feed_item_message" />
+
+            <TextView
+                android:id="@+id/itemTime1"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/itemMessage1"
+                android:layout_marginTop="5dp"
+                android:textColor="@color/timestamp"
+                android:layout_marginLeft="@dimen/feed_item_margin_top_bottom"
+                android:layout_marginRight="@dimen/feed_item_margin_top_bottom"
+                android:layout_marginBottom="@dimen/feed_item_margin_top_bottom"
+                android:textSize="@dimen/feed_item_time" />
+
+            <View
+                android:id="@+id/borderMessage"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/feed_item_border_width"
+                android:layout_below="@+id/itemTime1"
+                android:background="@color/feed_item_border"/>
+
+            <ListView
+                android:id="@+id/listViewComments"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/borderMessage"
+                android:childDivider="@color/feed_item_border"
+                android:divider="@color/feed_item_border"
+                android:dividerHeight="@dimen/feed_item_border_width"
+                android:groupIndicator="@null" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
 
     <EditText
         android:id="@+id/enterTextid"
@@ -71,16 +110,5 @@
         android:layout_alignParentRight="true"
         android:onClick="sendComment"
         android:background="@drawable/sharp_send_black_48dp" />
-
-    <ListView
-        android:id="@+id/listViewComments"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/itemMessage1"
-        android:layout_above="@+id/enterTextid"
-        android:childDivider="@color/feed_item_border"
-        android:divider="@color/feed_item_border"
-        android:dividerHeight="@dimen/feed_item_border_width"
-        android:groupIndicator="@null" />
 
 </RelativeLayout>

@@ -82,8 +82,8 @@ public class ItemAdapter extends BaseAdapter {
         name.setText(item.getName());
         String realtime = firebaseController.diffTime(item.getTime());
         time.setText(realtime);
-        commentCount.setText(String.valueOf(item.getComments()));
-        likeCount.setText(String.valueOf(item.getLikes()));
+        commentCount.setText(firebaseController.diffCount(item.getComments()));
+        likeCount.setText(firebaseController.diffCount(item.getLikes()));
 
         if(!item.getLiked()){
             likeButton.setBackgroundResource(R.drawable.like);

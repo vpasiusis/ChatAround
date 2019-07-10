@@ -10,6 +10,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -195,6 +196,18 @@ public class FirebaseController {
             e.printStackTrace();
         }
         return time;
+    }
+
+    public String diffCount(int count){
+        DecimalFormat df = new DecimalFormat("#.#");
+        if(count<1000) return String.valueOf(count);
+        else if(count<1000000){
+            String value = String.valueOf(df.format((float)count/1000));
+            return value + "K";
+        }else{
+            String value = String.valueOf(df.format((float)count/1000000));
+            return  value + "M";
+        }
     }
 
     public ListViewItem getCurrentSelectedItem(){

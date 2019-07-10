@@ -27,9 +27,8 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/bottom_navigation"
         android:layout_below="@+id/border"
-        android:childDivider="@color/feed_item_border"
-        android:divider="@color/feed_item_border"
-        android:dividerHeight="@dimen/feed_item_border_width"
+        android:dividerHeight="0dp"
+        android:divider="@null"
         android:groupIndicator="@null" />
 
     <View
