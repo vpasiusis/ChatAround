@@ -1,14 +1,22 @@
 package com.example.chataround;
 
+import android.net.Uri;
+import android.support.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -16,7 +24,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FirebaseController {
     private static FirebaseController instance = null;
@@ -26,9 +33,8 @@ public class FirebaseController {
     private String username;
     private String description = null;
     private int type = -1;
-    private int userLikes;
-    private int userPosts;
-    private AtomicBoolean done;
+    private int userLikes=-1;
+    private int userPosts=-1;
     private String postUserUid;
     private ListViewItem currentSelectedItem = null;
 
@@ -60,19 +66,19 @@ public class FirebaseController {
     }
 
     public void getUsername() {
-
-        getMyDatabase().child("users").child(currentFirebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+        Query queryName = getMyDatabase().
+                child("users").orderByKey();
+        queryName.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                username = dataSnapshot.child("Username").getValue(String.class);
-
+                username = dataSnapshot.child(currentFirebaseUser.getUid()).child("Username").getValue(String.class);
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
         });
-
     }
     public String returnUsername(){
         return username;
@@ -103,15 +109,13 @@ public class FirebaseController {
     public StorageReference getMyStorage() {
         return myStorage;
     }
-
-
-    public void sendMessage(String message, String imageId) {
+    public void sendMessage(String message, String imageId){
         String time = getTime();
         String key = getKey(time);
-        String name = username;
+        String name= returnUsername();
         Map<String, Object> newMessage = new HashMap<>();
         newMessage.put("message", message);
-        newMessage.put("imageId", imageId);
+        newMessage.put("imageId",imageId);
         newMessage.put("time", time);
         newMessage.put("comments", 0);
         newMessage.put("likes", 0);
@@ -121,14 +125,14 @@ public class FirebaseController {
         messageDb.setValue(newMessage);
     }
 
-    public void sendComment(String message, String postId, int comments) {
+    public void sendComment(String message, String postId, int comments){
         String time = getTime();
         String key = getKey(time);
 
         Map<String, Object> newMessage = new HashMap<>();
         newMessage.put("message", message);
         newMessage.put("time", time);
-        newMessage.put("username", username);
+        newMessage.put("username", returnUsername());
         newMessage.put("postId", postId);
 
         DatabaseReference commentDb = myDatabase.child("Comments").child(key);
@@ -136,21 +140,69 @@ public class FirebaseController {
 
         DatabaseReference messageDb = myDatabase.child("Messages").child(postId);
         Map<String, Object> changedMessage = new HashMap<>();
-        changedMessage.put("comments", comments + 1);
+        changedMessage.put("comments", comments+1);
         messageDb.updateChildren(changedMessage);
 
     }
 
-    public void sendImage(byte[] image, String message) {
+    public void sendImage(byte[] image, final String message){
         String time = getTime();
         String key = getKey(time);
-        StorageReference file = myStorage.child(key);
-        sendMessage(message, key);
-        file.putBytes(image);
+        final StorageReference file = myStorage.child(key);
+        file.putBytes(image).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                file.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        sendMessage(message,uri.toString());
+                    }
+                });
+            }
+        });
     }
+
 
     public void setDescription(String description) {
         myDatabase.child("users").child(currentFirebaseUser.getUid()).child("Description").setValue(description);
+    }
+    public void setLikes(){
+        if(userLikes!=-1){
+            myDatabase.child("users").child(currentFirebaseUser.getUid()).child("Likes").setValue(userLikes);
+        }
+    }
+    public void setPosts(){
+        if(userPosts!=-1){
+            myDatabase.child("users").child(currentFirebaseUser.getUid()).child("Posts").setValue(userPosts);
+        }
+    }
+    public int getLiked(){
+        myDatabase.child("users").child(currentFirebaseUser.getUid()).child("Likes").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                userLikes=dataSnapshot.getValue(Integer.class);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        return userLikes;
+    }
+    public int getPosts(){
+        myDatabase.child("users").child(currentFirebaseUser.getUid()).child("Posts").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                userPosts=dataSnapshot.getValue(Integer.class);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        return userPosts;
     }
 
     public String getDescription() {
@@ -205,7 +257,6 @@ public class FirebaseController {
                     }
                     userPosts = countingUserLikes;
                 }
-
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
 
@@ -215,11 +266,6 @@ public class FirebaseController {
         return userPosts;
     }
 
-    //
-    //
-    //
-    //
-    //man cia reikia paduot username posto, bet kai paduotu  neveikia.
     public String returnUid(String name){
         final String name2 = name;
         myDatabase.child("users").addListenerForSingleValueEvent(new ValueEventListener() {

@@ -2,8 +2,6 @@ package com.example.chataround;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -15,41 +13,40 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
-import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+
     private ListView listView;
     private FirebaseController firebaseController;
     private List<ListViewItem> list;
     private ItemAdapter adapter;
     private int loadedItems = 0;
-    private Button LikeButton;
     private boolean restarting=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         Toolbar mainToolbar = (Toolbar) findViewById(R.id.main_toolbar);
         mainToolbar.setTitle("Latest posts");
         listView = findViewById(R.id.listview1);
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
-        LikeButton = findViewById(R.id.likeButton);
         firebaseController = FirebaseController.getInstance();
         firebaseController.initialize();
+        firebaseController.getDescription();
+        firebaseController.getLiked();
+        firebaseController.getPosts();
         setSupportActionBar(mainToolbar);
         list = new ArrayList<>();
         adapter = new ItemAdapter(this, list);
@@ -60,12 +57,7 @@ public class MainActivity extends AppCompatActivity {
         loadItems(loadedItems, query);
         loadedItems+=10;
         updateFeed();
-        firebaseController.getUsername();
-        System.out.println(firebaseController.returnUsername());
-        firebaseController.getUserLiked(firebaseController.returnUsername());
-        firebaseController.getUserPostNumber(firebaseController.returnUsername());
-        System.out.println(firebaseController.returnUid("Global moderator"));
-        firebaseController.getDescription();
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -78,11 +70,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.topbar_menu, menu);
@@ -92,8 +79,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId()==R.id.postButton){
-           Intent intent = new Intent(this, PostingActivity.class);
-           startActivity(intent);
+            Intent intent = new Intent(this, PostingActivity.class);
+            startActivity(intent);
         }
 
         if(item.getItemId()==R.id.quit){
@@ -138,9 +125,6 @@ public class MainActivity extends AppCompatActivity {
                     final int likeCount = dst.child("likes").getValue(Integer.class);
                     final ListViewItem item1 = new ListViewItem(key,username1,
                             null,message,imageId,time,commentCount, likeCount);
-                    if(imageId!=null){
-                        //getImage(item1,imageId);
-                    }
                     list.add(start,item1);
                     adapter.notifyDataSetChanged();
                 }
@@ -174,26 +158,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
-            }
-        });
-    }
-
-    public void getImage(final ListViewItem item, final String message){
-        StorageReference ref = firebaseController.getMyStorage().child(message);
-        final long megabyte = 1024*1024;
-        item.setIsLoading(true);
-        ref.getBytes(megabyte).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-            @Override
-            public void onSuccess(byte[] bytes) {
-                Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                item.setImage(image);
-                item.setIsLoading(false);
-                adapter.notifyDataSetChanged();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                getImage(item,message);
             }
         });
     }

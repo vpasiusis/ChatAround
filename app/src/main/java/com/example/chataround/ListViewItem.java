@@ -3,13 +3,12 @@ package com.example.chataround;
 import android.graphics.Bitmap;
 
 import java.io.Serializable;
-import java.util.List;
 
 public class ListViewItem implements Serializable {
     private String id, name, message, time,imageId;
     private int comments, likes;
     private Bitmap image;
-    private boolean isLoading=false, isLiked=false;
+    private boolean isLiked=false;
 
 
 
@@ -56,14 +55,6 @@ public class ListViewItem implements Serializable {
         this.image = image;
     }
 
-    public boolean getIsLoading(){
-        return isLoading;
-    }
-
-    public void setIsLoading(boolean value){
-        isLoading = value;
-    }
-
     public String getMessage() {
         return message;
     }
@@ -99,6 +90,7 @@ public class ListViewItem implements Serializable {
     public void setLiked(boolean isLiked){
         this.isLiked = isLiked;
     }
+
     public boolean getLiked(){
         return isLiked;
     }

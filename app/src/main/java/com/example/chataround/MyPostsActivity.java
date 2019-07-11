@@ -2,8 +2,6 @@ package com.example.chataround;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -19,13 +17,10 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
-import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -120,7 +115,6 @@ public class MyPostsActivity extends AppCompatActivity {
                     return true;
                 }
             };
-
     public void updateFeed(){
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
@@ -140,6 +134,7 @@ public class MyPostsActivity extends AppCompatActivity {
             }
         });
     }
+
     public void loadItems(final int start, Query query) {
         query.addChildEventListener(new ChildEventListener() {
             @Override
@@ -154,9 +149,6 @@ public class MyPostsActivity extends AppCompatActivity {
                     final int likeCount = dst.child("likes").getValue(Integer.class);
                     final ListViewItem item1 = new ListViewItem(key,username1,
                             null,message,imageId,time,commentCount, likeCount);
-                    if(imageId!=null){
-                        //getImage(item1,imageId);
-                    }
                     if(firebaseController.returnUsername().equals(username1)) {
                         list.add(start, item1);
                         adapter.notifyDataSetChanged();
@@ -192,26 +184,6 @@ public class MyPostsActivity extends AppCompatActivity {
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
-            }
-        });
-    }
-
-    public void getImage(final ListViewItem item, final String message){
-        StorageReference ref = firebaseController.getMyStorage().child(message);
-        final long megabyte = 1024*1024;
-        item.setIsLoading(true);
-        ref.getBytes(megabyte).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-            @Override
-            public void onSuccess(byte[] bytes) {
-                Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                item.setImage(image);
-                item.setIsLoading(false);
-                adapter.notifyDataSetChanged();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                getImage(item,message);
             }
         });
     }

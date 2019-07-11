@@ -14,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +23,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 
 import java.util.List;
 
@@ -71,8 +72,8 @@ public class ItemAdapter extends BaseAdapter {
         TextView message = view.findViewById(R.id.itemMessage);
         final TextView commentCount = view.findViewById(R.id.commentCount);
         final TextView likeCount = view.findViewById(R.id.likeCount);
-        ImageView image = view.findViewById(R.id.itemImage);
-        CardView cardView = view.findViewById(R.id.cardView);
+        final ImageView image = view.findViewById(R.id.itemImage);
+        final CardView cardView = view.findViewById(R.id.cardView);
         Button deleteButton = view.findViewById(R.id.deleteButton);
         final Button likeButton = view.findViewById(R.id.likeButton);
         final Button commentButton = view.findViewById(R.id.commentButton);
@@ -118,25 +119,34 @@ public class ItemAdapter extends BaseAdapter {
 
             }
         });
-        ProgressBar progressBar = view.findViewById(R.id.progressBar);
-
-        if(item.getIsLoading()){
-            progressBar.setVisibility(View.VISIBLE);
-        }else{
-            progressBar.setVisibility(View.GONE);
-        }
 
         // Check image
         if(item.getImageId()!=null){
             cardView.setVisibility(View.VISIBLE);
+            image.setVisibility(View.VISIBLE);
+            final View view1 = view;
+            PicassoCache.getPicassoInstance(view1.getContext()).load(item.getImageId()).
+                    networkPolicy(NetworkPolicy.OFFLINE).into(image, new Callback() {
+                @Override
+                public void onSuccess() {
+                }
+
+                @Override
+                public void onError() {
+                    PicassoCache.getPicassoInstance(view1.getContext()).load(item.getImageId()).
+                            into(image, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                        }
+
+                        @Override
+                        public void onError() {
+                        }
+                    });
+                }
+            });
         }else{
             cardView.setVisibility(View.GONE);
-        }
-
-        if (item.getImage() != null) {
-            image.setImageBitmap(item.getImage());
-            image.setVisibility(View.VISIBLE);
-        } else {
             image.setVisibility(View.GONE);
         }
 
@@ -168,10 +178,11 @@ public class ItemAdapter extends BaseAdapter {
                             item.setLiked(true);
                             item.setLikes(item.getLikes()+1);
                             firebaseController.getMyDatabase().child("Messages").child(item.getId()).child("likes").setValue(item.getLikes());
-                            if(item.getName().equals(firebaseController.returnUsername())){
-                            firebaseController.getUserLiked(item.getName());}
-                            firebaseController.getMyDatabase().
+                          firebaseController.getMyDatabase().
                                     child("Liked").child(item.getId()).child(firebaseController.returnUsername()).setValue("+");
+                            if(item.getName().equals(firebaseController.returnUsername())){
+                                firebaseController.getUserLiked(item.getName());
+                                firebaseController.setLikes();}
                         }else {
                             likeButton.setBackgroundResource(R.drawable.like);
                             item.setLiked(false);
@@ -180,7 +191,7 @@ public class ItemAdapter extends BaseAdapter {
                             firebaseController.getMyDatabase(). child("Liked").child(item.getId()).child(firebaseController.returnUsername()).removeValue();
                             if(item.getName().equals(firebaseController.returnUsername())){
                                 firebaseController.getUserLiked(item.getName());
-
+                                firebaseController.setLikes();
                             }
 
                         }
@@ -212,9 +223,12 @@ public class ItemAdapter extends BaseAdapter {
                                 activity.overridePendingTransition(0, 0);
                                 activity.startActivity(activity.getIntent());
                                 activity.overridePendingTransition(0, 0);
+                                firebaseController.getUserPostNumber(firebaseController.returnUsername());
+                                firebaseController.getUserLiked(firebaseController.returnUsername());
+                                firebaseController.setLikes();
+                                firebaseController.setPosts();
                             }
                         });
-                        firebaseController.getUserPostNumber(item.getName());
                         if(item.getComments()!=0) {
                             firebaseController.getMyDatabase().child("Comments").addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override

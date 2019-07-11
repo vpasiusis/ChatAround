@@ -71,14 +71,6 @@
                 card_view:cardCornerRadius="8dp"
                 android:visibility="visible">
 
-                <ProgressBar
-                    android:id="@+id/progressBar"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_gravity="center"
-                    android:indeterminate="true"
-                    android:visibility="gone" />
-
                 <ImageView
                     android:id="@+id/itemImage"
                     android:layout_width="match_parent"

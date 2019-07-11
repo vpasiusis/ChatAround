@@ -30,7 +30,6 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView likeCount;
     private TextView postCount;
     private TextView userName;
-    private String myDescription=null;
     private Button myPostActivity;
 
     @SuppressLint("ClickableViewAccessibility")
@@ -62,13 +61,17 @@ public class ProfileActivity extends AppCompatActivity {
         String username=firebaseController.returnUsername();
         System.out.println(firebaseController.returnUid(firebaseController.returnUsername()));
         descriptionText.setCursorVisible(false);
-        System.out.println(firebaseController.getUserLiked(username));
-        likeCount.setText(firebaseController.getUserLiked(username)+"");
-        postCount.setText(firebaseController.getUserPostNumber(username)+"");
+        firebaseController.getUserPostNumber(username);
+        firebaseController.getUserLiked(username);
+        firebaseController.setLikes();
+        firebaseController.setPosts();
+        likeCount.setText(firebaseController.getLiked()+"");
+        postCount.setText(firebaseController.getPosts()+"");
         userName.setText(" "+username+" ");
         if(firebaseController.getDescription()!=null){
             descriptionText.setText(firebaseController.getDescription());
         }
+
         descriptionButton.setVisibility(View.GONE);
         descriptionText.addTextChangedListener(new TextWatcher() {
 
