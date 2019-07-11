@@ -1,5 +1,11 @@
 package com.example.chataround;
 
+import android.net.Uri;
+import android.support.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -9,6 +15,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -37,7 +44,12 @@ public class FirebaseController {
 
     public void initialize(){
         currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        myDatabase = FirebaseDatabase.getInstance().getReference();
+        if(myDatabase==null){
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            database.setPersistenceEnabled(true);
+            myDatabase=database.getReference();
+
+        }
         myStorage = FirebaseStorage.getInstance().getReference().child("Messages");
     }
     public void setDefaultData(){
@@ -128,12 +140,21 @@ public class FirebaseController {
 
     }
 
-    public void sendImage(byte[] image, String message){
+    public void sendImage(byte[] image, final String message){
         String time = getTime();
         String key = getKey(time);
-        StorageReference file = myStorage.child(key);
-        sendMessage(message,key);
-        file.putBytes(image);
+        final StorageReference file = myStorage.child(key);
+        file.putBytes(image).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                file.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        sendMessage(message,uri.toString());
+                    }
+                });
+            }
+        });
     }
 
     public String getTime(){

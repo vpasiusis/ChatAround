@@ -9,7 +9,7 @@ public class ListViewItem implements Serializable {
     private String id, name, message, time,imageId;
     private int comments, likes;
     private Bitmap image;
-    private boolean isLoading=false, isLiked=false;
+    private boolean isLiked=false;
 
 
 
@@ -54,14 +54,6 @@ public class ListViewItem implements Serializable {
 
     public void setImage(Bitmap image) {
         this.image = image;
-    }
-
-    public boolean getIsLoading(){
-        return isLoading;
-    }
-
-    public void setIsLoading(boolean value){
-        isLoading = value;
     }
 
     public String getMessage() {

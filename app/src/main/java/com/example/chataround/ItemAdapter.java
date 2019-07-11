@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 
 import java.util.List;
 
@@ -72,8 +75,8 @@ public class ItemAdapter extends BaseAdapter {
         TextView message = view.findViewById(R.id.itemMessage);
         final TextView commentCount = view.findViewById(R.id.commentCount);
         final TextView likeCount = view.findViewById(R.id.likeCount);
-        ImageView image = view.findViewById(R.id.itemImage);
-        CardView cardView = view.findViewById(R.id.cardView);
+        final ImageView image = view.findViewById(R.id.itemImage);
+        final CardView cardView = view.findViewById(R.id.cardView);
         Button deleteButton = view.findViewById(R.id.deleteButton);
         final Button likeButton = view.findViewById(R.id.likeButton);
         final Button commentButton = view.findViewById(R.id.commentButton);
@@ -119,25 +122,34 @@ public class ItemAdapter extends BaseAdapter {
 
             }
         });
-        ProgressBar progressBar = view.findViewById(R.id.progressBar);
-
-        if(item.getIsLoading()){
-            progressBar.setVisibility(View.VISIBLE);
-        }else{
-            progressBar.setVisibility(View.GONE);
-        }
 
         // Check image
         if(item.getImageId()!=null){
             cardView.setVisibility(View.VISIBLE);
+            image.setVisibility(View.VISIBLE);
+            final View view1 = view;
+            PicassoCache.getPicassoInstance(view1.getContext()).load(item.getImageId()).
+                    networkPolicy(NetworkPolicy.OFFLINE).into(image, new Callback() {
+                @Override
+                public void onSuccess() {
+                }
+
+                @Override
+                public void onError() {
+                    PicassoCache.getPicassoInstance(view1.getContext()).load(item.getImageId()).
+                            into(image, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                        }
+
+                        @Override
+                        public void onError() {
+                        }
+                    });
+                }
+            });
         }else{
             cardView.setVisibility(View.GONE);
-        }
-
-        if (item.getImage() != null) {
-            image.setImageBitmap(item.getImage());
-            image.setVisibility(View.VISIBLE);
-        } else {
             image.setVisibility(View.GONE);
         }
 

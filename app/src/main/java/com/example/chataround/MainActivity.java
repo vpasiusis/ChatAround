@@ -1,9 +1,6 @@
 package com.example.chataround;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -15,17 +12,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
-import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +29,6 @@ public class MainActivity extends AppCompatActivity {
     private List<ListViewItem> list;
     private ItemAdapter adapter;
     private int loadedItems = 0;
-    private Button LikeButton;
     private boolean restarting=false;
 
     @Override
@@ -49,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
         mainToolbar.setTitle("Latest posts");
         listView = findViewById(R.id.listview1);
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
-        LikeButton = findViewById(R.id.likeButton);
         firebaseController = FirebaseController.getInstance();
         firebaseController.initialize();
         setSupportActionBar(mainToolbar);
@@ -132,9 +122,6 @@ public class MainActivity extends AppCompatActivity {
                     final int likeCount = dst.child("likes").getValue(Integer.class);
                     final ListViewItem item1 = new ListViewItem(key,username1,
                             null,message,imageId,time,commentCount, likeCount);
-                    if(imageId!=null){
-                        getImage(item1,imageId);
-                    }
                     list.add(start,item1);
                     adapter.notifyDataSetChanged();
                 }
@@ -172,31 +159,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void getImage(final ListViewItem item, final String message){
-        StorageReference ref = firebaseController.getMyStorage().child(message);
-        final long megabyte = 1024*1024;
-        item.setIsLoading(true);
-        ref.getBytes(megabyte).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-            @Override
-            public void onSuccess(byte[] bytes) {
-                Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                item.setImage(image);
-                item.setIsLoading(false);
-                adapter.notifyDataSetChanged();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                getImage(item,message);
-            }
-        });
-    }
-
     private BottomNavigationView.OnNavigationItemSelectedListener navListener =
             new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    Activity selectedActivity = null;
 
                     switch (item.getItemId()) {
                         case R.id.nav_home:
@@ -214,5 +180,4 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 }
             };
-
 }
