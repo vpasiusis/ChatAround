@@ -3,6 +3,7 @@ package com.example.chataround;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -22,6 +23,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
+
+import static java.lang.String.format;
+
 public class ProfileActivity extends AppCompatActivity {
     private Activity activity;
     private Button descriptionButton;
@@ -31,6 +38,8 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView postCount;
     private TextView userName;
     private Button myPostActivity;
+    private ProgressDialog progressDialog;
+
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -41,6 +50,9 @@ public class ProfileActivity extends AppCompatActivity {
         setSupportActionBar(settingsToolbar);
         firebaseController= FirebaseController.getInstance();
         activity = ProfileActivity.this;
+        progressDialog = new ProgressDialog(activity);
+        progressDialog.setTitle("Loading data...");
+        progressDialog.show();
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
         bottomNav.setSelectedItemId(R.id.nav_settings);
@@ -58,19 +70,9 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
         firebaseController.getUsername();
-        String username=firebaseController.returnUsername();
-        System.out.println(firebaseController.returnUid(firebaseController.returnUsername()));
+        userName.setText(firebaseController.returnUsername());
         descriptionText.setCursorVisible(false);
-        firebaseController.getUserPostNumber(username);
-        firebaseController.getUserLiked(username);
-        firebaseController.setLikes();
-        firebaseController.setPosts();
-        likeCount.setText(firebaseController.getLiked()+"");
-        postCount.setText(firebaseController.getPosts()+"");
-        userName.setText(" "+username+" ");
-        if(firebaseController.getDescription()!=null){
-            descriptionText.setText(firebaseController.getDescription());
-        }
+        loadData();
 
         descriptionButton.setVisibility(View.GONE);
         descriptionText.addTextChangedListener(new TextWatcher() {
@@ -114,10 +116,59 @@ public class ProfileActivity extends AppCompatActivity {
                 descriptionText.setCursorVisible(true);
                 return false;
             }
-
         });
-
         super.onCreate(savedInstanceState);
+
+    }
+
+    public void loadData() {
+        firebaseController.getMyDatabase().child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(final DataSnapshot dataSnapshot) {
+                for(DataSnapshot snapshot:dataSnapshot.getChildren()){
+                    if(userName.getText().toString().trim().equals(snapshot.child("Username").getValue())){
+                        final String key = snapshot.getKey();
+                        firebaseController.getMyDatabase().child("users").child(key).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                            final String username = dataSnapshot.child("Username").getValue(String.class);
+                            final String avatarId = dataSnapshot.child("AvatarId").getValue(String.class);
+                            final String email = dataSnapshot.child("Email").getValue(String.class);
+                            final int posts = dataSnapshot.child("Posts").getValue(Integer.class);
+                            final int likes = dataSnapshot.child("Likes").getValue(Integer.class);
+                            final int type = dataSnapshot.child("Type").getValue(Integer.class);
+                            final String decription = dataSnapshot.child("Description").getValue(String.class);
+                            final UserClass item1 = new UserClass(key,username,
+                                    avatarId,decription,email,posts,likes, type);
+                            userName.setText(" "+username+" ");
+                            if(decription!=null) {
+                                descriptionText.setText(" " + item1.getDescription() + " ");
+                            }
+                            likeCount.setText(format("%d", item1.getLikes()));
+                            postCount.setText(format("%d", item1.getPosts()));
+                            descriptionButton.setVisibility(View.GONE);
+                            if(avatarId==null) {
+                                //put a default avatar
+                            }
+                            else {
+                                //upload an image
+                            }
+                            progressDialog.dismiss();
+                            }
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
     }
 
@@ -154,7 +205,6 @@ public class ProfileActivity extends AppCompatActivity {
                             startActivity(intent1);
                             break;
                         case R.id.nav_settings:
-
                             break;
                     }
 

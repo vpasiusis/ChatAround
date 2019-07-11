@@ -60,9 +60,6 @@ public class MyPostsActivity extends AppCompatActivity {
         loadedItems+=10;
         updateFeed();
         firebaseController.getUsername();
-        firebaseController.getUserLiked(firebaseController.returnUsername());
-        firebaseController.getUserPostNumber(firebaseController.returnUsername());
-        firebaseController.getDescription();
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {

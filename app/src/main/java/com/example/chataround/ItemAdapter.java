@@ -178,21 +178,17 @@ public class ItemAdapter extends BaseAdapter {
                             item.setLiked(true);
                             item.setLikes(item.getLikes()+1);
                             firebaseController.getMyDatabase().child("Messages").child(item.getId()).child("likes").setValue(item.getLikes());
-                          firebaseController.getMyDatabase().
+                            firebaseController.getMyDatabase().
                                     child("Liked").child(item.getId()).child(firebaseController.returnUsername()).setValue("+");
-                            if(item.getName().equals(firebaseController.returnUsername())){
-                                firebaseController.getUserLiked(item.getName());
-                                firebaseController.setLikes();}
+                            firebaseController.updateLikes(item.getName(),true,1);
+
                         }else {
                             likeButton.setBackgroundResource(R.drawable.like);
                             item.setLiked(false);
                             item.setLikes(item.getLikes()-1);
                             firebaseController.getMyDatabase().child("Messages").child(item.getId()).child("likes").setValue(item.getLikes());
                             firebaseController.getMyDatabase(). child("Liked").child(item.getId()).child(firebaseController.returnUsername()).removeValue();
-                            if(item.getName().equals(firebaseController.returnUsername())){
-                                firebaseController.getUserLiked(item.getName());
-                                firebaseController.setLikes();
-                            }
+                            firebaseController.updateLikes(item.getName(),false,1);
 
                         }
                     }
@@ -223,10 +219,7 @@ public class ItemAdapter extends BaseAdapter {
                                 activity.overridePendingTransition(0, 0);
                                 activity.startActivity(activity.getIntent());
                                 activity.overridePendingTransition(0, 0);
-                                firebaseController.getUserPostNumber(firebaseController.returnUsername());
-                                firebaseController.getUserLiked(firebaseController.returnUsername());
-                                firebaseController.setLikes();
-                                firebaseController.setPosts();
+                                firebaseController.updatePosts(item.getName(),false);
                             }
                         });
                         if(item.getComments()!=0) {
@@ -248,6 +241,7 @@ public class ItemAdapter extends BaseAdapter {
                         }
                         if(item.getLikes()!=0) {
                             firebaseController.getMyDatabase().child("Liked").child(item.getId()).removeValue();
+                            firebaseController.updateLikes(item.getName(),false,item.getLikes());
                         }
                         if(item.getImage()!=null) {
                             StorageReference ref = firebaseController.getMyStorage().child(item.getImageId());

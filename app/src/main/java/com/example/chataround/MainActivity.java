@@ -44,9 +44,6 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         firebaseController = FirebaseController.getInstance();
         firebaseController.initialize();
-        firebaseController.getDescription();
-        firebaseController.getLiked();
-        firebaseController.getPosts();
         setSupportActionBar(mainToolbar);
         list = new ArrayList<>();
         adapter = new ItemAdapter(this, list);

@@ -161,50 +161,9 @@ public class FirebaseController {
             }
         });
     }
-
-
     public void setDescription(String description) {
         myDatabase.child("users").child(currentFirebaseUser.getUid()).child("Description").setValue(description);
     }
-    public void setLikes(){
-        if(userLikes!=-1){
-            myDatabase.child("users").child(currentFirebaseUser.getUid()).child("Likes").setValue(userLikes);
-        }
-    }
-    public void setPosts(){
-        if(userPosts!=-1){
-            myDatabase.child("users").child(currentFirebaseUser.getUid()).child("Posts").setValue(userPosts);
-        }
-    }
-    public int getLiked(){
-        myDatabase.child("users").child(currentFirebaseUser.getUid()).child("Likes").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                userLikes=dataSnapshot.getValue(Integer.class);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        return userLikes;
-    }
-    public int getPosts(){
-        myDatabase.child("users").child(currentFirebaseUser.getUid()).child("Posts").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                userPosts=dataSnapshot.getValue(Integer.class);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        return userPosts;
-    }
-
     public String getDescription() {
         myDatabase.child("users").child(currentFirebaseUser.getUid()).child("Description").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -220,60 +179,21 @@ public class FirebaseController {
 
         return description;
     }
-    public int getUserLiked(final String name) {
-        if(name!=null) {
-            myDatabase.child("Messages").addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    int countingUserPost = 0;
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        if (name.equals(snapshot.child("username").getValue())) {
-                            countingUserPost += snapshot.child("likes").getValue(Integer.class);
-                        }
-                    }
-                    userLikes = countingUserPost;
-                }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-        }
-
-        return userLikes;
-    }
-
-    public int getUserPostNumber(final String name) {
-        if(name!=null) {
-            myDatabase.child("Messages").addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    int countingUserLikes = 0;
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        if (name.equals(snapshot.child("username").getValue())) {
-                            countingUserLikes += 1;
-                        }
-                    }
-                    userPosts = countingUserLikes;
-                }
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-        }
-        return userPosts;
-    }
-
-    public String returnUid(String name){
+    public void updateLikes(String name, final boolean liked,final int number){
         final String name2 = name;
         myDatabase.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for(DataSnapshot snapshot:dataSnapshot.getChildren()){
                     if(name2.equals(snapshot.child("Username").getValue())){
-                       postUserUid= snapshot.getKey();
+                        int value;
+                        if(liked) {
+                            value = snapshot.child("Likes").getValue(Integer.class) + number;
+                        }else {
+                            value = snapshot.child("Likes").getValue(Integer.class) - number;
+                        }
+                        myDatabase.child("users").child(snapshot.getKey()).child("Likes").setValue(value);
                     }
                 }
             }
@@ -283,7 +203,30 @@ public class FirebaseController {
 
             }
         });
-        return postUserUid;
+    }
+    public void updatePosts(String name, final boolean posted){
+        final String name2 = name;
+        myDatabase.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot snapshot:dataSnapshot.getChildren()){
+                    if(name2.equals(snapshot.child("Username").getValue())){
+                        int value;
+                        if(posted) {
+                            value = snapshot.child("Posts").getValue(Integer.class) +1;
+                        }else {
+                            value = snapshot.child("Posts").getValue(Integer.class) -1;
+                        }
+                        myDatabase.child("users").child(snapshot.getKey()).child("Posts").setValue(value);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
 
