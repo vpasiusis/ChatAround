@@ -16,58 +16,72 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FirebaseController {
     private static FirebaseController instance = null;
     private FirebaseUser currentFirebaseUser;
     private DatabaseReference myDatabase;
     private StorageReference myStorage;
-    private String username=null;
-    private int type=-1;
+    private String username;
+    private String description = null;
+    private int type = -1;
+    private int userLikes;
+    private int userPosts;
+    private AtomicBoolean done;
+    private String postUserUid;
     private ListViewItem currentSelectedItem = null;
 
-    private FirebaseController(){ }
+    private FirebaseController() {
+    }
 
-    public static FirebaseController getInstance(){
-        if(instance==null){
+    public static FirebaseController getInstance() {
+        if (instance == null) {
             instance = new FirebaseController();
         }
         return instance;
     }
 
-    public void initialize(){
+    public void initialize() {
         currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         myDatabase = FirebaseDatabase.getInstance().getReference();
         myStorage = FirebaseStorage.getInstance().getReference().child("Messages");
     }
-    public void setDefaultData(){
-        username=null;
-        type=-1;
+
+    public void setDefaultData() {
+        username = null;
+        type = -1;
     }
-    public String currentUser(){
+
+    public String currentUser() {
         String Email;
-        Email=currentFirebaseUser.getEmail();
+        Email = currentFirebaseUser.getEmail();
         return Email;
     }
-    public String getUsername(){
-        if(username==null) {
-            System.out.println(1);
-            getMyDatabase().child("users").child(currentFirebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    username = dataSnapshot.child("Username").getValue(String.class);
-                }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
+    public void getUsername() {
 
-                }
-            });
-        }
+        getMyDatabase().child("users").child(currentFirebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                username = dataSnapshot.child("Username").getValue(String.class);
+
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+    public String returnUsername(){
         return username;
     }
+
+
+
     public int getMyType() {
-        if(type==-1) {
+        if (type == -1) {
             getMyDatabase().child("users").child(currentFirebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -76,29 +90,28 @@ public class FirebaseController {
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
-
                 }
             });
         }
         return type;
     }
 
-    public DatabaseReference getMyDatabase(){
+    public DatabaseReference getMyDatabase() {
         return myDatabase;
     }
 
-    public StorageReference getMyStorage(){
+    public StorageReference getMyStorage() {
         return myStorage;
     }
 
 
-    public void sendMessage(String message, String imageId){
+    public void sendMessage(String message, String imageId) {
         String time = getTime();
         String key = getKey(time);
-        String name= getUsername();
+        String name = username;
         Map<String, Object> newMessage = new HashMap<>();
         newMessage.put("message", message);
-        newMessage.put("imageId",imageId);
+        newMessage.put("imageId", imageId);
         newMessage.put("time", time);
         newMessage.put("comments", 0);
         newMessage.put("likes", 0);
@@ -108,14 +121,14 @@ public class FirebaseController {
         messageDb.setValue(newMessage);
     }
 
-    public void sendComment(String message, String postId, int comments){
+    public void sendComment(String message, String postId, int comments) {
         String time = getTime();
         String key = getKey(time);
 
         Map<String, Object> newMessage = new HashMap<>();
         newMessage.put("message", message);
         newMessage.put("time", time);
-        newMessage.put("username", getUsername());
+        newMessage.put("username", username);
         newMessage.put("postId", postId);
 
         DatabaseReference commentDb = myDatabase.child("Comments").child(key);
@@ -123,18 +136,112 @@ public class FirebaseController {
 
         DatabaseReference messageDb = myDatabase.child("Messages").child(postId);
         Map<String, Object> changedMessage = new HashMap<>();
-        changedMessage.put("comments", comments+1);
+        changedMessage.put("comments", comments + 1);
         messageDb.updateChildren(changedMessage);
 
     }
 
-    public void sendImage(byte[] image, String message){
+    public void sendImage(byte[] image, String message) {
         String time = getTime();
         String key = getKey(time);
         StorageReference file = myStorage.child(key);
-        sendMessage(message,key);
+        sendMessage(message, key);
         file.putBytes(image);
     }
+
+    public void setDescription(String description) {
+        myDatabase.child("users").child(currentFirebaseUser.getUid()).child("Description").setValue(description);
+    }
+
+    public String getDescription() {
+        myDatabase.child("users").child(currentFirebaseUser.getUid()).child("Description").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                description = dataSnapshot.getValue(String.class);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        return description;
+    }
+    public int getUserLiked(final String name) {
+        if(name!=null) {
+            myDatabase.child("Messages").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    int countingUserPost = 0;
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        if (name.equals(snapshot.child("username").getValue())) {
+                            countingUserPost += snapshot.child("likes").getValue(Integer.class);
+                        }
+                    }
+                    userLikes = countingUserPost;
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+
+        return userLikes;
+    }
+
+    public int getUserPostNumber(final String name) {
+        if(name!=null) {
+            myDatabase.child("Messages").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    int countingUserLikes = 0;
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        if (name.equals(snapshot.child("username").getValue())) {
+                            countingUserLikes += 1;
+                        }
+                    }
+                    userPosts = countingUserLikes;
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+        return userPosts;
+    }
+
+    //
+    //
+    //
+    //
+    //man cia reikia paduot username posto, bet kai paduotu  neveikia.
+    public String returnUid(String name){
+        final String name2 = name;
+        myDatabase.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot snapshot:dataSnapshot.getChildren()){
+                    if(name2.equals(snapshot.child("Username").getValue())){
+                       postUserUid= snapshot.getKey();
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        return postUserUid;
+    }
+
+
+
 
     public String getTime(){
         Calendar c = Calendar.getInstance();

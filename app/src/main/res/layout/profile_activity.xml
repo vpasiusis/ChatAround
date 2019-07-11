@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".PostingActivity"
+    android:background="@color/feed_item_border">
+
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/posting_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/white"/>
+
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cardView1"
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/posting_toolbar"
+        android:layout_centerInParent="true"
+        android:layout_gravity="center"
+        android:layout_marginBottom="15dp"
+        android:layout_marginTop="10dp"
+        card_view:cardCornerRadius="8dp"
+        android:visibility="visible">
+        <ImageView
+            android:id="@+id/imageViewAvatar"
+            android:layout_width="128dp"
+            android:layout_height="128dp"
+            android:background="@drawable/ic_person_black_24dp"
+            android:layout_gravity="center"
+            android:fadingEdgeLength="3dp"/>
+
+
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cardView2"
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/cardView1"
+        android:layout_centerInParent="true"
+        android:layout_gravity="center"
+        android:layout_marginBottom="15dp"
+        android:layout_marginTop="10dp"
+        card_view:cardCornerRadius="8dp"
+        android:visibility="visible">
+
+        <TextView
+            android:id="@+id/usernameProfile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:background="@color/feed_bg"
+            android:keepScreenOn="false"
+            android:textAlignment="center"
+            android:textIsSelectable="false"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+
+
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cardView3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/cardView2"
+        android:layout_centerInParent="true"
+        android:layout_gravity="center"
+        android:layout_marginBottom="15dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        app:cardCornerRadius="8dp"
+        android:visibility="visible">
+        <TextView
+            android:id="@+id/description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/feed_bg"
+            android:text="Description" />
+
+        <View style="@style/Divider"
+            android:layout_marginTop="20dp"/>
+
+        <EditText
+            android:id="@+id/descriptionText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/description"
+            android:layout_marginTop="25dp"
+            android:background="@color/feed_bg"
+            android:hint="Talk about your self..." />
+    </android.support.v7.widget.CardView>
+
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cardView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/description_button"
+        android:layout_marginBottom="15dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="10dp"
+        app:cardCornerRadius="8dp"
+        android:visibility="visible">
+        <Button
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginLeft="2dp"
+            android:background="@drawable/like_heart"/>
+
+        <TextView
+            android:id="@+id/gotLikes"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:layout_marginStart="42dp"
+            android:background="@color/feed_bg" />
+    </android.support.v7.widget.CardView>
+
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cardView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/cardView4"
+        android:layout_below="@id/description_button"
+        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="15dp"
+        android:layout_marginTop="10dp"
+        app:cardCornerRadius="8dp"
+        android:visibility="visible">
+        <Button
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginLeft="2dp"
+            android:background="@drawable/writing"/>
+
+        <TextView
+            android:id="@+id/gotPosts"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:layout_marginStart="42dp"
+            android:background="@color/feed_bg" />
+    </android.support.v7.widget.CardView>
+
+
+    <Button
+        android:id="@+id/description_button"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_below="@id/cardView3"
+        android:background="@drawable/verified"
+        android:layout_marginStart="20dp"
+        android:visibility="visible" />
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cardView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/cardView5"
+        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="15dp"
+        android:layout_marginTop="10dp"
+        app:cardCornerRadius="8dp"
+        android:visibility="visible">
+
+
+       <Button
+           android:layout_width="24dp"
+           android:layout_height="24dp"
+           android:layout_marginStart="5dp"
+           android:layout_marginTop="5dp"
+           android:layout_marginLeft="2dp"
+           android:background="@drawable/posts_profile"/>
+        <Button
+            android:id="@+id/myPostButton"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_marginStart="42dp"
+            android:background="@color/feed_bg"
+            android:text="My posts"
+            android:textSize="12sp" />
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cardView7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/cardView6"
+        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="15dp"
+        android:layout_marginTop="10dp"
+        app:cardCornerRadius="8dp"
+        android:visibility="visible">
+
+
+        <Button
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="2dp"
+            android:background="@drawable/ic_build_black_24dp"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_marginStart="42dp"
+            android:background="@color/feed_bg"
+            android:text="My Settings"
+            android:textSize="12sp" />
+    </android.support.v7.widget.CardView>
+
+
+    <android.support.design.widget.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        app:itemTextColor="@drawable/bottom_navigation_color"
+        app:itemIconTint="@drawable/bottom_navigation_color"
+        app:menu="@menu/bottom_menu"
+        android:background="@color/white"/>
+
+
+
+
+</RelativeLayout>

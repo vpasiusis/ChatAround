@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -29,8 +30,9 @@ import com.google.firebase.storage.StorageReference;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MyPostsActivity extends AppCompatActivity {
 
+    private Activity activity;
     private ListView listView;
     private FirebaseController firebaseController;
     private List<ListViewItem> list;
@@ -38,64 +40,58 @@ public class MainActivity extends AppCompatActivity {
     private int loadedItems = 0;
     private Button LikeButton;
     private boolean restarting=false;
-
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Toolbar mainToolbar = (Toolbar) findViewById(R.id.main_toolbar);
-        mainToolbar.setTitle("Latest posts");
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        setContentView(R.layout.myposts_activity);
+        activity=MyPostsActivity.this;
+        Toolbar mainToolbar = (Toolbar) findViewById(R.id.posting_toolbar);
+        mainToolbar.setTitle("My posts");
+        setSupportActionBar(mainToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
         listView = findViewById(R.id.listview1);
-        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
-        LikeButton = findViewById(R.id.likeButton);
+        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation2);
+        bottomNav.setOnNavigationItemSelectedListener(navListener);
+        bottomNav.setSelectedItemId(R.id.nav_settings);
         firebaseController = FirebaseController.getInstance();
         firebaseController.initialize();
-        setSupportActionBar(mainToolbar);
         list = new ArrayList<>();
         adapter = new ItemAdapter(this, list);
         listView.setAdapter(adapter);
-        bottomNav.setOnNavigationItemSelectedListener(navListener);
         Query query = firebaseController.getMyDatabase().
                 child("Messages").orderByKey().limitToLast(10);
         loadItems(loadedItems, query);
         loadedItems+=10;
         updateFeed();
         firebaseController.getUsername();
-        System.out.println(firebaseController.returnUsername());
         firebaseController.getUserLiked(firebaseController.returnUsername());
         firebaseController.getUserPostNumber(firebaseController.returnUsername());
-        System.out.println(firebaseController.returnUid("Global moderator"));
         firebaseController.getDescription();
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent intent = new Intent(MainActivity.this, CommentsActivity.class);
+                Intent intent = new Intent(MyPostsActivity.this, CommentsActivity.class);
                 firebaseController.setCurrentSelectedItem(adapter.getListViewItem(i));
                 intent.putExtra("keyboard", false);
                 startActivity(intent);
             }
         });
+        super.onCreate(savedInstanceState);
     }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.topbar_menu, menu);
+        inflater.inflate(R.menu.topbar_posting, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId()==R.id.postButton){
-           Intent intent = new Intent(this, PostingActivity.class);
-           startActivity(intent);
-        }
 
+        if (item.getItemId() == android.R.id.home) {
+            finish(); // close this activity and return to preview activity (if there is any)
+        }
         if(item.getItemId()==R.id.quit){
             LogOffDialog logOffDialog = new LogOffDialog();
             logOffDialog.show(getSupportFragmentManager(),"Log Off");
@@ -103,6 +99,27 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    private BottomNavigationView.OnNavigationItemSelectedListener navListener =
+            new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+                    switch (item.getItemId()) {
+                        case R.id.nav_home:
+                            Intent intent = new Intent(activity, MainActivity.class);
+                            startActivity(intent);
+                            break;
+                        case R.id.nav_events:
+                            Intent intent1 = new Intent(activity, EventsActivity.class);
+                            startActivity(intent1);
+                            break;
+                        case R.id.nav_settings:
+                            break;
+                    }
+                    return true;
+                }
+            };
 
     public void updateFeed(){
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -123,7 +140,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
     public void loadItems(final int start, Query query) {
         query.addChildEventListener(new ChildEventListener() {
             @Override
@@ -141,8 +157,10 @@ public class MainActivity extends AppCompatActivity {
                     if(imageId!=null){
                         //getImage(item1,imageId);
                     }
-                    list.add(start,item1);
-                    adapter.notifyDataSetChanged();
+                    if(firebaseController.returnUsername().equals(username1)) {
+                        list.add(start, item1);
+                        adapter.notifyDataSetChanged();
+                    }
                 }
             }
 
@@ -198,28 +216,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private BottomNavigationView.OnNavigationItemSelectedListener navListener =
-            new BottomNavigationView.OnNavigationItemSelectedListener() {
-                @Override
-                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    Activity selectedActivity = null;
 
-                    switch (item.getItemId()) {
-                        case R.id.nav_home:
-                            break;
-                        case R.id.nav_events:
-                            Intent intent1 = new Intent(MainActivity.this, EventsActivity.class);
-                            startActivity(intent1);
-                            break;
-                        case R.id.nav_settings:
-                            firebaseController.getUsername();
-                            System.out.println("CIA DABAR  "+ firebaseController.returnUsername());
-                            Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-                            startActivity(intent);
-                            break;
-                    }
-                    return true;
-                }
-            };
 
 }

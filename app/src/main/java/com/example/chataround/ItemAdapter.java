@@ -60,7 +60,6 @@ public class ItemAdapter extends BaseAdapter {
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         firebaseController = FirebaseController.getInstance();
-
         if (inflater == null){
             inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
@@ -104,7 +103,7 @@ public class ItemAdapter extends BaseAdapter {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                if("+".equals(dataSnapshot.child(firebaseController.getUsername()).getValue())){
+                if("+".equals(dataSnapshot.child(firebaseController.returnUsername()).getValue())){
                     likeButton.setBackgroundResource(R.drawable.liked);
                     item.setLiked(true);
                 }
@@ -151,7 +150,7 @@ public class ItemAdapter extends BaseAdapter {
             }
         });
 
-        if(item.getName().equals(firebaseController.getUsername())||99==firebaseController.getMyType()){
+        if(item.getName().equals(firebaseController.returnUsername())||99==firebaseController.getMyType()){
             deleteButton.setVisibility(View.VISIBLE);
         } else {
             deleteButton.setVisibility(View.GONE);
@@ -164,20 +163,26 @@ public class ItemAdapter extends BaseAdapter {
                 firebaseController.getMyDatabase().child("Liked").child(item.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        if(dataSnapshot.child(firebaseController.getUsername()).getValue()==null){
+                        if(dataSnapshot.child(firebaseController.returnUsername()).getValue()==null){
                             likeButton.setBackgroundResource(R.drawable.liked);
                             item.setLiked(true);
                             item.setLikes(item.getLikes()+1);
                             firebaseController.getMyDatabase().child("Messages").child(item.getId()).child("likes").setValue(item.getLikes());
+                            if(item.getName().equals(firebaseController.returnUsername())){
+                            firebaseController.getUserLiked(item.getName());}
                             firebaseController.getMyDatabase().
-                                    child("Liked").child(item.getId()).child(firebaseController.getUsername()).setValue("+");
+                                    child("Liked").child(item.getId()).child(firebaseController.returnUsername()).setValue("+");
                         }else {
                             likeButton.setBackgroundResource(R.drawable.like);
                             item.setLiked(false);
                             item.setLikes(item.getLikes()-1);
                             firebaseController.getMyDatabase().child("Messages").child(item.getId()).child("likes").setValue(item.getLikes());
-                            firebaseController.getMyDatabase().
-                                    child("Liked").child(item.getId()).child(firebaseController.getUsername()).removeValue();
+                            firebaseController.getMyDatabase(). child("Liked").child(item.getId()).child(firebaseController.returnUsername()).removeValue();
+                            if(item.getName().equals(firebaseController.returnUsername())){
+                                firebaseController.getUserLiked(item.getName());
+
+                            }
+
                         }
                     }
 
@@ -209,7 +214,7 @@ public class ItemAdapter extends BaseAdapter {
                                 activity.overridePendingTransition(0, 0);
                             }
                         });
-
+                        firebaseController.getUserPostNumber(item.getName());
                         if(item.getComments()!=0) {
                             firebaseController.getMyDatabase().child("Comments").addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override

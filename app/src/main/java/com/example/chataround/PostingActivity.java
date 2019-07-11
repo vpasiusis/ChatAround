@@ -102,7 +102,7 @@ public class PostingActivity extends AppCompatActivity {
                             startActivity(intent2);
                             break;
                         case R.id.nav_settings:
-                            Intent intent1 = new Intent(activity, SettingsActivity.class);
+                            Intent intent1 = new Intent(activity, ProfileActivity.class);
                             startActivity(intent1);
                             break;
                     }

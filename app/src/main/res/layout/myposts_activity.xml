@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".PostingActivity"
+    tools:context=".MainActivity"
     android:background="@color/feed_bg">
 
 
@@ -13,21 +13,31 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/white"/>
-
     <View
+        android:id="@+id/border"
         android:layout_width="match_parent"
         android:layout_height="@dimen/feed_item_border_width"
         android:layout_below="@+id/posting_toolbar"
         android:background="@color/feed_item_border"/>
 
+    <ListView
+        android:id="@+id/listview1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bottom_navigation2"
+        android:layout_below="@+id/border"
+        android:dividerHeight="0dp"
+        android:divider="@null"
+        android:groupIndicator="@null" />
+
     <View
         android:layout_width="match_parent"
         android:layout_height="@dimen/feed_item_border_width"
-        android:layout_above="@+id/bottom_navigation"
+        android:layout_above="@+id/bottom_navigation2"
         android:background="@color/feed_item_border"/>
 
     <android.support.design.widget.BottomNavigationView
-        android:id="@+id/bottom_navigation"
+        android:id="@+id/bottom_navigation2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -35,25 +45,6 @@
         app:itemIconTint="@drawable/bottom_navigation_color"
         app:menu="@menu/bottom_menu"
         android:background="@color/white"/>
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="336dp"
-        android:layout_height="442dp"
-        android:layout_below="@+id/posting_toolbar"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginStart="40dp"
-        android:layout_marginLeft="40dp"
-        android:layout_marginTop="77dp"
-        android:layout_marginEnd="35dp"
-        android:layout_marginRight="35dp"
-        android:layout_marginBottom="43dp"
-        android:text="SETTINGS"
-        android:textSize="36sp"
-        android:textStyle="bold" />
 
 
 </RelativeLayout>

@@ -100,6 +100,9 @@ public class CreateAccountActivity extends AppCompatActivity {
                                             currentUserDB.child("Type").setValue(0);
                                             currentUserDB.child("Email").setValue(email);
                                             currentUserDB.child("Username").setValue(userName);
+                                            currentUserDB.child("Likes").setValue(0);
+                                            currentUserDB.child("Posts").setValue(0);
+                                            currentUserDB.child("AvatarId").setValue(null);
                                         } else
                                             Toast.makeText(CreateAccountActivity.this, "error registering user", Toast.LENGTH_SHORT).show();
 
