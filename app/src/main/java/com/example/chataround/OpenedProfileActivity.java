@@ -1,7 +1,5 @@
-
 package com.example.chataround;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -11,16 +9,11 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
@@ -29,94 +22,53 @@ import com.google.firebase.database.ValueEventListener;
 
 import static java.lang.String.format;
 
-public class ProfileActivity extends AppCompatActivity {
+public class OpenedProfileActivity extends AppCompatActivity {
     private Activity activity;
     private Button descriptionButton;
-    private EditText descriptionText;
+    private TextView descriptionText;
     private FirebaseController firebaseController;
     private TextView likeCount;
     private TextView postCount;
     private TextView userName;
     private Button myPostActivity;
     private ProgressDialog progressDialog;
-
-
-    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        setContentView(R.layout.profile_activity);
+        setContentView(R.layout.opened_profile_activity);
         Toolbar settingsToolbar = (Toolbar) findViewById(R.id.posting_toolbar);
-        settingsToolbar.setTitle("My Profile");
+        settingsToolbar.setTitle("Profile");
         setSupportActionBar(settingsToolbar);
         firebaseController= FirebaseController.getInstance();
-        activity = ProfileActivity.this;
+        activity = OpenedProfileActivity.this;
         progressDialog = new ProgressDialog(activity);
         progressDialog.setTitle("Loading data...");
         progressDialog.show();
+        Bundle extras = getIntent().getExtras();
+        String userData="";
+        if (extras != null) {
+            userData = extras.getString("username");
+
+        }
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
-        bottomNav.setSelectedItemId(R.id.nav_settings);
+        //bottomNav.setSelectedItemId(R.id.nav_settings);
         descriptionText=findViewById(R.id.descriptionText);
-        descriptionButton=findViewById(R.id.description_button);
         userName=findViewById(R.id.usernameProfile);
         likeCount=findViewById(R.id.gotLikes);
         postCount=findViewById(R.id.gotPosts);
-        myPostActivity=findViewById(R.id.myPostButton);
+        myPostActivity=findViewById(R.id.userPostButton);
+        userName.setText(userData);
+        descriptionText.setCursorVisible(false);
+        loadData();
         myPostActivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(activity,MyPostsActivity.class);
+                intent.putExtra("username",userName.getText().toString().trim());
                 startActivity(intent);
             }
         });
-        firebaseController.getUsername();
-        userName.setText(firebaseController.returnUsername());
-        descriptionText.setCursorVisible(false);
-        loadData();
 
-        descriptionButton.setVisibility(View.GONE);
-        descriptionText.addTextChangedListener(new TextWatcher() {
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                if(s.toString().trim().length()==0){
-                    descriptionButton.setVisibility(View.GONE);
-                } else {
-                    descriptionButton.setVisibility(View.VISIBLE);
-                }
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count,
-                                          int after) {
-                descriptionButton.setVisibility(View.GONE);
-            }
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
-        });
-        descriptionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(!TextUtils.isEmpty(descriptionText.getText().toString().trim()))
-                firebaseController.setDescription(descriptionText.getText().toString().trim());
-                descriptionText.setCursorVisible(false);
-                descriptionText.clearFocus();
-                descriptionButton.setVisibility(View.GONE);
-                firebaseController.getDescription();
-            }
-        });
-        descriptionText.setOnTouchListener(new View.OnTouchListener() {
-
-            public boolean onTouch(View v, MotionEvent event) {
-                descriptionText.setSelection(descriptionText.getText().toString().length());
-                descriptionText.requestFocus();
-                descriptionText.requestFocusFromTouch();
-                descriptionText.setCursorVisible(true);
-                return false;
-            }
-        });
         super.onCreate(savedInstanceState);
 
     }
@@ -131,32 +83,32 @@ public class ProfileActivity extends AppCompatActivity {
                         firebaseController.getMyDatabase().child("users").child(key).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
-                            final String username = dataSnapshot.child("Username").getValue(String.class);
-                            final String avatarId = dataSnapshot.child("AvatarId").getValue(String.class);
-                            final String email = dataSnapshot.child("Email").getValue(String.class);
-                            final int posts = dataSnapshot.child("Posts").getValue(Integer.class);
-                            final int likes = dataSnapshot.child("Likes").getValue(Integer.class);
-                            final int type = dataSnapshot.child("Type").getValue(Integer.class);
-                            final String decription = dataSnapshot.child("Description").getValue(String.class);
-                            final UserClass item1 = new UserClass(key,username,
-                                    avatarId,decription,email,posts,likes, type);
-                            userName.setText(" "+username+" ");
-                            if(decription!=null) {
-                                descriptionText.setText(" " + item1.getDescription() + " ");
-                            }
-                            likeCount.setText(format("%d", item1.getLikes()));
-                            postCount.setText(format("%d", item1.getPosts()));
-                            if(type==99){
-                                userName.setBackgroundColor(getResources().getColor(R.color.admin));
-                            }
-                            descriptionButton.setVisibility(View.GONE);
-                            if(avatarId==null) {
-                                //put a default avatar
-                            }
-                            else {
-                                //upload an image
-                            }
-                            progressDialog.dismiss();
+                                final String username = dataSnapshot.child("Username").getValue(String.class);
+                                final String avatarId = dataSnapshot.child("AvatarId").getValue(String.class);
+                                final String email = dataSnapshot.child("Email").getValue(String.class);
+                                final int posts = dataSnapshot.child("Posts").getValue(Integer.class);
+                                final int likes = dataSnapshot.child("Likes").getValue(Integer.class);
+                                final int type = dataSnapshot.child("Type").getValue(Integer.class);
+                                final String decription = dataSnapshot.child("Description").getValue(String.class);
+                                final UserClass item1 = new UserClass(key,username,
+                                        avatarId,decription,email,posts,likes, type);
+                                userName.setText(" "+username+" ");
+                                if(decription!=null) {
+                                    descriptionText.setText(" " + item1.getDescription() + " ");
+                                }
+                                likeCount.setText(format("%d", item1.getLikes()));
+                                postCount.setText(format("%d", item1.getPosts()));
+                                if(type==99){
+                                    userName.setBackgroundColor(getResources().getColor(R.color.admin));
+                                }
+
+                                if(avatarId==null) {
+                                    //put a default avatar
+                                }
+                                else {
+                                    //upload an image
+                                }
+                                progressDialog.dismiss();
                             }
                             @Override
                             public void onCancelled(DatabaseError databaseError) {
@@ -196,7 +148,6 @@ public class ProfileActivity extends AppCompatActivity {
             new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    Activity selectedActivity = null;
 
                     switch (item.getItemId()) {
                         case R.id.nav_home:
@@ -208,6 +159,9 @@ public class ProfileActivity extends AppCompatActivity {
                             startActivity(intent1);
                             break;
                         case R.id.nav_settings:
+                            Intent intent2 = new Intent(activity, ProfileActivity.class);
+                            startActivity(intent2);
+
                             break;
                     }
 
@@ -215,7 +169,6 @@ public class ProfileActivity extends AppCompatActivity {
                     return true;
                 }
             };
-
 
 }
 

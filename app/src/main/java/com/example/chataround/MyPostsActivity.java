@@ -34,23 +34,39 @@ public class MyPostsActivity extends AppCompatActivity {
     private ItemAdapter adapter;
     private int loadedItems = 0;
     private Button LikeButton;
+    private String user;
     private boolean restarting=false;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         setContentView(R.layout.myposts_activity);
         activity=MyPostsActivity.this;
-        Toolbar mainToolbar = (Toolbar) findViewById(R.id.posting_toolbar);
-        mainToolbar.setTitle("My posts");
-        setSupportActionBar(mainToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+
 
         listView = findViewById(R.id.listview1);
+
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation2);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
-        bottomNav.setSelectedItemId(R.id.nav_settings);
+        //bottomNav.setSelectedItemId(R.id.nav_settings);
         firebaseController = FirebaseController.getInstance();
         firebaseController.initialize();
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            user = extras.getString("username");
+            Toolbar mainToolbar = (Toolbar) findViewById(R.id.posting_toolbar);
+            mainToolbar.setTitle(user+" posts");
+            setSupportActionBar(mainToolbar);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        }else {
+            Toolbar mainToolbar = (Toolbar) findViewById(R.id.posting_toolbar);
+            mainToolbar.setTitle("My posts");
+            setSupportActionBar(mainToolbar);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            user=firebaseController.returnUsername();
+        }
         list = new ArrayList<>();
         adapter = new ItemAdapter(this, list);
         listView.setAdapter(adapter);
@@ -59,7 +75,6 @@ public class MyPostsActivity extends AppCompatActivity {
         loadItems(loadedItems, query);
         loadedItems+=10;
         updateFeed();
-        firebaseController.getUsername();
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -82,7 +97,7 @@ public class MyPostsActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if (item.getItemId() == android.R.id.home) {
-            finish(); // close this activity and return to preview activity (if there is any)
+            finish();
         }
         if(item.getItemId()==R.id.quit){
             LogOffDialog logOffDialog = new LogOffDialog();
@@ -107,6 +122,9 @@ public class MyPostsActivity extends AppCompatActivity {
                             startActivity(intent1);
                             break;
                         case R.id.nav_settings:
+                            Intent intent2 = new Intent(activity, ProfileActivity.class);
+                            startActivity(intent2);
+
                             break;
                     }
                     return true;
@@ -146,7 +164,7 @@ public class MyPostsActivity extends AppCompatActivity {
                     final int likeCount = dst.child("likes").getValue(Integer.class);
                     final ListViewItem item1 = new ListViewItem(key,username1,
                             null,message,imageId,time,commentCount, likeCount);
-                    if(firebaseController.returnUsername().equals(username1)) {
+                    if(user.equals(username1)) {
                         list.add(start, item1);
                         adapter.notifyDataSetChanged();
                     }

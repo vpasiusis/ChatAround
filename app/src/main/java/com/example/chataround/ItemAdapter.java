@@ -77,7 +77,6 @@ public class ItemAdapter extends BaseAdapter {
         Button deleteButton = view.findViewById(R.id.deleteButton);
         final Button likeButton = view.findViewById(R.id.likeButton);
         final Button commentButton = view.findViewById(R.id.commentButton);
-
         final ListViewItem item = itemList.get(i);
         name.setText(item.getName());
         String realtime = firebaseController.diffTime(item.getTime());
@@ -268,6 +267,23 @@ public class ItemAdapter extends BaseAdapter {
                 builder.show();
             }
         });
+        name.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                firebaseController.getUsername();
+                if(!item.getName().equals(firebaseController.returnUsername())) {
+                    Intent intent = new Intent(activity, OpenedProfileActivity.class);
+                    intent.putExtra("username", item.getName());
+                    activity.startActivity(intent);
+                }
+                else {
+                    Intent intent = new Intent(activity, ProfileActivity.class);
+                    activity.startActivity(intent);
+                }
+
+
+            }
+        });
 
         image.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -278,5 +294,8 @@ public class ItemAdapter extends BaseAdapter {
 
         return view;
     }
+
+
+
 
 }

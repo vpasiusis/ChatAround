@@ -90,14 +90,13 @@
         <View style="@style/Divider"
             android:layout_marginTop="20dp"/>
 
-        <EditText
+        <TextView
             android:id="@+id/descriptionText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/description"
             android:layout_marginTop="25dp"
-            android:background="@color/feed_bg"
-            android:hint="Talk about your self..." />
+            android:background="@color/feed_bg" />
     </android.support.v7.widget.CardView>
 
 
@@ -105,7 +104,7 @@
         android:id="@+id/cardView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/description_button"
+        android:layout_below="@id/cardView3"
         android:layout_marginBottom="15dp"
         android:layout_marginTop="10dp"
         android:layout_marginStart="10dp"
@@ -134,7 +133,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/cardView4"
-        android:layout_below="@id/description_button"
+        android:layout_below="@id/cardView3"
         android:layout_marginLeft="10dp"
         android:layout_marginBottom="15dp"
         android:layout_marginTop="10dp"
@@ -157,50 +156,11 @@
             android:background="@color/feed_bg" />
     </android.support.v7.widget.CardView>
 
-
-    <Button
-        android:id="@+id/description_button"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_below="@id/cardView3"
-        android:background="@drawable/verified"
-        android:layout_marginStart="20dp"
-        android:visibility="visible" />
-
     <android.support.v7.widget.CardView
         android:id="@+id/cardView6"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/cardView5"
-        android:layout_marginLeft="10dp"
-        android:layout_marginBottom="15dp"
-        android:layout_marginTop="10dp"
-        app:cardCornerRadius="8dp"
-        android:visibility="visible">
-
-
-       <Button
-           android:layout_width="24dp"
-           android:layout_height="24dp"
-           android:layout_marginStart="5dp"
-           android:layout_marginTop="5dp"
-           android:layout_marginLeft="2dp"
-           android:background="@drawable/posts_profile"/>
-        <Button
-            android:id="@+id/myPostButton"
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:layout_marginStart="42dp"
-            android:background="@color/feed_bg"
-            android:text="My posts"
-            android:textSize="12sp" />
-    </android.support.v7.widget.CardView>
-
-    <android.support.v7.widget.CardView
-        android:id="@+id/cardView7"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/cardView6"
         android:layout_marginLeft="10dp"
         android:layout_marginBottom="15dp"
         android:layout_marginTop="10dp"
@@ -214,15 +174,18 @@
             android:layout_marginStart="5dp"
             android:layout_marginTop="5dp"
             android:layout_marginLeft="2dp"
-            android:background="@drawable/ic_build_black_24dp"/>
+            android:background="@drawable/posts_profile"/>
         <Button
+            android:id="@+id/userPostButton"
             android:layout_width="wrap_content"
             android:layout_height="36dp"
             android:layout_marginStart="42dp"
             android:background="@color/feed_bg"
-            android:text="My Settings"
+            android:text="User posts"
             android:textSize="12sp" />
     </android.support.v7.widget.CardView>
+
+
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/bottom_navigation"

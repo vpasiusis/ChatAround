@@ -1,15 +1,15 @@
 package com.example.chataround;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -29,6 +29,7 @@ public class CommentsActivity extends AppCompatActivity {
     private ListView listView;
     private List<ListViewComment> comments;
     private CommentAdapter adapter;
+    private Activity activity;
     private TextView message,time,user,commentNumber;
     private EditText editMessage;
     private FirebaseController firebaseController;
@@ -42,7 +43,7 @@ public class CommentsActivity extends AppCompatActivity {
         mainToolbar.setTitle("Post");
         setSupportActionBar(mainToolbar);
         firebaseController = FirebaseController.getInstance();
-
+        activity=CommentsActivity.this;
         item = firebaseController.getCurrentSelectedItem();
         listView = findViewById(R.id.listViewComments);
         message = findViewById(R.id.itemMessage1);
@@ -60,6 +61,23 @@ public class CommentsActivity extends AppCompatActivity {
         time.setText(realtime);
         user.setText(item.getName());
 
+        user.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                firebaseController.getUsername();
+                if(!item.getName().equals(firebaseController.returnUsername())) {
+                    Intent intent = new Intent(activity, OpenedProfileActivity.class);
+                    intent.putExtra("username", item.getName());
+                    activity.startActivity(intent);
+                }
+                else {
+                    Intent intent = new Intent(activity, ProfileActivity.class);
+                    activity.startActivity(intent);
+                }
+
+
+            }
+        });
         int comments = item.getComments();
         if(comments==0) commentNumber.setText("No comments");
         else if(comments==1) commentNumber.setText("Showing 1 comment");

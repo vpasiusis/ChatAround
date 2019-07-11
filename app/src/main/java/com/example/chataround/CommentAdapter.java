@@ -2,6 +2,7 @@ package com.example.chataround;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +16,7 @@ public class CommentAdapter extends BaseAdapter {
     private Activity activity;
     private LayoutInflater inflater;
     private List<ListViewComment> commentList;
+    private FirebaseController firebaseController;
 
     public CommentAdapter(Activity activity, List<ListViewComment> commentList){
         this.commentList = commentList;
@@ -46,6 +48,8 @@ public class CommentAdapter extends BaseAdapter {
         if (view == null){
             view = inflater.inflate(R.layout.listview_comment, null);
         }
+        firebaseController=FirebaseController.getInstance();
+        firebaseController.initialize();
         TextView name = view.findViewById(R.id.commentName);
         TextView time = view.findViewById(R.id.commentTime);
         TextView message = view.findViewById(R.id.commentMessage);
@@ -61,6 +65,24 @@ public class CommentAdapter extends BaseAdapter {
             // message is empty, remove from view
             message.setVisibility(View.GONE);
         }
+
+        name.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                firebaseController.getUsername();
+                if(!comment.getName().equals(firebaseController.returnUsername())) {
+                    Intent intent = new Intent(activity, OpenedProfileActivity.class);
+                    intent.putExtra("username", comment.getName());
+                    activity.startActivity(intent);
+                }
+                else {
+                    Intent intent = new Intent(activity, ProfileActivity.class);
+                    activity.startActivity(intent);
+                }
+
+
+            }
+        });
         return view;
 
     }
