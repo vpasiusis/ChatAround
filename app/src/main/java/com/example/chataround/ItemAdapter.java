@@ -103,7 +103,7 @@ public class ItemAdapter extends BaseAdapter {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                if("+".equals(dataSnapshot.child(firebaseController.returnUsername()).getValue())){
+                if("+".equals(dataSnapshot.child(firebaseController.getCurrentUser().getName()).getValue())){
                     likeButton.setBackgroundResource(R.drawable.liked);
                     item.setLiked(true);
                 }
@@ -159,7 +159,8 @@ public class ItemAdapter extends BaseAdapter {
             }
         });
 
-        if(item.getName().equals(firebaseController.returnUsername())||99==firebaseController.getMyType()){
+        if(item.getName().equals(firebaseController.getCurrentUser().getName())
+                ||firebaseController.getCurrentUser().getType()==99){
             deleteButton.setVisibility(View.VISIBLE);
         } else {
             deleteButton.setVisibility(View.GONE);
@@ -172,13 +173,13 @@ public class ItemAdapter extends BaseAdapter {
                 firebaseController.getMyDatabase().child("Liked").child(item.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        if(dataSnapshot.child(firebaseController.returnUsername()).getValue()==null){
+                        if(dataSnapshot.child(firebaseController.getCurrentUser().getName()).getValue()==null){
                             likeButton.setBackgroundResource(R.drawable.liked);
                             item.setLiked(true);
                             item.setLikes(item.getLikes()+1);
                             firebaseController.getMyDatabase().child("Messages").child(item.getId()).child("likes").setValue(item.getLikes());
                             firebaseController.getMyDatabase().
-                                    child("Liked").child(item.getId()).child(firebaseController.returnUsername()).setValue("+");
+                                    child("Liked").child(item.getId()).child(firebaseController.getCurrentUser().getName()).setValue("+");
                             firebaseController.updateLikes(item.getName(),true,1);
 
                         }else {
@@ -186,7 +187,7 @@ public class ItemAdapter extends BaseAdapter {
                             item.setLiked(false);
                             item.setLikes(item.getLikes()-1);
                             firebaseController.getMyDatabase().child("Messages").child(item.getId()).child("likes").setValue(item.getLikes());
-                            firebaseController.getMyDatabase(). child("Liked").child(item.getId()).child(firebaseController.returnUsername()).removeValue();
+                            firebaseController.getMyDatabase(). child("Liked").child(item.getId()).child(firebaseController.getCurrentUser().getName()).removeValue();
                             firebaseController.updateLikes(item.getName(),false,1);
 
                         }
@@ -270,15 +271,11 @@ public class ItemAdapter extends BaseAdapter {
         name.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                firebaseController.getUsername();
-                if(!item.getName().equals(firebaseController.returnUsername())) {
-                    Intent intent = new Intent(activity, OpenedProfileActivity.class);
-                    intent.putExtra("username", item.getName());
-                    activity.startActivity(intent);
+                if(item.getName().equals(firebaseController.getCurrentUser().getName())) {
+                    firebaseController.updateCurrentUser(true, activity);
                 }
                 else {
-                    Intent intent = new Intent(activity, ProfileActivity.class);
-                    activity.startActivity(intent);
+                    firebaseController.openClickedUser(item.getName(),activity);
                 }
 
 

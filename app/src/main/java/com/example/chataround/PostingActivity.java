@@ -156,7 +156,7 @@ public class PostingActivity extends AppCompatActivity {
     public void sendMessage(View view) {
         String text = editPostText.getText().toString().trim();
         if(!TextUtils.isEmpty(text)||hasImageSpan(editPostText)) {
-            firebaseController.updatePosts(firebaseController.returnUsername(),true);
+            firebaseController.updatePosts(firebaseController.getCurrentUser().getName(),true);
             if (hasImageSpan(editPostText)) {
                 firebaseController.sendImage(image,text);
                 Intent intent = new Intent(this, MainActivity.class);

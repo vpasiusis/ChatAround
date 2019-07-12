@@ -173,10 +173,7 @@ public class MainActivity extends AppCompatActivity {
                             startActivity(intent1);
                             break;
                         case R.id.nav_settings:
-                            firebaseController.getUsername();
-                            System.out.println("CIA DABAR  "+ firebaseController.returnUsername());
-                            Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-                            startActivity(intent);
+                            firebaseController.updateCurrentUser(true,MainActivity.this);
                             break;
                     }
                     return true;

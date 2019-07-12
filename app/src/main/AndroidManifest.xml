@@ -28,9 +28,6 @@
             android:name=".EventsActivity"
             android:screenOrientation="portrait"></activity>
         <activity
-            android:name=".OpenedProfileActivity"
-            android:screenOrientation="portrait"></activity>
-        <activity
             android:name=".MyPostsActivity"
             android:screenOrientation="portrait"></activity>
         <activity

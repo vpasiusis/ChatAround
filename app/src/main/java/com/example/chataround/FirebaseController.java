@@ -1,5 +1,7 @@
 package com.example.chataround;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
@@ -12,7 +14,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -28,14 +29,9 @@ import java.util.Map;
 public class FirebaseController {
     private static FirebaseController instance = null;
     private FirebaseUser currentFirebaseUser;
-    private DatabaseReference myDatabase;
+    private UserClass currentUser, clickedUser;
+    private DatabaseReference myDatabase=null;
     private StorageReference myStorage;
-    private String username;
-    private String description = null;
-    private int type = -1;
-    private int userLikes=-1;
-    private int userPosts=-1;
-    private String postUserUid;
     private ListViewItem currentSelectedItem = null;
 
     private FirebaseController() {
@@ -50,28 +46,63 @@ public class FirebaseController {
 
     public void initialize() {
         currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        myDatabase = FirebaseDatabase.getInstance().getReference();
-        myStorage = FirebaseStorage.getInstance().getReference().child("Messages");
+        if(myDatabase==null) {
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            database.setPersistenceEnabled(true);
+            myDatabase = database.getReference();
+            myStorage = FirebaseStorage.getInstance().getReference().child("Messages");
+            updateCurrentUser(false,null);
+        }
     }
 
-    public void setDefaultData() {
-        username = null;
-        type = -1;
+    public void updateCurrentUser(final boolean toOpen, final Activity activity){
+        myDatabase.child("users").child(currentFirebaseUser.getUid()).
+                addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        String username = dataSnapshot.child("Username").getValue(String.class);
+                        String avatarId = dataSnapshot.child("AvatarId").getValue(String.class);
+                        String email = dataSnapshot.child("Email").getValue(String.class);
+                        int posts = dataSnapshot.child("Posts").getValue(Integer.class);
+                        int likes = dataSnapshot.child("Likes").getValue(Integer.class);
+                        int type = dataSnapshot.child("Type").getValue(Integer.class);
+                        String decription = dataSnapshot.child("Description").getValue(String.class);
+                        currentUser = new UserClass(currentFirebaseUser.getUid(),username,
+                                avatarId,decription,email,posts,likes, type);
+                        if(toOpen){
+                            Intent intent = new Intent(activity, ProfileActivity.class);
+                            intent.putExtra("currentUser", true);
+                            activity.startActivity(intent);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
     }
 
-    public String currentUser() {
-        String Email;
-        Email = currentFirebaseUser.getEmail();
-        return Email;
-    }
-
-    public void getUsername() {
-        Query queryName = getMyDatabase().
-                child("users").orderByKey();
-        queryName.addListenerForSingleValueEvent(new ValueEventListener() {
+    public void openClickedUser(final String name, final Activity activity){
+        myDatabase.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                username = dataSnapshot.child(currentFirebaseUser.getUid()).child("Username").getValue(String.class);
+                for(DataSnapshot snap:dataSnapshot.getChildren()){
+                    if(name.equals(snap.child("Username").getValue())){
+                        String username = snap.child("Username").getValue(String.class);
+                        String avatarId = snap.child("AvatarId").getValue(String.class);
+                        String email = snap.child("Email").getValue(String.class);
+                        int posts = snap.child("Posts").getValue(Integer.class);
+                        int likes = snap.child("Likes").getValue(Integer.class);
+                        int type = snap.child("Type").getValue(Integer.class);
+                        String decription = snap.child("Description").getValue(String.class);
+                        clickedUser = new UserClass(snap.getKey(),username,
+                                avatarId,decription,email,posts,likes, type);
+                        Intent intent = new Intent(activity, ProfileActivity.class);
+                        intent.putExtra("currentUser", false);
+                        activity.startActivity(intent);
+                    }
+                }
             }
 
             @Override
@@ -80,26 +111,13 @@ public class FirebaseController {
             }
         });
     }
-    public String returnUsername(){
-        return username;
+
+    public UserClass getCurrentUser(){
+        return currentUser;
     }
 
-
-
-    public int getMyType() {
-        if (type == -1) {
-            getMyDatabase().child("users").child(currentFirebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    type = dataSnapshot.child("Type").getValue(Integer.class);
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                }
-            });
-        }
-        return type;
+    public UserClass getClickedUser(){
+        return clickedUser;
     }
 
     public DatabaseReference getMyDatabase() {
@@ -112,7 +130,7 @@ public class FirebaseController {
     public void sendMessage(String message, String imageId){
         String time = getTime();
         String key = getKey(time);
-        String name= returnUsername();
+        String name= currentUser.getName();
         Map<String, Object> newMessage = new HashMap<>();
         newMessage.put("message", message);
         newMessage.put("imageId",imageId);
@@ -132,7 +150,7 @@ public class FirebaseController {
         Map<String, Object> newMessage = new HashMap<>();
         newMessage.put("message", message);
         newMessage.put("time", time);
-        newMessage.put("username", returnUsername());
+        newMessage.put("username", currentUser.getName());
         newMessage.put("postId", postId);
 
         DatabaseReference commentDb = myDatabase.child("Comments").child(key);
@@ -161,32 +179,17 @@ public class FirebaseController {
             }
         });
     }
+
     public void setDescription(String description) {
         myDatabase.child("users").child(currentFirebaseUser.getUid()).child("Description").setValue(description);
     }
-    public String getDescription() {
-        myDatabase.child("users").child(currentFirebaseUser.getUid()).child("Description").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                description = dataSnapshot.getValue(String.class);
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-        return description;
-    }
-
-    public void updateLikes(String name, final boolean liked,final int number){
-        final String name2 = name;
+    public void updateLikes(final String name, final boolean liked, final int number){
         myDatabase.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for(DataSnapshot snapshot:dataSnapshot.getChildren()){
-                    if(name2.equals(snapshot.child("Username").getValue())){
+                    if(name.equals(snapshot.child("Username").getValue())){
                         int value;
                         if(liked) {
                             value = snapshot.child("Likes").getValue(Integer.class) + number;
@@ -204,13 +207,13 @@ public class FirebaseController {
             }
         });
     }
-    public void updatePosts(String name, final boolean posted){
-        final String name2 = name;
+
+    public void updatePosts(final String name, final boolean posted){
         myDatabase.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for(DataSnapshot snapshot:dataSnapshot.getChildren()){
-                    if(name2.equals(snapshot.child("Username").getValue())){
+                    if(name.equals(snapshot.child("Username").getValue())){
                         int value;
                         if(posted) {
                             value = snapshot.child("Posts").getValue(Integer.class) +1;
@@ -228,9 +231,6 @@ public class FirebaseController {
             }
         });
     }
-
-
-
 
     public String getTime(){
         Calendar c = Calendar.getInstance();

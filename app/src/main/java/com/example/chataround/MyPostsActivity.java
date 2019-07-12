@@ -34,38 +34,32 @@ public class MyPostsActivity extends AppCompatActivity {
     private ItemAdapter adapter;
     private int loadedItems = 0;
     private Button LikeButton;
-    private String user;
+    private UserClass user;
     private boolean restarting=false;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         setContentView(R.layout.myposts_activity);
         activity=MyPostsActivity.this;
 
-
-
         listView = findViewById(R.id.listview1);
-
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation2);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
         //bottomNav.setSelectedItemId(R.id.nav_settings);
         firebaseController = FirebaseController.getInstance();
-        firebaseController.initialize();
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            user = extras.getString("username");
-            Toolbar mainToolbar = (Toolbar) findViewById(R.id.posting_toolbar);
+
+        Toolbar mainToolbar = (Toolbar) findViewById(R.id.posting_toolbar);
+        setSupportActionBar(mainToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        final boolean isCurrentUser = getIntent().getExtras().getBoolean("currentUser");
+        if (!isCurrentUser) {
+            user = firebaseController.getClickedUser();
             mainToolbar.setTitle(user+" posts");
-            setSupportActionBar(mainToolbar);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         }else {
-            Toolbar mainToolbar = (Toolbar) findViewById(R.id.posting_toolbar);
+            user = firebaseController.getCurrentUser();
             mainToolbar.setTitle("My posts");
-            setSupportActionBar(mainToolbar);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-            user=firebaseController.returnUsername();
         }
         list = new ArrayList<>();
         adapter = new ItemAdapter(this, list);
@@ -130,6 +124,7 @@ public class MyPostsActivity extends AppCompatActivity {
                     return true;
                 }
             };
+
     public void updateFeed(){
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
@@ -164,7 +159,7 @@ public class MyPostsActivity extends AppCompatActivity {
                     final int likeCount = dst.child("likes").getValue(Integer.class);
                     final ListViewItem item1 = new ListViewItem(key,username1,
                             null,message,imageId,time,commentCount, likeCount);
-                    if(user.equals(username1)) {
+                    if(user.getName().equals(username1)) {
                         list.add(start, item1);
                         adapter.notifyDataSetChanged();
                     }

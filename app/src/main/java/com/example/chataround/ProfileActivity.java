@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -38,7 +39,8 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView postCount;
     private TextView userName;
     private Button myPostActivity;
-    private ProgressDialog progressDialog;
+    private UserClass user;
+    private CardView settingsCardView;
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -46,13 +48,9 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         setContentView(R.layout.profile_activity);
         Toolbar settingsToolbar = (Toolbar) findViewById(R.id.posting_toolbar);
-        settingsToolbar.setTitle("My Profile");
         setSupportActionBar(settingsToolbar);
         firebaseController= FirebaseController.getInstance();
         activity = ProfileActivity.this;
-        progressDialog = new ProgressDialog(activity);
-        progressDialog.setTitle("Loading data...");
-        progressDialog.show();
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
         bottomNav.setSelectedItemId(R.id.nav_settings);
@@ -62,117 +60,93 @@ public class ProfileActivity extends AppCompatActivity {
         likeCount=findViewById(R.id.gotLikes);
         postCount=findViewById(R.id.gotPosts);
         myPostActivity=findViewById(R.id.myPostButton);
+        settingsCardView=findViewById(R.id.cardView7);
+        descriptionText.setCursorVisible(false);
+
+        final boolean isCurrentUser = getIntent().getExtras().getBoolean("currentUser");
+        if (isCurrentUser) {
+            user = firebaseController.getCurrentUser();
+            myPostActivity.setText("My posts");
+            settingsToolbar.setTitle("My Profile");
+            descriptionText.addTextChangedListener(new TextWatcher() {
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                    if(s.toString().trim().length()==0){
+                        descriptionButton.setVisibility(View.GONE);
+                    } else {
+                        descriptionButton.setVisibility(View.VISIBLE);
+                    }
+                }
+
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count,
+                                              int after) {
+                    descriptionButton.setVisibility(View.GONE);
+                }
+                @Override
+                public void afterTextChanged(Editable s) {
+                }
+            });
+            descriptionButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(!TextUtils.isEmpty(descriptionText.getText().toString().trim()))
+                        firebaseController.setDescription(descriptionText.getText().toString().trim());
+                    descriptionText.setCursorVisible(false);
+                    descriptionText.clearFocus();
+                    descriptionButton.setVisibility(View.GONE);
+                }
+            });
+            descriptionText.setOnTouchListener(new View.OnTouchListener() {
+
+                public boolean onTouch(View v, MotionEvent event) {
+                    descriptionText.setSelection(descriptionText.getText().toString().length());
+                    descriptionText.requestFocus();
+                    descriptionText.requestFocusFromTouch();
+                    descriptionText.setCursorVisible(true);
+                    return false;
+                }
+            });
+        }else{
+            settingsToolbar.setTitle("Profile");
+            myPostActivity.setText("User posts");
+            user = firebaseController.getClickedUser();
+            settingsCardView.setVisibility(View.GONE);
+            descriptionText.setKeyListener(null);
+        }
         myPostActivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(activity,MyPostsActivity.class);
+                intent.putExtra("currentUser",isCurrentUser);
                 startActivity(intent);
             }
         });
-        firebaseController.getUsername();
-        userName.setText(firebaseController.returnUsername());
-        descriptionText.setCursorVisible(false);
+
         loadData();
-
-        descriptionButton.setVisibility(View.GONE);
-        descriptionText.addTextChangedListener(new TextWatcher() {
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                if(s.toString().trim().length()==0){
-                    descriptionButton.setVisibility(View.GONE);
-                } else {
-                    descriptionButton.setVisibility(View.VISIBLE);
-                }
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count,
-                                          int after) {
-                descriptionButton.setVisibility(View.GONE);
-            }
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
-        });
-        descriptionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(!TextUtils.isEmpty(descriptionText.getText().toString().trim()))
-                firebaseController.setDescription(descriptionText.getText().toString().trim());
-                descriptionText.setCursorVisible(false);
-                descriptionText.clearFocus();
-                descriptionButton.setVisibility(View.GONE);
-                firebaseController.getDescription();
-            }
-        });
-        descriptionText.setOnTouchListener(new View.OnTouchListener() {
-
-            public boolean onTouch(View v, MotionEvent event) {
-                descriptionText.setSelection(descriptionText.getText().toString().length());
-                descriptionText.requestFocus();
-                descriptionText.requestFocusFromTouch();
-                descriptionText.setCursorVisible(true);
-                return false;
-            }
-        });
         super.onCreate(savedInstanceState);
 
     }
 
     public void loadData() {
-        firebaseController.getMyDatabase().child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(final DataSnapshot dataSnapshot) {
-                for(DataSnapshot snapshot:dataSnapshot.getChildren()){
-                    if(userName.getText().toString().trim().equals(snapshot.child("Username").getValue())){
-                        final String key = snapshot.getKey();
-                        firebaseController.getMyDatabase().child("users").child(key).addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                            final String username = dataSnapshot.child("Username").getValue(String.class);
-                            final String avatarId = dataSnapshot.child("AvatarId").getValue(String.class);
-                            final String email = dataSnapshot.child("Email").getValue(String.class);
-                            final int posts = dataSnapshot.child("Posts").getValue(Integer.class);
-                            final int likes = dataSnapshot.child("Likes").getValue(Integer.class);
-                            final int type = dataSnapshot.child("Type").getValue(Integer.class);
-                            final String decription = dataSnapshot.child("Description").getValue(String.class);
-                            final UserClass item1 = new UserClass(key,username,
-                                    avatarId,decription,email,posts,likes, type);
-                            userName.setText(" "+username+" ");
-                            if(decription!=null) {
-                                descriptionText.setText(" " + item1.getDescription() + " ");
-                            }
-                            likeCount.setText(format("%d", item1.getLikes()));
-                            postCount.setText(format("%d", item1.getPosts()));
-                            if(type==99){
-                                userName.setBackgroundColor(getResources().getColor(R.color.admin));
-                            }
-                            descriptionButton.setVisibility(View.GONE);
-                            if(avatarId==null) {
-                                //put a default avatar
-                            }
-                            else {
-                                //upload an image
-                            }
-                            progressDialog.dismiss();
-                            }
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
+        descriptionButton.setVisibility(View.GONE);
+        userName.setText(" "+user.getName()+" ");
+        if(user.getDescription()!=null) {
+            descriptionText.setText(" " + user.getDescription() + " ");
+        }
+        likeCount.setText(format("%d", user.getLikes()));
+        postCount.setText(format("%d", user.getPosts()));
+        if(user.getType()==99){
+            userName.setBackgroundColor(getResources().getColor(R.color.admin));
+        }
+        if(user.getAvatarId()==null) {
+            //put a default avatar
+        }
+        else {
+            //upload an image
+        }
     }
 
     @Override

@@ -69,15 +69,11 @@ public class CommentAdapter extends BaseAdapter {
         name.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                firebaseController.getUsername();
-                if(!comment.getName().equals(firebaseController.returnUsername())) {
-                    Intent intent = new Intent(activity, OpenedProfileActivity.class);
-                    intent.putExtra("username", comment.getName());
-                    activity.startActivity(intent);
+                if(!comment.getName().equals(firebaseController.getCurrentUser().getName())) {
+                    firebaseController.openClickedUser(comment.getName(),activity);
                 }
                 else {
-                    Intent intent = new Intent(activity, ProfileActivity.class);
-                    activity.startActivity(intent);
+                    firebaseController.updateCurrentUser(true,activity);
                 }
 
 

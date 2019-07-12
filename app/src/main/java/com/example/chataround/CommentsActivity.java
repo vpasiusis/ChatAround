@@ -64,15 +64,11 @@ public class CommentsActivity extends AppCompatActivity {
         user.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                firebaseController.getUsername();
-                if(!item.getName().equals(firebaseController.returnUsername())) {
-                    Intent intent = new Intent(activity, OpenedProfileActivity.class);
-                    intent.putExtra("username", item.getName());
-                    activity.startActivity(intent);
+                if(!item.getName().equals(firebaseController.getCurrentUser().getName())) {
+                    firebaseController.openClickedUser(item.getName(),activity);
                 }
                 else {
-                    Intent intent = new Intent(activity, ProfileActivity.class);
-                    activity.startActivity(intent);
+                    firebaseController.updateCurrentUser(true,activity);
                 }
 
 

@@ -99,7 +99,6 @@ public class LoginActivity extends AppCompatActivity {
                 if (firebaseAuth.getCurrentUser() != null) {
                     FirebaseController firebaseController = FirebaseController.getInstance();
                     firebaseController.initialize();
-                    firebaseController.getUsername();
                     Toast.makeText(LoginActivity.this,   firebaseAuth.getCurrentUser().getEmail() +" joined chat", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(intent);
@@ -242,7 +241,6 @@ public class LoginActivity extends AppCompatActivity {
                                 Toast.makeText(LoginActivity.this, "Joined", Toast.LENGTH_SHORT).show();
                                 FirebaseController firebaseController = FirebaseController.getInstance();
                                 firebaseController.initialize();
-                                firebaseController.getUsername();
                             } else
                                 Toast.makeText(LoginActivity.this, "Email or password incorrect", Toast.LENGTH_SHORT).show();
                         }
