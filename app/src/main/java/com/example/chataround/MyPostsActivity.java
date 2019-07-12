@@ -32,7 +32,7 @@ public class MyPostsActivity extends AppCompatActivity {
     private FirebaseController firebaseController;
     private List<ListViewItem> list;
     private ItemAdapter adapter;
-    private int loadedItems = 0;
+    private int loadedItems = 0, userItems=0, itemsToLoad=10;
     private Button LikeButton;
     private UserClass user;
     private boolean restarting=false;
@@ -46,28 +46,24 @@ public class MyPostsActivity extends AppCompatActivity {
         bottomNav.setOnNavigationItemSelectedListener(navListener);
         //bottomNav.setSelectedItemId(R.id.nav_settings);
         firebaseController = FirebaseController.getInstance();
-
         Toolbar mainToolbar = (Toolbar) findViewById(R.id.posting_toolbar);
-        setSupportActionBar(mainToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         final boolean isCurrentUser = getIntent().getExtras().getBoolean("currentUser");
         if (!isCurrentUser) {
             user = firebaseController.getClickedUser();
-            mainToolbar.setTitle(user+" posts");
+            mainToolbar.setTitle("User posts");
 
         }else {
             user = firebaseController.getCurrentUser();
             mainToolbar.setTitle("My posts");
         }
+        setSupportActionBar(mainToolbar);
         list = new ArrayList<>();
         adapter = new ItemAdapter(this, list);
         listView.setAdapter(adapter);
         Query query = firebaseController.getMyDatabase().
                 child("Messages").orderByKey().limitToLast(10);
-        loadItems(loadedItems, query);
-        loadedItems+=10;
+        loadItems(userItems, query);
         updateFeed();
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -116,9 +112,7 @@ public class MyPostsActivity extends AppCompatActivity {
                             startActivity(intent1);
                             break;
                         case R.id.nav_settings:
-                            Intent intent2 = new Intent(activity, ProfileActivity.class);
-                            startActivity(intent2);
-
+                            firebaseController.updateCurrentUser(true,MyPostsActivity.this);
                             break;
                     }
                     return true;
@@ -134,12 +128,12 @@ public class MyPostsActivity extends AppCompatActivity {
 
             @Override
             public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                if(adapter.getCount()>=loadedItems && firstVisibleItem+visibleItemCount==totalItemCount){
-                    String oldestItemTime = adapter.getListViewItem(loadedItems-1).getTime();
+                if(loadedItems==itemsToLoad && firstVisibleItem+visibleItemCount==totalItemCount){
+                    String oldestItemTime = adapter.getListViewItem(userItems-1).getTime();
                     Query query = firebaseController.getMyDatabase().
                             child("Messages").orderByKey().endAt(oldestItemTime).limitToLast(10);
-                    loadItems(loadedItems, query);
-                    loadedItems+=10;
+                    loadItems(userItems, query);
+                    itemsToLoad+=10;
                 }
             }
         });
@@ -162,7 +156,9 @@ public class MyPostsActivity extends AppCompatActivity {
                     if(user.getName().equals(username1)) {
                         list.add(start, item1);
                         adapter.notifyDataSetChanged();
+                        userItems++;
                     }
+                    loadedItems++;
                 }
             }
 

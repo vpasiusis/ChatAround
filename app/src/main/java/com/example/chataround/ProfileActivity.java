@@ -43,7 +43,6 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         setContentView(R.layout.profile_activity);
         Toolbar settingsToolbar = (Toolbar) findViewById(R.id.posting_toolbar);
-        setSupportActionBar(settingsToolbar);
         firebaseController= FirebaseController.getInstance();
         activity = ProfileActivity.this;
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
@@ -62,7 +61,7 @@ public class ProfileActivity extends AppCompatActivity {
         if (isCurrentUser) {
             user = firebaseController.getCurrentUser();
             myPostActivity.setText("My posts");
-            settingsToolbar.setTitle("My Profile");
+            settingsToolbar.setTitle("My profile");
             descriptionText.addTextChangedListener(new TextWatcher() {
 
                 @Override
@@ -105,9 +104,9 @@ public class ProfileActivity extends AppCompatActivity {
                 }
             });
         }else{
-            settingsToolbar.setTitle("Profile");
-            myPostActivity.setText("User posts");
             user = firebaseController.getClickedUser();
+            settingsToolbar.setTitle("User profile");
+            myPostActivity.setText("User posts");
             settingsCardView.setVisibility(View.GONE);
             descriptionText.setKeyListener(null);
         }
@@ -119,7 +118,7 @@ public class ProfileActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
+        setSupportActionBar(settingsToolbar);
         loadData();
         super.onCreate(savedInstanceState);
 
@@ -132,8 +131,8 @@ public class ProfileActivity extends AppCompatActivity {
             descriptionText.setText(" " + user.getDescription() + " ");
         }
         descriptionButton.setVisibility(View.GONE);
-        likeCount.setText(format("%d", user.getLikes()));
-        postCount.setText(format("%d", user.getPosts()));
+        likeCount.setText(String.valueOf(user.getLikes()));
+        postCount.setText(String.valueOf(user.getPosts()));
         if(user.getType()==99){
             userName.setBackgroundColor(getResources().getColor(R.color.admin));
         }

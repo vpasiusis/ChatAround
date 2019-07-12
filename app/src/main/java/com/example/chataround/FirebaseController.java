@@ -48,7 +48,7 @@ public class FirebaseController {
         currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         if(myDatabase==null) {
             FirebaseDatabase database = FirebaseDatabase.getInstance();
-            database.setPersistenceEnabled(true);
+            database.setPersistenceEnabled(true);      //bugged for now, maybe fixed later
             myDatabase = database.getReference();
             myStorage = FirebaseStorage.getInstance().getReference().child("Messages");
             updateCurrentUser(false,null);
@@ -97,10 +97,10 @@ public class FirebaseController {
                         int posts = snap.child("Posts").getValue(Integer.class);
                         int likes = snap.child("Likes").getValue(Integer.class);
                         int type = snap.child("Type").getValue(Integer.class);
-                        String decription = snap.child("Description").getValue(String.class);
+                        String description = snap.child("Description").getValue(String.class);
                         String registerData = dataSnapshot.child("RegisterData").getValue(String.class);
                         clickedUser = new UserClass(snap.getKey(),username,
-                                avatarId,decription,email,registerData,posts,likes, type);
+                                avatarId,description,email,registerData,posts,likes, type);
                         Intent intent = new Intent(activity, ProfileActivity.class);
                         intent.putExtra("currentUser", false);
                         activity.startActivity(intent);
