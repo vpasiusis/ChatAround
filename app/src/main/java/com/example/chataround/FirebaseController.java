@@ -67,8 +67,10 @@ public class FirebaseController {
                         int likes = dataSnapshot.child("Likes").getValue(Integer.class);
                         int type = dataSnapshot.child("Type").getValue(Integer.class);
                         String decription = dataSnapshot.child("Description").getValue(String.class);
+
+                        String registerData = dataSnapshot.child("RegisterData").getValue(String.class);
                         currentUser = new UserClass(currentFirebaseUser.getUid(),username,
-                                avatarId,decription,email,posts,likes, type);
+                                avatarId,decription,email,registerData,posts,likes, type);
                         if(toOpen){
                             Intent intent = new Intent(activity, ProfileActivity.class);
                             intent.putExtra("currentUser", true);
@@ -96,8 +98,9 @@ public class FirebaseController {
                         int likes = snap.child("Likes").getValue(Integer.class);
                         int type = snap.child("Type").getValue(Integer.class);
                         String decription = snap.child("Description").getValue(String.class);
+                        String registerData = dataSnapshot.child("RegisterData").getValue(String.class);
                         clickedUser = new UserClass(snap.getKey(),username,
-                                avatarId,decription,email,posts,likes, type);
+                                avatarId,decription,email,registerData,posts,likes, type);
                         Intent intent = new Intent(activity, ProfileActivity.class);
                         intent.putExtra("currentUser", false);
                         activity.startActivity(intent);

@@ -22,6 +22,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 public class CreateAccountActivity extends AppCompatActivity {
 
 
@@ -102,6 +105,7 @@ public class CreateAccountActivity extends AppCompatActivity {
                                             currentUserDB.child("Username").setValue(userName);
                                             currentUserDB.child("Likes").setValue(0);
                                             currentUserDB.child("Posts").setValue(0);
+                                            currentUserDB.child("RegisterData").setValue(getTime());
                                             currentUserDB.child("AvatarId").setValue(null);
                                         } else
                                             Toast.makeText(CreateAccountActivity.this, "error registering user", Toast.LENGTH_SHORT).show();
@@ -124,6 +128,12 @@ public class CreateAccountActivity extends AppCompatActivity {
 
         }else
             Toast.makeText(CreateAccountActivity.this, "Enter all data", Toast.LENGTH_SHORT).show();
+    }
+    public String getTime(){
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String time = df.format(c.getTime());
+        return time;
     }
 
 }

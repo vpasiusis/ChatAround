@@ -3,18 +3,28 @@ package com.example.chataround;
 import java.io.Serializable;
 
 public class UserClass implements Serializable {
-    private String id, name, avatarId, description, email;
+    private String id, name, avatarId, description, email,registerTime;
     private int posts, likes,type;
 
-    public UserClass(String id, String name, String avatarId, String description, String email, int posts, int likes, int type) {
+    public UserClass(String id, String name, String avatarId, String description,
+                     String email, String registerTime, int posts, int likes, int type) {
         this.id = id;
         this.name = name;
         this.avatarId = avatarId;
         this.description = description;
         this.email = email;
+        this.registerTime = registerTime;
         this.posts = posts;
         this.likes = likes;
         this.type = type;
+    }
+
+    public String getRegisterTime() {
+        return registerTime;
+    }
+
+    public void setRegisterTime(String registerTime) {
+        this.registerTime = registerTime;
     }
 
     public String getDescription() {

@@ -3,7 +3,6 @@ package com.example.chataround;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -23,10 +22,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ValueEventListener;
 
 import static java.lang.String.format;
 
@@ -136,6 +131,7 @@ public class ProfileActivity extends AppCompatActivity {
         if(user.getDescription()!=null) {
             descriptionText.setText(" " + user.getDescription() + " ");
         }
+        descriptionButton.setVisibility(View.GONE);
         likeCount.setText(format("%d", user.getLikes()));
         postCount.setText(format("%d", user.getPosts()));
         if(user.getType()==99){
