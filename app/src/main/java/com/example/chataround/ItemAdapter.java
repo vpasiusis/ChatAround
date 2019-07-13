@@ -77,6 +77,8 @@ public class ItemAdapter extends BaseAdapter {
         Button deleteButton = view.findViewById(R.id.deleteButton);
         final Button likeButton = view.findViewById(R.id.likeButton);
         final Button commentButton = view.findViewById(R.id.commentButton);
+        final ImageView imageViewAvatar = view.findViewById(R.id.itemAvatar);
+        final ImageView defaultImageViewAvatar = view.findViewById(R.id.defaultitemAvatar);
         final ListViewItem item = itemList.get(i);
         name.setText(item.getName());
         String realtime = firebaseController.diffTime(item.getTime());
@@ -98,7 +100,34 @@ public class ItemAdapter extends BaseAdapter {
             // message is empty, remove from view
             message.setVisibility(View.GONE);
         }
+        if(item.getAvatarId()!=null){
+            imageViewAvatar.setVisibility(View.VISIBLE);
+            defaultImageViewAvatar.setVisibility(View.INVISIBLE);
+            PicassoCache.getPicassoInstance(activity).load(item.getAvatarId()).
+                    networkPolicy(NetworkPolicy.OFFLINE).into(imageViewAvatar, new Callback() {
+                @Override
+                public void onSuccess() {
+                }
 
+                @Override
+                public void onError() {
+                    PicassoCache.getPicassoInstance(activity).load(item.getAvatarId()).
+                            into(imageViewAvatar, new Callback() {
+                                @Override
+                                public void onSuccess() {
+                                }
+
+                                @Override
+                                public void onError() {
+                                }
+                            });
+                }
+            });
+        }else {
+            imageViewAvatar.setVisibility(View.INVISIBLE);
+            defaultImageViewAvatar.setVisibility(View.VISIBLE);
+            defaultImageViewAvatar.setBackgroundResource(R.drawable.ic_person_black_24dp);
+        }
         firebaseController.getMyDatabase().child("Liked").child(item.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -118,7 +147,6 @@ public class ItemAdapter extends BaseAdapter {
 
             }
         });
-
         // Check image
         if(item.getImageId()!=null){
             cardView.setVisibility(View.VISIBLE);
@@ -244,7 +272,7 @@ public class ItemAdapter extends BaseAdapter {
                             firebaseController.updateLikes(item.getName(),false,item.getLikes());
                         }
                         if(item.getImage()!=null) {
-                            StorageReference ref = firebaseController.getMyStorage().child(item.getImageId());
+                            StorageReference ref = firebaseController.getMyStorage().child("Messages").child(item.getImageId());
                             ref.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {

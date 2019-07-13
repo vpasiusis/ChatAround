@@ -21,6 +21,7 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,6 +92,7 @@ public class MyPostsActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if (item.getItemId() == android.R.id.home) {
+            firebaseController.updateCurrentUser(true, MyPostsActivity.this);
             finish();
         }
         if(item.getItemId()==R.id.quit){
@@ -116,9 +118,7 @@ public class MyPostsActivity extends AppCompatActivity {
                             startActivity(intent1);
                             break;
                         case R.id.nav_settings:
-                            Intent intent2 = new Intent(activity, ProfileActivity.class);
-                            startActivity(intent2);
-
+                            firebaseController.updateCurrentUser(true,MyPostsActivity.this);
                             break;
                     }
                     return true;
@@ -157,12 +157,29 @@ public class MyPostsActivity extends AppCompatActivity {
                     final String time = dst.child("time").getValue(String.class);
                     final int commentCount = dst.child("comments").getValue(Integer.class);
                     final int likeCount = dst.child("likes").getValue(Integer.class);
-                    final ListViewItem item1 = new ListViewItem(key,username1,
-                            null,message,imageId,time,commentCount, likeCount);
-                    if(user.getName().equals(username1)) {
-                        list.add(start, item1);
-                        adapter.notifyDataSetChanged();
-                    }
+                    firebaseController.getMyDatabase().child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            for(DataSnapshot dataSnapshot1:dataSnapshot.getChildren()){
+                                if(username1.equals(dataSnapshot1.child("Username").getValue())){
+                                    final String avatarId = dataSnapshot1.child("AvatarId").getValue(String.class);
+                                    final ListViewItem item1 = new ListViewItem(key,username1,
+                                            null,message,imageId,time,commentCount, likeCount,avatarId);
+                                    if(user.getName().equals(username1)) {
+                                        list.add(start, item1);
+                                        adapter.notifyDataSetChanged();
+                                    }
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+
                 }
             }
 

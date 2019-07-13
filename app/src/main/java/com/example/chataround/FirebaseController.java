@@ -50,7 +50,7 @@ public class FirebaseController {
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             database.setPersistenceEnabled(true);
             myDatabase = database.getReference();
-            myStorage = FirebaseStorage.getInstance().getReference().child("Messages");
+            myStorage = FirebaseStorage.getInstance().getReference();
             updateCurrentUser(false,null);
         }
     }
@@ -114,6 +114,9 @@ public class FirebaseController {
             }
         });
     }
+    public void setAvatarId(String value){
+        getMyDatabase().child("users").child(currentFirebaseUser.getUid()).child("AvatarId").setValue(value);
+    }
 
     public UserClass getCurrentUser(){
         return currentUser;
@@ -130,6 +133,7 @@ public class FirebaseController {
     public StorageReference getMyStorage() {
         return myStorage;
     }
+
     public void sendMessage(String message, String imageId){
         String time = getTime();
         String key = getKey(time);
@@ -169,7 +173,7 @@ public class FirebaseController {
     public void sendImage(byte[] image, final String message){
         String time = getTime();
         String key = getKey(time);
-        final StorageReference file = myStorage.child(key);
+        final StorageReference file = myStorage.child("Messages").child(key);
         file.putBytes(image).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
@@ -182,6 +186,7 @@ public class FirebaseController {
             }
         });
     }
+
 
     public void setDescription(String description) {
         myDatabase.child("users").child(currentFirebaseUser.getUid()).child("Description").setValue(description);

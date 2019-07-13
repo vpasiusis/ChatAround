@@ -5,14 +5,14 @@ import android.graphics.Bitmap;
 import java.io.Serializable;
 
 public class ListViewItem implements Serializable {
-    private String id, name, message, time,imageId;
+    private String id, name, message, time,imageId,avatarId;
     private int comments, likes;
     private Bitmap image;
     private boolean isLiked=false;
 
 
 
-    public ListViewItem(String id, String name, Bitmap image, String message, String imageId, String time, int comments, int likes) {
+    public ListViewItem(String id, String name, Bitmap image, String message, String imageId, String time, int comments, int likes, String avatarId) {
         super();
         this.id = id;
         this.name = name;
@@ -22,11 +22,18 @@ public class ListViewItem implements Serializable {
         this.time = time;
         this.comments = comments;
         this.likes=likes;
+        this.avatarId=avatarId;
     }
     public String getImageId() {
         return imageId;
     }
 
+    public String getAvatarId() {
+        return avatarId;
+    }
+    public void setAvatarId(String avatarId) {
+        this.avatarId = avatarId;
+    }
     public void setImageId(String imageId) {
         this.imageId = imageId;
     }
