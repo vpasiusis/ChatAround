@@ -109,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void loadItems(final int start, Query query) {
+        query.keepSynced(true);
         query.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dst, String s) {

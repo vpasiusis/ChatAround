@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -36,6 +37,8 @@ public class MyPostsActivity extends AppCompatActivity {
     private Button LikeButton;
     private UserClass user;
     private boolean restarting=false;
+    private String latestItemTime=null;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         setContentView(R.layout.myposts_activity);
@@ -128,12 +131,12 @@ public class MyPostsActivity extends AppCompatActivity {
 
             @Override
             public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                if(loadedItems==itemsToLoad && firstVisibleItem+visibleItemCount==totalItemCount){
-                    String oldestItemTime = adapter.getListViewItem(userItems-1).getTime();
-                    Query query = firebaseController.getMyDatabase().
-                            child("Messages").orderByKey().endAt(oldestItemTime).limitToLast(10);
-                    loadItems(userItems, query);
+                if(totalItemCount!=0 && loadedItems==itemsToLoad && firstVisibleItem+visibleItemCount==totalItemCount){
                     itemsToLoad+=10;
+                    Log.e("loaded",String.valueOf(loadedItems));
+                    Query query = firebaseController.getMyDatabase().
+                            child("Messages").orderByKey().endAt(latestItemTime).limitToLast(10);
+                    loadItems(userItems, query);
                 }
             }
         });
@@ -158,7 +161,14 @@ public class MyPostsActivity extends AppCompatActivity {
                         adapter.notifyDataSetChanged();
                         userItems++;
                     }
+                    if(loadedItems==(itemsToLoad-10)) latestItemTime = time;
                     loadedItems++;
+
+                    if(loadedItems==itemsToLoad&&userItems==0){
+                        Query query = firebaseController.getMyDatabase().
+                                child("Messages").orderByKey().endAt(latestItemTime).limitToLast(10);
+                        loadItems(userItems, query);
+                    }
                 }
             }
 

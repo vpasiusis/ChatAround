@@ -22,6 +22,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
@@ -243,8 +244,8 @@ public class ItemAdapter extends BaseAdapter {
                             firebaseController.getMyDatabase().child("Liked").child(item.getId()).removeValue();
                             firebaseController.updateLikes(item.getName(),false,item.getLikes());
                         }
-                        if(item.getImage()!=null) {
-                            StorageReference ref = firebaseController.getMyStorage().child(item.getImageId());
+                        if(item.getImageId()!=null) {
+                            StorageReference ref = FirebaseStorage.getInstance().getReferenceFromUrl(item.getImageId());
                             ref.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
