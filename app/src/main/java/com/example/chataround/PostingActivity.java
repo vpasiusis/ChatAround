@@ -102,7 +102,7 @@ public class PostingActivity extends AppCompatActivity {
                             startActivity(intent2);
                             break;
                         case R.id.nav_settings:
-                            firebaseController.updateCurrentUser(true,PostingActivity.this);
+                            firebaseController.updateCurrentUser(true, PostingActivity.this);
                             break;
                     }
 

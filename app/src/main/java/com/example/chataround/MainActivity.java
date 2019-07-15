@@ -19,6 +19,7 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -108,8 +109,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void loadItems(final int start, Query query) {
-        query.keepSynced(true);
+    public void loadItems(final int start, final Query query) {
         query.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dst, String s) {
@@ -121,10 +121,27 @@ public class MainActivity extends AppCompatActivity {
                     final String time = dst.child("time").getValue(String.class);
                     final int commentCount = dst.child("comments").getValue(Integer.class);
                     final int likeCount = dst.child("likes").getValue(Integer.class);
-                    final ListViewItem item1 = new ListViewItem(key,username1,
-                            null,message,imageId,time,commentCount, likeCount);
-                    list.add(start,item1);
-                    adapter.notifyDataSetChanged();
+                    Query query1 = firebaseController.getMyDatabase().child("users");
+                    query1.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            for(DataSnapshot dataSnapshot1:dataSnapshot.getChildren()){
+                                if(username1.equals(dataSnapshot1.child("Username").getValue())){
+                                    final String avatarId = dataSnapshot1.child("AvatarId").getValue(String.class);
+                                    final ListViewItem item1 = new ListViewItem(key,username1,
+                                            null,message,imageId,time,commentCount, likeCount,avatarId);
+                                    list.add(start,item1);
+                                    adapter.notifyDataSetChanged();
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
                 }
             }
 

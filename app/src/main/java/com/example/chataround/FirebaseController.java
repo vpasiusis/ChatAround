@@ -51,14 +51,15 @@ public class FirebaseController {
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             database.setPersistenceEnabled(true);      //bugged for now, maybe fixed later
             myDatabase = database.getReference();
-            myStorage = FirebaseStorage.getInstance().getReference().child("Messages");
+            myDatabase.keepSynced(true);
+            myStorage = FirebaseStorage.getInstance().getReference();
             updateCurrentUser(false,null);
         }
     }
 
     public void updateCurrentUser(final boolean toOpen, final Activity activity){
-        myDatabase.child("users").child(currentFirebaseUser.getUid()).
-                addListenerForSingleValueEvent(new ValueEventListener() {
+        Query query = myDatabase.child("users").child(currentFirebaseUser.getUid());
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         String username = dataSnapshot.child("Username").getValue(String.class);
@@ -88,7 +89,6 @@ public class FirebaseController {
 
     public void openClickedUser(final String name, final Activity activity){
         Query query = myDatabase.child("users");
-        query.keepSynced(true);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -117,6 +117,9 @@ public class FirebaseController {
             }
         });
     }
+    public void setAvatarId(String value){
+        myDatabase.child("users").child(currentFirebaseUser.getUid()).child("AvatarId").setValue(value);
+    }
 
     public UserClass getCurrentUser(){
         return currentUser;
@@ -133,6 +136,7 @@ public class FirebaseController {
     public StorageReference getMyStorage() {
         return myStorage;
     }
+
     public void sendMessage(String message, String imageId){
         String time = getTime();
         String key = getKey(time);
@@ -172,7 +176,7 @@ public class FirebaseController {
     public void sendImage(byte[] image, final String message){
         String time = getTime();
         String key = getKey(time);
-        final StorageReference file = myStorage.child(key);
+        final StorageReference file = myStorage.child("Messages").child(key);
         file.putBytes(image).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
@@ -185,6 +189,7 @@ public class FirebaseController {
             }
         });
     }
+
 
     public void setDescription(String description) {
         myDatabase.child("users").child(currentFirebaseUser.getUid()).child("Description").setValue(description);

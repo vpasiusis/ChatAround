@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -78,6 +79,8 @@ public class ItemAdapter extends BaseAdapter {
         Button deleteButton = view.findViewById(R.id.deleteButton);
         final Button likeButton = view.findViewById(R.id.likeButton);
         final Button commentButton = view.findViewById(R.id.commentButton);
+        final ImageView imageViewAvatar = view.findViewById(R.id.itemAvatar);
+        final ImageView defaultImageViewAvatar = view.findViewById(R.id.defaultitemAvatar);
         final ListViewItem item = itemList.get(i);
         name.setText(item.getName());
         String realtime = firebaseController.diffTime(item.getTime());
@@ -99,7 +102,34 @@ public class ItemAdapter extends BaseAdapter {
             // message is empty, remove from view
             message.setVisibility(View.GONE);
         }
+        if(item.getAvatarId()!=null){
+            imageViewAvatar.setVisibility(View.VISIBLE);
+            defaultImageViewAvatar.setVisibility(View.INVISIBLE);
+            PicassoCache.getPicassoInstance(activity).load(item.getAvatarId()).
+                    networkPolicy(NetworkPolicy.OFFLINE).into(imageViewAvatar, new Callback() {
+                @Override
+                public void onSuccess() {
+                }
 
+                @Override
+                public void onError() {
+                    PicassoCache.getPicassoInstance(activity).load(item.getAvatarId()).
+                            into(imageViewAvatar, new Callback() {
+                                @Override
+                                public void onSuccess() {
+                                }
+
+                                @Override
+                                public void onError() {
+                                }
+                            });
+                }
+            });
+        }else {
+            imageViewAvatar.setVisibility(View.INVISIBLE);
+            defaultImageViewAvatar.setVisibility(View.VISIBLE);
+            defaultImageViewAvatar.setBackgroundResource(R.drawable.ic_person_black_24dp);
+        }
         firebaseController.getMyDatabase().child("Liked").child(item.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -119,13 +149,11 @@ public class ItemAdapter extends BaseAdapter {
 
             }
         });
-
         // Check image
         if(item.getImageId()!=null){
             cardView.setVisibility(View.VISIBLE);
             image.setVisibility(View.VISIBLE);
-            final View view1 = view;
-            PicassoCache.getPicassoInstance(view1.getContext()).load(item.getImageId()).
+            PicassoCache.getPicassoInstance(activity).load(item.getImageId()).
                     networkPolicy(NetworkPolicy.OFFLINE).into(image, new Callback() {
                 @Override
                 public void onSuccess() {
@@ -133,7 +161,7 @@ public class ItemAdapter extends BaseAdapter {
 
                 @Override
                 public void onError() {
-                    PicassoCache.getPicassoInstance(view1.getContext()).load(item.getImageId()).
+                    PicassoCache.getPicassoInstance(activity).load(item.getImageId()).
                             into(image, new Callback() {
                         @Override
                         public void onSuccess() {
@@ -246,18 +274,7 @@ public class ItemAdapter extends BaseAdapter {
                         }
                         if(item.getImageId()!=null) {
                             StorageReference ref = FirebaseStorage.getInstance().getReferenceFromUrl(item.getImageId());
-                            ref.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception exception) {
-                                    Toast.makeText(activity, "Error deleting an image", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-
+                            ref.delete();
                         }
                     }
                 }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
