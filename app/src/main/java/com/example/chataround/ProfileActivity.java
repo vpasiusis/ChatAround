@@ -362,7 +362,6 @@ public class ProfileActivity extends AppCompatActivity {
                 InputStream imageStream = getContentResolver().openInputStream(imageUri);
                 Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
                 selectedImage = ImageController.ResizeImage(selectedImage,1300);
-                selectedImage=Bitmap.createScaledBitmap(selectedImage, 512, 512, true);
                 image = ImageController.BitmapToBytes(selectedImage);
                 uploadAvatar(image);
                 progressDialog.show();
@@ -375,7 +374,6 @@ public class ProfileActivity extends AppCompatActivity {
                 Bitmap selectedImage = MediaStore.Images.Media.getBitmap(
                         getContentResolver(), imageUri);
                 selectedImage = ImageController.ResizeImage(selectedImage, 1300);
-                selectedImage=Bitmap.createScaledBitmap(selectedImage, 512, 512, true);
                 image = ImageController.BitmapToBytes(selectedImage);
                 uploadAvatar(image);
                 progressDialog.show();

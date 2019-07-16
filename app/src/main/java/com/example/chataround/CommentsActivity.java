@@ -33,6 +33,7 @@ public class CommentsActivity extends AppCompatActivity {
     private TextView message,time,user,commentNumber;
     private EditText editMessage;
     private FirebaseController firebaseController;
+    private int commentCounter=0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -74,10 +75,6 @@ public class CommentsActivity extends AppCompatActivity {
 
             }
         });
-        int comments = item.getComments();
-        if(comments==0) commentNumber.setText("No comments");
-        else if(comments==1) commentNumber.setText("Showing 1 comment");
-        else commentNumber.setText("Showing " + comments + " comments");
 
         boolean keyboard = getIntent().getExtras().getBoolean("keyboard");
         if(keyboard){
@@ -105,6 +102,9 @@ public class CommentsActivity extends AppCompatActivity {
                     ListViewComment comment = new ListViewComment(key,username,message,realTime);
                     comments.add(comment);
                     adapter.notifyDataSetChanged();
+                    commentCounter++;
+                    if(commentCounter==1)commentNumber.setText("Showing 1 comment");
+                    else commentNumber.setText(String.format("Showing %d comments", commentCounter));
                 }
             }
             @Override

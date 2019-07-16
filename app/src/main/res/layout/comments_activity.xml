@@ -80,6 +80,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/borderMessage1"
                 android:textStyle="bold"
+                android:text="No comments"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:layout_marginTop="@dimen/feed_item_margin_top_bottom"

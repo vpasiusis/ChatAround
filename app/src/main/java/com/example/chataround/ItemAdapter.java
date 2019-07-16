@@ -244,10 +244,10 @@ public class ItemAdapter extends BaseAdapter {
                                 removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
-                                activity.finish();
                                 activity.overridePendingTransition(0, 0);
                                 activity.startActivity(activity.getIntent());
                                 activity.overridePendingTransition(0, 0);
+                                activity.finish();
                                 firebaseController.updatePosts(item.getName(),false);
                             }
                         });
