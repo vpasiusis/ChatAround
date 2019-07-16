@@ -60,6 +60,9 @@ public class MyPostsActivity extends AppCompatActivity {
         }else {
             user = firebaseController.getCurrentUser();
             mainToolbar.setTitle("My posts");
+            setSupportActionBar(mainToolbar);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
         setSupportActionBar(mainToolbar);
         list = new ArrayList<>();
