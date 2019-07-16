@@ -61,7 +61,7 @@ public class ItemAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int i, View view, ViewGroup viewGroup) {
+    public View getView(final int i, View view, ViewGroup viewGroup) {
         firebaseController = FirebaseController.getInstance();
         if (inflater == null){
             inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -303,7 +303,8 @@ public class ItemAdapter extends BaseAdapter {
         image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //someday, someday...
+                ImageController.croppedImageView = image;
+                ImageController.zoomImageIn(activity,item.getImageId());
             }
         });
 
