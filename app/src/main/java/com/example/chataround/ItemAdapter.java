@@ -61,7 +61,7 @@ public class ItemAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int i, View view, ViewGroup viewGroup) {
+    public View getView(final int i, View view, ViewGroup viewGroup) {
         firebaseController = FirebaseController.getInstance();
         if (inflater == null){
             inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -244,10 +244,10 @@ public class ItemAdapter extends BaseAdapter {
                                 removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
-                                activity.finish();
                                 activity.overridePendingTransition(0, 0);
                                 activity.startActivity(activity.getIntent());
                                 activity.overridePendingTransition(0, 0);
+                                activity.finish();
                                 firebaseController.updatePosts(item.getName(),false);
                             }
                         });
@@ -303,7 +303,8 @@ public class ItemAdapter extends BaseAdapter {
         image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //someday, someday...
+                ImageController.croppedImageView = image;
+                ImageController.zoomImageIn(activity,item.getImageId());
             }
         });
 
