@@ -5,10 +5,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,9 +14,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -87,6 +83,7 @@ public class ItemAdapter extends BaseAdapter {
         time.setText(realtime);
         commentCount.setText(firebaseController.diffCount(item.getComments()));
         likeCount.setText(firebaseController.diffCount(item.getLikes()));
+
 
         if(!item.getLiked()){
             likeButton.setBackgroundResource(R.drawable.like);

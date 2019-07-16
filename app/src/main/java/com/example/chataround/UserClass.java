@@ -5,9 +5,10 @@ import java.io.Serializable;
 public class UserClass implements Serializable {
     private String id, name, avatarId, description, email,registerTime;
     private int posts, likes,type;
+    private boolean anonMode;
 
     public UserClass(String id, String name, String avatarId, String description,
-                     String email, String registerTime, int posts, int likes, int type) {
+                     String email, String registerTime, int posts, int likes, int type,boolean anonMode) {
         this.id = id;
         this.name = name;
         this.avatarId = avatarId;
@@ -17,8 +18,14 @@ public class UserClass implements Serializable {
         this.posts = posts;
         this.likes = likes;
         this.type = type;
+        this.anonMode=anonMode;
     }
-
+    public boolean isAnonMode() {
+        return anonMode;
+    }
+    public void setAnonMode(boolean anonMode) {
+        this.anonMode = anonMode;
+    }
     public String getRegisterTime() {
         return registerTime;
     }

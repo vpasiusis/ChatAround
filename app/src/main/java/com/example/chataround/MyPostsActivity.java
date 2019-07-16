@@ -175,7 +175,6 @@ public class MyPostsActivity extends AppCompatActivity {
                                     }
                                     if(loadedItems==(itemsToLoad-10)) latestItemTime = time;
                                     loadedItems++;
-
                                     if(loadedItems==itemsToLoad&&userItems==0){
                                         Query query = firebaseController.getMyDatabase().
                                                 child("Messages").orderByKey().endAt(latestItemTime).limitToLast(10);
@@ -184,7 +183,6 @@ public class MyPostsActivity extends AppCompatActivity {
                                 }
                             }
                         }
-
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
 

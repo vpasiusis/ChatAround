@@ -41,6 +41,7 @@ public class PostingActivity extends AppCompatActivity {
     private FirebaseController firebaseController;
     private Activity activity;
     private Button cameraButton;
+    private UserClass user;
     private byte[] image;
     private Uri imageUri;
     @Override
@@ -54,6 +55,7 @@ public class PostingActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         activity=PostingActivity.this;
         firebaseController = FirebaseController.getInstance();
+        user=firebaseController.getCurrentUser();
         editPostText = findViewById(R.id.enterTextidpost);
         cameraButton  = (Button)findViewById(R.id.PictureButtonId);
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
@@ -155,7 +157,9 @@ public class PostingActivity extends AppCompatActivity {
     public void sendMessage(View view) {
         String text = editPostText.getText().toString().trim();
         if(!TextUtils.isEmpty(text)||hasImageSpan(editPostText)) {
-            firebaseController.updatePosts(firebaseController.getCurrentUser().getName(),true);
+            if(!user.isAnonMode()) {
+                firebaseController.updatePosts(user.getName(), true);
+            }
             if (hasImageSpan(editPostText)) {
                 firebaseController.sendImage(image,text);
                 Intent intent = new Intent(this, MainActivity.class);

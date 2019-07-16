@@ -34,6 +34,7 @@ public class CommentsActivity extends AppCompatActivity {
     private Activity activity;
     private TextView message,time,user,commentNumber;
     private EditText editMessage;
+    private UserClass userClass;
     private FirebaseController firebaseController;
     private int commentCounter=0;
 
@@ -50,6 +51,7 @@ public class CommentsActivity extends AppCompatActivity {
         setSupportActionBar(mainToolbar);
         firebaseController = FirebaseController.getInstance();
         activity=CommentsActivity.this;
+        userClass=firebaseController.getCurrentUser();
         item = firebaseController.getCurrentSelectedItem();
         listView = findViewById(R.id.listViewComments);
         message = findViewById(R.id.itemMessage1);
@@ -62,10 +64,18 @@ public class CommentsActivity extends AppCompatActivity {
         adapter = new CommentAdapter(CommentsActivity.this,comments);
         listView.setAdapter(adapter);
 
+
         message.setText(item.getMessage());
         String realtime = firebaseController.diffTime(item.getTime());
         time.setText(realtime);
         user.setText(item.getName());
+        if(item.getName().equals("")) {
+            user.setVisibility(View.GONE);
+        }else
+        {
+            user.setText(item.getName());
+        }
+
 
         user.setOnClickListener(new View.OnClickListener() {
             @Override

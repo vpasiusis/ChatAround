@@ -69,10 +69,10 @@ public class FirebaseController {
                         int likes = dataSnapshot.child("Likes").getValue(Integer.class);
                         int type = dataSnapshot.child("Type").getValue(Integer.class);
                         String decription = dataSnapshot.child("Description").getValue(String.class);
-
+                        boolean anonymousMode = dataSnapshot.child("AnonymousMode").getValue(boolean.class);
                         String registerData = dataSnapshot.child("RegisterData").getValue(String.class);
                         currentUser = new UserClass(currentFirebaseUser.getUid(),username,
-                                avatarId,decription,email,registerData,posts,likes, type);
+                                avatarId,decription,email,registerData,posts,likes, type,anonymousMode);
                         if(toOpen){
                             Intent intent = new Intent(activity, ProfileActivity.class);
                             intent.putExtra("currentUser", true);
@@ -103,7 +103,7 @@ public class FirebaseController {
                         String description = snap.child("Description").getValue(String.class);
                         String registerData = dataSnapshot.child("RegisterData").getValue(String.class);
                         clickedUser = new UserClass(snap.getKey(),username,
-                                avatarId,description,email,registerData,posts,likes, type);
+                                avatarId,description,email,registerData,posts,likes, type,false);
                         Intent intent = new Intent(activity, ProfileActivity.class);
                         intent.putExtra("currentUser", false);
                         activity.startActivity(intent);
@@ -119,6 +119,9 @@ public class FirebaseController {
     }
     public void setAvatarId(String value){
         myDatabase.child("users").child(currentFirebaseUser.getUid()).child("AvatarId").setValue(value);
+    }
+    public void setUserAnon(Boolean isAnon){
+        myDatabase.child("users").child(currentFirebaseUser.getUid()).child("AnonymousMode").setValue(isAnon);
     }
 
     public UserClass getCurrentUser(){
@@ -147,8 +150,11 @@ public class FirebaseController {
         newMessage.put("time", time);
         newMessage.put("comments", 0);
         newMessage.put("likes", 0);
-        newMessage.put("username", name);
-
+        if(currentUser.isAnonMode()) {
+            newMessage.put("username", "");
+        }else{
+            newMessage.put("username", name);
+        }
         DatabaseReference messageDb = myDatabase.child("Messages").child(key);
         messageDb.setValue(newMessage);
     }
@@ -160,9 +166,13 @@ public class FirebaseController {
         Map<String, Object> newMessage = new HashMap<>();
         newMessage.put("message", message);
         newMessage.put("time", time);
-        newMessage.put("username", currentUser.getName());
+        if(!currentUser.isAnonMode()) {
+            newMessage.put("username", currentUser.getName());
+        }else
+        {
+            newMessage.put("username", "");
+        }
         newMessage.put("postId", postId);
-
         DatabaseReference commentDb = myDatabase.child("Comments").child(key);
         commentDb.setValue(newMessage);
 

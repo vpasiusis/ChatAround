@@ -2,7 +2,6 @@ package com.example.chataround;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -54,7 +53,14 @@ public class CommentAdapter extends BaseAdapter {
         TextView time = view.findViewById(R.id.commentTime);
         TextView message = view.findViewById(R.id.commentMessage);
         final ListViewComment comment = commentList.get(i);
-        name.setText(comment.getName());
+        if(comment.getName().equals("")) {
+            name.setVisibility(View.GONE);
+        }else
+        {
+            name.setText(comment.getName());
+        }
+
+
         time.setText(comment.getTime());
 
         // Check for empty message

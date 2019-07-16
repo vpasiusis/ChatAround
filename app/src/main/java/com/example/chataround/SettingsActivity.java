@@ -11,11 +11,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.CompoundButton;
 import android.widget.Switch;
 
 public class SettingsActivity extends AppCompatActivity {
     private Activity activity;
     private FirebaseController firebaseController;
+    private UserClass user;
     private Switch aSwitch;
 
     @Override
@@ -25,11 +27,29 @@ public class SettingsActivity extends AppCompatActivity {
         eventsToolbar.setTitle("My settings");
         firebaseController=FirebaseController.getInstance();
         firebaseController.initialize();
+        user=firebaseController.getCurrentUser();
         setSupportActionBar(eventsToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         activity = SettingsActivity.this;
         aSwitch=findViewById(R.id.switch1);
+        if(user.isAnonMode()){
+            aSwitch.setChecked(true);
+        }else {
+            aSwitch.setChecked(false);
+        }
+        aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    user.setAnonMode(true);
+                    firebaseController.setUserAnon(true);
+                }else {
+                    user.setAnonMode(false);
+                    firebaseController.setUserAnon(false);
+                }
+            }
+        });
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
         super.onCreate(savedInstanceState);

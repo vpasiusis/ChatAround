@@ -107,6 +107,7 @@ public class CreateAccountActivity extends AppCompatActivity {
                                             currentUserDB.child("Posts").setValue(0);
                                             currentUserDB.child("RegisterData").setValue(getTime());
                                             currentUserDB.child("AvatarId").setValue(null);
+                                            currentUserDB.child("AnonymousMode").setValue(false);
                                         } else
                                             Toast.makeText(CreateAccountActivity.this, "error registering user", Toast.LENGTH_SHORT).show();
 
