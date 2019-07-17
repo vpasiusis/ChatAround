@@ -19,7 +19,8 @@ import java.io.ByteArrayOutputStream;
 
 public class ImageController {
 
-    public static ImageView croppedImageView;
+    private static ImageView croppedImageView,expandedImageView,expandedImageView1;
+    private static RelativeLayout container1, container2;
     public static boolean isFullscreen=false;
 
     public static Bitmap ResizeImage(Bitmap bitmap, int maxSize){
@@ -44,12 +45,16 @@ public class ImageController {
         return byteArray;
     }
 
-    public static void zoomImageIn(final Activity activity, final String imageId) {
-        final RelativeLayout container1 = activity.findViewById(R.id.container1);
-        final RelativeLayout container2 = activity.findViewById(R.id.container2);
-        final ImageView expandedImageView1 = activity.findViewById(R.id.expanded_image1);
-        final ImageView expandedImageView = activity.findViewById(R.id.expanded_image);
+    public static void setViews(ImageView expanded1, ImageView expanded2, ImageView cropped,
+                                RelativeLayout layout1, RelativeLayout layout2){
+        expandedImageView=expanded1;
+        expandedImageView1=expanded2;
+        croppedImageView=cropped;
+        container1=layout1;
+        container2=layout2;
+    }
 
+    public static void zoomImageIn(final Activity activity, final String imageId) {
         PicassoCache.getPicassoInstance(activity).load(imageId).
                 networkPolicy(NetworkPolicy.OFFLINE).into(expandedImageView);
 
@@ -114,10 +119,6 @@ public class ImageController {
     }
 
     public static void zoomImageOut(Activity activity){
-        final RelativeLayout container1 = activity.findViewById(R.id.container1);
-        final RelativeLayout container2 = activity.findViewById(R.id.container2);
-        final ImageView expandedImageView = activity.findViewById(R.id.expanded_image);
-
         final Rect startBounds = new Rect();
         final Rect finalBounds = new Rect();
         final Point globalOffset = new Point();

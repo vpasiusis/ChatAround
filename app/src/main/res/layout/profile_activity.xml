@@ -7,7 +7,6 @@
     tools:context=".PostingActivity"
     android:background="@color/feed_item_border">
 
-
     <android.support.v7.widget.Toolbar
         android:id="@+id/posting_toolbar"
         android:layout_width="match_parent"
@@ -180,13 +179,13 @@
         android:visibility="visible">
 
 
-       <Button
-           android:layout_width="24dp"
-           android:layout_height="24dp"
-           android:layout_marginStart="5dp"
-           android:layout_marginTop="5dp"
-           android:layout_marginLeft="2dp"
-           android:background="@drawable/posts_profile"/>
+        <Button
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="2dp"
+            android:background="@drawable/posts_profile"/>
         <Button
             android:id="@+id/myPostButton"
             android:layout_width="wrap_content"
@@ -235,8 +234,5 @@
         app:itemIconTint="@drawable/bottom_navigation_color"
         app:menu="@menu/bottom_menu"
         android:background="@color/white"/>
-
-
-
 
 </RelativeLayout>

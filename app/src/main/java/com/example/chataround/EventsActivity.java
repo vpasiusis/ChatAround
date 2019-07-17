@@ -76,5 +76,4 @@ public class EventsActivity extends AppCompatActivity {
                 }
             };
 
-
 }

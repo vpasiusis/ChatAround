@@ -37,20 +37,19 @@ public class MyPostsActivity extends AppCompatActivity {
     private int loadedItems = 0, userItems=0, itemsToLoad=10;
     private Button LikeButton;
     private UserClass user;
-    private boolean restarting=false;
-    private String latestItemTime=null;
+    private String latestItemTime=null, avatarId;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        setContentView(R.layout.myposts_activity);
+        setContentView(R.layout.activity_main);
         activity=MyPostsActivity.this;
 
         listView = findViewById(R.id.listview1);
-        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation2);
+        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
         //bottomNav.setSelectedItemId(R.id.nav_settings);
         firebaseController = FirebaseController.getInstance();
-        Toolbar mainToolbar = (Toolbar) findViewById(R.id.posting_toolbar);
+        Toolbar mainToolbar = (Toolbar) findViewById(R.id.main_toolbar);
 
         final boolean isCurrentUser = getIntent().getExtras().getBoolean("currentUser");
         if (!isCurrentUser) {
@@ -64,14 +63,17 @@ public class MyPostsActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
+        avatarId = user.getAvatarId();
         setSupportActionBar(mainToolbar);
         list = new ArrayList<>();
         adapter = new ItemAdapter(this, list);
         listView.setAdapter(adapter);
+
         Query query = firebaseController.getMyDatabase().
                 child("Messages").orderByKey().limitToLast(10);
         loadItems(userItems, query);
         updateFeed();
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -94,7 +96,6 @@ public class MyPostsActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if (item.getItemId() == android.R.id.home) {
-            firebaseController.updateCurrentUser(true, MyPostsActivity.this);
             finish();
         }
         if(item.getItemId()==R.id.quit){
@@ -138,7 +139,6 @@ public class MyPostsActivity extends AppCompatActivity {
             public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 if(totalItemCount!=0 && loadedItems==itemsToLoad && firstVisibleItem+visibleItemCount==totalItemCount){
                     itemsToLoad+=10;
-                    Log.e("loaded",String.valueOf(loadedItems));
                     Query query = firebaseController.getMyDatabase().
                             child("Messages").orderByKey().endAt(latestItemTime).limitToLast(10);
                     loadItems(userItems, query);
@@ -151,44 +151,29 @@ public class MyPostsActivity extends AppCompatActivity {
         query.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dst, String s) {
-                if(!restarting){
-                    final String key = dst.getKey();
-                    final String message = dst.child("message").getValue(String.class);
-                    final String imageId = dst.child("imageId").getValue(String.class);
-                    final String username1 = dst.child("username").getValue(String.class);
-                    final String time = dst.child("time").getValue(String.class);
-                    final int commentCount = dst.child("comments").getValue(Integer.class);
-                    final int likeCount = dst.child("likes").getValue(Integer.class);
+                final String key = dst.getKey();
+                final String message = dst.child("message").getValue(String.class);
+                final String imageId = dst.child("imageId").getValue(String.class);
+                final String username1 = dst.child("username").getValue(String.class);
+                final String time = dst.child("time").getValue(String.class);
+                final int commentCount = dst.child("comments").getValue(Integer.class);
+                final int likeCount = dst.child("likes").getValue(Integer.class);
 
-                    firebaseController.getMyDatabase().child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            for(DataSnapshot dataSnapshot1:dataSnapshot.getChildren()){
-                                if(username1.equals(dataSnapshot1.child("Username").getValue())){
-                                    final String avatarId = dataSnapshot1.child("AvatarId").getValue(String.class);
-                                    final ListViewItem item1 = new ListViewItem(key,username1,
-                                            null,message,imageId,time,commentCount, likeCount,avatarId);
-                                    if(user.getName().equals(username1)) {
-                                        list.add(start, item1);
-                                        adapter.notifyDataSetChanged();
-                                        userItems++;
-                                    }
-                                    if(loadedItems==(itemsToLoad-10)) latestItemTime = time;
-                                    loadedItems++;
-                                    if(loadedItems==itemsToLoad&&userItems==0){
-                                        Query query = firebaseController.getMyDatabase().
-                                                child("Messages").orderByKey().endAt(latestItemTime).limitToLast(10);
-                                        loadItems(userItems, query);
-                                    }
-                                }
-                            }
-                        }
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
+                if(user.getName().equals(username1)) {
+                    final ListViewItem item1 = new ListViewItem(key,username1,
+                            null,message,imageId,time,commentCount, likeCount,avatarId);
+                    list.add(start, item1);
+                    adapter.notifyDataSetChanged();
+                    userItems++;
                 }
+                if(loadedItems==(itemsToLoad-10)) latestItemTime = time;
+                loadedItems++;
+                if(loadedItems==itemsToLoad&&userItems==0){
+                    Query query = firebaseController.getMyDatabase().
+                            child("Messages").orderByKey().endAt(latestItemTime).limitToLast(10);
+                    loadItems(userItems, query);
+                }
+
             }
 
             @Override
@@ -208,7 +193,7 @@ public class MyPostsActivity extends AppCompatActivity {
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-                restarting=true;
+
             }
 
             @Override
@@ -223,6 +208,10 @@ public class MyPostsActivity extends AppCompatActivity {
         });
     }
 
-
+    @Override
+    public void onBackPressed() {
+        if(ImageController.isFullscreen) ImageController.zoomImageOut(this);
+        else super.onBackPressed();
+    }
 
 }

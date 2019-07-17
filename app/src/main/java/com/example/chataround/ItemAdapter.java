@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -300,7 +301,12 @@ public class ItemAdapter extends BaseAdapter {
         image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ImageController.croppedImageView = image;
+                ImageController.setViews(
+                        (ImageView)activity.findViewById(R.id.expanded_image),
+                        (ImageView)activity.findViewById(R.id.expanded_image1),
+                        image,
+                        (RelativeLayout) activity.findViewById(R.id.container1),
+                        (RelativeLayout)activity.findViewById(R.id.container2));
                 ImageController.zoomImageIn(activity,item.getImageId());
             }
         });
