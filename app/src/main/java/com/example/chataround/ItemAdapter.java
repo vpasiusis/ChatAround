@@ -288,7 +288,7 @@ public class ItemAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 if(item.getName().equals(firebaseController.getCurrentUser().getName())) {
-                    firebaseController.updateCurrentUser(true, activity);
+                    firebaseController.updateCurrentUser(false,true, activity);
                 }
                 else {
                     firebaseController.openClickedUser(item.getName(),activity);

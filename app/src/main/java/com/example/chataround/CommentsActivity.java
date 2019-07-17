@@ -84,7 +84,7 @@ public class CommentsActivity extends AppCompatActivity {
                     firebaseController.openClickedUser(item.getName(),activity);
                 }
                 else {
-                    firebaseController.updateCurrentUser(true,activity);
+                    firebaseController.updateCurrentUser(false,true,activity);
                 }
 
 

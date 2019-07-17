@@ -48,7 +48,6 @@ public class CommentAdapter extends BaseAdapter {
             view = inflater.inflate(R.layout.listview_comment, null);
         }
         firebaseController=FirebaseController.getInstance();
-        firebaseController.initialize();
         TextView name = view.findViewById(R.id.commentName);
         TextView time = view.findViewById(R.id.commentTime);
         TextView message = view.findViewById(R.id.commentMessage);
@@ -79,7 +78,7 @@ public class CommentAdapter extends BaseAdapter {
                     firebaseController.openClickedUser(comment.getName(),activity);
                 }
                 else {
-                    firebaseController.updateCurrentUser(true,activity);
+                    firebaseController.updateCurrentUser(false,true,activity);
                 }
 
 

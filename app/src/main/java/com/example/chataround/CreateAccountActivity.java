@@ -46,7 +46,6 @@ public class CreateAccountActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.create_account);
         firebaseController = FirebaseController.getInstance();
-        firebaseController.initialize();
         Name = (EditText) findViewById(R.id.edusername);
         Password = (EditText) findViewById(R.id.atpass);
         UserName = findViewById(R.id.edusername2);

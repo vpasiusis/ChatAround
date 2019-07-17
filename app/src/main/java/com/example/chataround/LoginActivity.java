@@ -1,5 +1,6 @@
 package com.example.chataround;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -40,14 +41,10 @@ import com.google.firebase.database.FirebaseDatabase;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private long backPressedTime;
-    private Toast backToast;
     private EditText Name;
     private EditText Password;
-    private TextView Info;
     private Button Login;
     private Button Register;
-    private ProgressBar pbbar;
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
     private SignInButton signInButton;
@@ -98,11 +95,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 if (firebaseAuth.getCurrentUser() != null) {
                     FirebaseController firebaseController = FirebaseController.getInstance();
-                    firebaseController.initialize();
-                    Toast.makeText(LoginActivity.this,   firebaseAuth.getCurrentUser().getEmail() +" joined chat", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
+                    firebaseController.initialize(LoginActivity.this);
                 }
             }
         };
@@ -240,7 +233,7 @@ public class LoginActivity extends AppCompatActivity {
                             if (task.isSuccessful()) {
                                 Toast.makeText(LoginActivity.this, "Joined", Toast.LENGTH_SHORT).show();
                                 FirebaseController firebaseController = FirebaseController.getInstance();
-                                firebaseController.initialize();
+                                firebaseController.initialize(LoginActivity.this);
                             } else
                                 Toast.makeText(LoginActivity.this, "Email or password incorrect", Toast.LENGTH_SHORT).show();
                         }

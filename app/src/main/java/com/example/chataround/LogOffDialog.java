@@ -24,6 +24,7 @@ public class LogOffDialog extends AppCompatDialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 FirebaseController firebaseController = FirebaseController.getInstance();
+                firebaseController.logOff();
                 FirebaseAuth.getInstance().signOut();
                 LoginManager.getInstance().logOut();
                 Intent i = new Intent(getApplicationContext(), LoginActivity.class); //if under this dialog you do not have your MainActivity

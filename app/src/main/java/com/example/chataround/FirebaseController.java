@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -45,19 +46,19 @@ public class FirebaseController {
         return instance;
     }
 
-    public void initialize() {
+    public void initialize(Activity activity) {
         currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         if(myDatabase==null) {
             FirebaseDatabase database = FirebaseDatabase.getInstance();
-            database.setPersistenceEnabled(true);      //bugged for now, maybe fixed later
+            //database.setPersistenceEnabled(true);      //bugged for now, maybe fixed later
             myDatabase = database.getReference();
             myDatabase.keepSynced(true);
             myStorage = FirebaseStorage.getInstance().getReference();
-            updateCurrentUser(false,null);
+            updateCurrentUser(true,false, activity);
         }
     }
 
-    public void updateCurrentUser(final boolean toOpen, final Activity activity){
+    public void updateCurrentUser(final boolean firstTime, final boolean profile, final Activity activity){
         Query query = myDatabase.child("users").child(currentFirebaseUser.getUid());
         query.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -73,10 +74,15 @@ public class FirebaseController {
                         String registerData = dataSnapshot.child("RegisterData").getValue(String.class);
                         currentUser = new UserClass(currentFirebaseUser.getUid(),username,
                                 avatarId,decription,email,registerData,posts,likes, type,anonymousMode);
-                        if(toOpen){
+                        if(profile){
                             Intent intent = new Intent(activity, ProfileActivity.class);
                             intent.putExtra("currentUser", true);
                             activity.startActivity(intent);
+                        }
+                        if(firstTime){
+                            Intent intent = new Intent(activity, MainActivity.class);
+                            activity.startActivity(intent);
+                            activity.finish();
                         }
                     }
 
@@ -313,6 +319,10 @@ public class FirebaseController {
             e.printStackTrace();
         }
         return time;
+    }
+
+    public void logOff(){
+        instance=null;
     }
 
     public String diffCount(int count){

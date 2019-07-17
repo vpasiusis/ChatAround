@@ -121,7 +121,7 @@ public class MyPostsActivity extends AppCompatActivity {
                             startActivity(intent1);
                             break;
                         case R.id.nav_settings:
-                            firebaseController.updateCurrentUser(true,MyPostsActivity.this);
+                            firebaseController.updateCurrentUser(false,true,MyPostsActivity.this);
                             break;
                     }
                     return true;

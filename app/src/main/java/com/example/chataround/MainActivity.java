@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
         listView = findViewById(R.id.listview1);
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         firebaseController = FirebaseController.getInstance();
-        firebaseController.initialize();
         setSupportActionBar(mainToolbar);
         list = new ArrayList<>();
         adapter = new ItemAdapter(this, list);
@@ -198,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
                             startActivity(intent1);
                             break;
                         case R.id.nav_settings:
-                            firebaseController.updateCurrentUser(true,MainActivity.this);
+                            firebaseController.updateCurrentUser(false,true,MainActivity.this);
                             break;
                     }
                     return true;

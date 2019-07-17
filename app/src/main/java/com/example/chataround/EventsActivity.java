@@ -23,7 +23,6 @@ public class EventsActivity extends AppCompatActivity {
         Toolbar eventsToolbar = (Toolbar) findViewById(R.id.main_toolbar);
         eventsToolbar.setTitle("Latest events");
         firebaseController=FirebaseController.getInstance();
-        firebaseController.initialize();
         setSupportActionBar(eventsToolbar);
         activity = EventsActivity.this;
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
@@ -67,7 +66,7 @@ public class EventsActivity extends AppCompatActivity {
                             // selectedActivity = new FavoritesFragment();
                             break;
                         case R.id.nav_settings:
-                            firebaseController.updateCurrentUser(true,EventsActivity.this);
+                            firebaseController.updateCurrentUser(false,true,EventsActivity.this);
                             break;
                     }
 
