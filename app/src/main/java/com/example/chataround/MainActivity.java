@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -31,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseController firebaseController;
     private List<ListViewItem> list;
     private ItemAdapter adapter;
-    private int loadedItems = 0;
+    private int loadedItems = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,8 +51,7 @@ public class MainActivity extends AppCompatActivity {
         bottomNav.setOnNavigationItemSelectedListener(navListener);
         Query query = firebaseController.getMyDatabase().
                 child("Messages").orderByKey().limitToLast(10);
-        loadItems(loadedItems, query);
-        loadedItems+=10;
+        loadItems(query);
         updateFeed();
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -97,17 +97,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 if(adapter.getCount()>=loadedItems && firstVisibleItem+visibleItemCount==totalItemCount){
-                    String oldestItemTime = adapter.getListViewItem(loadedItems-1).getTime();
-                    Query query = firebaseController.getMyDatabase().
-                            child("Messages").orderByKey().endAt(oldestItemTime).limitToLast(10);
-                    loadItems(loadedItems, query);
+                    String oldestItemKey = adapter.getListViewItem(loadedItems-1).getTime();
                     loadedItems+=10;
+                    Query query = firebaseController.getMyDatabase().
+                            child("Messages").orderByKey().endAt(oldestItemKey).limitToLast(10);
+                    loadItems(query);
                 }
             }
         });
     }
 
-    public void loadItems(final int start, final Query query) {
+    public void loadItems(final Query query) {
         query.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dst, String s) {
@@ -118,8 +118,13 @@ public class MainActivity extends AppCompatActivity {
                 final String time = dst.child("time").getValue(String.class);
                 final int commentCount = dst.child("comments").getValue(Integer.class);
                 final int likeCount = dst.child("likes").getValue(Integer.class);
+                int i=0;
+                while(adapter.getCount()>i &&
+                        Long.parseLong(time)<Long.parseLong(adapter.getListViewItem(i).getTime())){
+                    i++;
+                }
+                final int place = i;
                 Query query1 = firebaseController.getMyDatabase().child("users");
-
                 query1.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -128,27 +133,23 @@ public class MainActivity extends AppCompatActivity {
                                 final String avatarId = dataSnapshot1.child("AvatarId").getValue(String.class);
                                 final ListViewItem item1 = new ListViewItem(key, username1,
                                         null, message, imageId, time, commentCount, likeCount, avatarId);
-                                list.add(start, item1);
+                                list.add(place, item1);
                                 adapter.notifyDataSetChanged();
                             }
                         }
                         if ("".equals(username1)) {
                             final ListViewItem item1 = new ListViewItem(key, username1,
                                     null, message, imageId, time, commentCount, likeCount, null);
-                            list.add(start, item1);
+                            list.add(place, item1);
                             adapter.notifyDataSetChanged();
                         }
-
                     }
-
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
 
                     }
                 });
-
-
             }
 
             @Override
@@ -168,7 +169,13 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-
+                for(int i = 0; i< list.size();i++){
+                    if(list.get(i).getId().equals(dataSnapshot.getKey())){
+                        ListViewItem item = list.get(i);
+                        list.remove(item);
+                        adapter.notifyDataSetChanged();
+                    }
+                }
             }
 
             @Override

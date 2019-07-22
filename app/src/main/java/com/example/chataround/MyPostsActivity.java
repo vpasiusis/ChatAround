@@ -71,7 +71,7 @@ public class MyPostsActivity extends AppCompatActivity {
 
         Query query = firebaseController.getMyDatabase().
                 child("Messages").orderByKey().limitToLast(10);
-        loadItems(userItems, query);
+        loadItems(query);
         updateFeed();
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -141,13 +141,13 @@ public class MyPostsActivity extends AppCompatActivity {
                     itemsToLoad+=10;
                     Query query = firebaseController.getMyDatabase().
                             child("Messages").orderByKey().endAt(latestItemTime).limitToLast(10);
-                    loadItems(userItems, query);
+                    loadItems(query);
                 }
             }
         });
     }
 
-    public void loadItems(final int start, Query query) {
+    public void loadItems(Query query) {
         query.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dst, String s) {
@@ -160,40 +160,59 @@ public class MyPostsActivity extends AppCompatActivity {
                 final int likeCount = dst.child("likes").getValue(Integer.class);
 
                 if(user.getName().equals(username1)) {
+                    int i=0;
+                    while(adapter.getCount()>i &&
+                            Long.parseLong(time)<Long.parseLong(adapter.getListViewItem(i).getTime())){
+                        i++;
+                    }
                     final ListViewItem item1 = new ListViewItem(key,username1,
                             null,message,imageId,time,commentCount, likeCount,avatarId);
-                    list.add(start, item1);
+                    list.add(i, item1);
                     adapter.notifyDataSetChanged();
                     userItems++;
                 }
                 if(loadedItems==(itemsToLoad-10)) latestItemTime = time;
+                if(loadedItems==itemsToLoad){
+                    latestItemTime=time;
+                    loadedItems--;
+                }
                 loadedItems++;
                 if(loadedItems==itemsToLoad&&userItems==0){
                     Query query = firebaseController.getMyDatabase().
                             child("Messages").orderByKey().endAt(latestItemTime).limitToLast(10);
-                    loadItems(userItems, query);
+                    loadItems(query);
                 }
 
             }
 
             @Override
             public void onChildChanged(DataSnapshot dst, String s) {
-                final String key = dst.getKey();
-                final int commentCount = dst.child("comments").getValue(Integer.class);
-                final int likeCount = dst.child("likes").getValue(Integer.class);
-                for(int i = 0; i< list.size();i++){
-                    if(list.get(i).getId().equals(key)){
-                        ListViewItem item = list.get(i);
-                        item.setComments(commentCount);
-                        item.setLikes(likeCount);
-                        adapter.notifyDataSetChanged();
+                final String username = dst.child("username").getValue(String.class);
+                if(username == user.getName()){
+                    final String key = dst.getKey();
+                    final int commentCount = dst.child("comments").getValue(Integer.class);
+                    final int likeCount = dst.child("likes").getValue(Integer.class);
+                    for(int i = 0; i< list.size();i++){
+                        if(list.get(i).getId().equals(key)){
+                            ListViewItem item = list.get(i);
+                            item.setComments(commentCount);
+                            item.setLikes(likeCount);
+                            adapter.notifyDataSetChanged();
+                        }
                     }
                 }
             }
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-
+                for(int i = 0; i< list.size();i++){
+                    if(list.get(i).getId().equals(dataSnapshot.getKey())){
+                        ListViewItem item = list.get(i);
+                        list.remove(item);
+                        adapter.notifyDataSetChanged();
+                        if(item.getName()==user.getName())userItems--;
+                    }
+                }
             }
 
             @Override

@@ -50,7 +50,6 @@ public class FirebaseController {
         currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         if(myDatabase==null) {
             FirebaseDatabase database = FirebaseDatabase.getInstance();
-            //database.setPersistenceEnabled(true);      //bugged for now, maybe fixed later
             myDatabase = database.getReference();
             myDatabase.keepSynced(true);
             myStorage = FirebaseStorage.getInstance().getReference();
@@ -261,7 +260,7 @@ public class FirebaseController {
 
     public String getTime(){
         Calendar c = Calendar.getInstance();
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
         String time = df.format(c.getTime());
         return time;
     }
@@ -276,7 +275,7 @@ public class FirebaseController {
         long difference;
         String time = "Just now";
         try {
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
             Date date1 = df.parse(MessageTime);
             Date date2 = df.parse(getTime());
             difference = (date2.getTime() - date1.getTime()) / 1000; // to seconds

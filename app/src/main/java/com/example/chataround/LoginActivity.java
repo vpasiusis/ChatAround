@@ -56,6 +56,17 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_activity);
+
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                if (firebaseAuth.getCurrentUser() != null) {
+                    FirebaseController firebaseController = FirebaseController.getInstance();
+                    firebaseController.initialize(LoginActivity.this);
+                }
+            }
+        };
+
         Name = (EditText)findViewById(R.id.etName);
         progressDialog = new ProgressDialog(this);
         Password = (EditText)findViewById(R.id.etPass);
@@ -90,15 +101,6 @@ public class LoginActivity extends AppCompatActivity {
         });
         FacebookSdk.sdkInitialize(getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if (firebaseAuth.getCurrentUser() != null) {
-                    FirebaseController firebaseController = FirebaseController.getInstance();
-                    firebaseController.initialize(LoginActivity.this);
-                }
-            }
-        };
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()

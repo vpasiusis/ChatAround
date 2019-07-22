@@ -162,14 +162,14 @@ public class PostingActivity extends AppCompatActivity {
             }
             if (hasImageSpan(editPostText)) {
                 firebaseController.sendImage(image,text);
-                Intent intent = new Intent(this, MainActivity.class);
-                startActivity(intent);
             } else {
                 firebaseController.sendMessage(text, null);
                 editPostText.setText("");
-                Intent intent = new Intent(this, MainActivity.class);
-                startActivity(intent);
             }
+            Intent intent = new Intent(PostingActivity.this, MainActivity.class);
+            startActivity(intent);
+            overridePendingTransition(0, 0);
+            activity.finish();
         }
         else {
             //check
