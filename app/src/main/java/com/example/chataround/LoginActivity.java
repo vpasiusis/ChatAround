@@ -3,27 +3,22 @@ package com.example.chataround;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.hardware.camera2.params.SessionConfiguration;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.facebook.appevents.AppEventsLogger;
+
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
-import com.facebook.login.LoginBehavior;
-import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -44,19 +39,12 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
-
 public class LoginActivity extends AppCompatActivity {
 
-    private long backPressedTime;
-    private Toast backToast;
     private EditText Name;
     private EditText Password;
-    private TextView Info;
     private Button Login;
     private Button Register;
-    private ProgressBar pbbar;
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
     private SignInButton signInButton;
@@ -64,11 +52,21 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener mAuthListener;
     private CallbackManager callbackManager;
     private LoginButton loginButton1;
-    FirebaseController firebaseController;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_activity);
+
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                if (firebaseAuth.getCurrentUser() != null) {
+                    FirebaseController firebaseController = FirebaseController.getInstance();
+                    firebaseController.initialize(LoginActivity.this);
+                }
+            }
+        };
+
         Name = (EditText)findViewById(R.id.etName);
         progressDialog = new ProgressDialog(this);
         Password = (EditText)findViewById(R.id.etPass);
@@ -103,17 +101,6 @@ public class LoginActivity extends AppCompatActivity {
         });
         FacebookSdk.sdkInitialize(getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if (firebaseAuth.getCurrentUser() != null) {
-                    Toast.makeText(LoginActivity.this,   firebaseAuth.getCurrentUser().getEmail() +" joined chat", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
-            }
-        };
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
@@ -247,6 +234,8 @@ public class LoginActivity extends AppCompatActivity {
                             progressDialog.dismiss();
                             if (task.isSuccessful()) {
                                 Toast.makeText(LoginActivity.this, "Joined", Toast.LENGTH_SHORT).show();
+                                FirebaseController firebaseController = FirebaseController.getInstance();
+                                firebaseController.initialize(LoginActivity.this);
                             } else
                                 Toast.makeText(LoginActivity.this, "Email or password incorrect", Toast.LENGTH_SHORT).show();
                         }

@@ -1,10 +1,17 @@
 package com.example.chataround;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -24,9 +31,12 @@ public class CommentsActivity extends AppCompatActivity {
     private ListView listView;
     private List<ListViewComment> comments;
     private CommentAdapter adapter;
-    private TextView message,time,user;
+    private Activity activity;
+    private TextView message,time,user,commentNumber;
     private EditText editMessage;
+    private UserClass userClass;
     private FirebaseController firebaseController;
+    private int commentCounter=0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -34,23 +44,60 @@ public class CommentsActivity extends AppCompatActivity {
         setContentView(R.layout.comments_activity);
 
         Toolbar mainToolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        mainToolbar.setTitle("Post");
+        setSupportActionBar(mainToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
         setSupportActionBar(mainToolbar);
         firebaseController = FirebaseController.getInstance();
-
+        activity=CommentsActivity.this;
+        userClass=firebaseController.getCurrentUser();
         item = firebaseController.getCurrentSelectedItem();
         listView = findViewById(R.id.listViewComments);
         message = findViewById(R.id.itemMessage1);
         time = findViewById(R.id.itemTime1);
         user = findViewById(R.id.itemName1);
         editMessage = findViewById(R.id.enterTextid);
+        commentNumber = findViewById(R.id.commentNumber);
 
         comments = new ArrayList<>();
         adapter = new CommentAdapter(CommentsActivity.this,comments);
         listView.setAdapter(adapter);
 
+
         message.setText(item.getMessage());
-        time.setText(item.getTime());
+        String realtime = firebaseController.diffTime(item.getTime());
+        time.setText(realtime);
         user.setText(item.getName());
+        if(item.getName().equals("")) {
+            user.setVisibility(View.GONE);
+        }else
+        {
+            user.setText(item.getName());
+        }
+
+
+        user.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!item.getName().equals(firebaseController.getCurrentUser().getName())) {
+                    firebaseController.openClickedUser(item.getName(),activity);
+                }
+                else {
+                    firebaseController.updateCurrentUser(false,true,activity);
+                }
+
+
+            }
+        });
+
+        boolean keyboard = getIntent().getExtras().getBoolean("keyboard");
+        if(keyboard){
+            editMessage.requestFocus();
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            Dialog d = builder.create();
+            d.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        }
 
         loadComments();
     }
@@ -70,6 +117,9 @@ public class CommentsActivity extends AppCompatActivity {
                     ListViewComment comment = new ListViewComment(key,username,message,realTime);
                     comments.add(comment);
                     adapter.notifyDataSetChanged();
+                    commentCounter++;
+                    if(commentCounter==1)commentNumber.setText("Showing 1 comment");
+                    else commentNumber.setText(String.format("Showing %d comments", commentCounter));
                 }
             }
             @Override
@@ -94,6 +144,24 @@ public class CommentsActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.topbar_posting, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+        }
+        if (item.getItemId() == R.id.quit) {
+            LogOffDialog logOffDialog = new LogOffDialog();
+            logOffDialog.show(getSupportFragmentManager(), "Log Off");
+        }
+        return super.onOptionsItemSelected(item);
+    }
     public void sendComment(View view) {
         String text = editMessage.getText().toString().trim();
         if(!TextUtils.isEmpty(text)) {

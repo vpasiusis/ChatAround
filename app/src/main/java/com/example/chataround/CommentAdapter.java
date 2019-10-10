@@ -15,6 +15,7 @@ public class CommentAdapter extends BaseAdapter {
     private Activity activity;
     private LayoutInflater inflater;
     private List<ListViewComment> commentList;
+    private FirebaseController firebaseController;
 
     public CommentAdapter(Activity activity, List<ListViewComment> commentList){
         this.commentList = commentList;
@@ -40,20 +41,26 @@ public class CommentAdapter extends BaseAdapter {
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
-
         if (inflater == null){
             inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
         if (view == null){
             view = inflater.inflate(R.layout.listview_comment, null);
         }
+        firebaseController=FirebaseController.getInstance();
         TextView name = view.findViewById(R.id.commentName);
         TextView time = view.findViewById(R.id.commentTime);
         TextView message = view.findViewById(R.id.commentMessage);
         final ListViewComment comment = commentList.get(i);
-        name.setText(comment.getName());
-        time.setText(comment.getTime());
+        if(comment.getName().equals("")) {
+            name.setVisibility(View.GONE);
+        }else
+        {
+            name.setText(comment.getName());
+        }
 
+
+        time.setText(comment.getTime());
 
         // Check for empty message
         if (!TextUtils.isEmpty(comment.getMessage())) {
@@ -63,6 +70,20 @@ public class CommentAdapter extends BaseAdapter {
             // message is empty, remove from view
             message.setVisibility(View.GONE);
         }
+
+        name.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!comment.getName().equals(firebaseController.getCurrentUser().getName())) {
+                    firebaseController.openClickedUser(comment.getName(),activity);
+                }
+                else {
+                    firebaseController.updateCurrentUser(false,true,activity);
+                }
+
+
+            }
+        });
         return view;
 
     }

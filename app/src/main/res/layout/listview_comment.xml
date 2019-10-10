@@ -8,8 +8,8 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_marginLeft="@dimen/feed_item_margin_sides"
-        android:layout_marginRight="@dimen/feed_item_margin_sides"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
         android:layout_marginTop="@dimen/feed_comment_margin_top_bottom"
         android:layout_marginBottom="@dimen/feed_comment_margin_top_bottom"
         android:orientation="vertical">
@@ -22,18 +22,19 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/commentTime"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/timestamp"
-            android:paddingBottom="@dimen/feed_item_padding_time"
-            android:textSize="@dimen/feed_item_time" />
-
-        <TextView
             android:id="@+id/commentMessage"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             android:textSize="@dimen/feed_item_message" />
+
+        <TextView
+            android:id="@+id/commentTime"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:textColor="@color/timestamp"
+            android:textSize="@dimen/feed_item_time" />
     </LinearLayout>
 
 </LinearLayout>

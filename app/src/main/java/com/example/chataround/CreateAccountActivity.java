@@ -1,25 +1,14 @@
 package com.example.chataround;
 
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.AppCompatDialog;
 import android.text.TextUtils;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -33,9 +22,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 public class CreateAccountActivity extends AppCompatActivity {
 
@@ -58,7 +46,6 @@ public class CreateAccountActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.create_account);
         firebaseController = FirebaseController.getInstance();
-        firebaseController.initialize();
         Name = (EditText) findViewById(R.id.edusername);
         Password = (EditText) findViewById(R.id.atpass);
         UserName = findViewById(R.id.edusername2);
@@ -112,9 +99,14 @@ public class CreateAccountActivity extends AppCompatActivity {
                                             DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child("users");
                                             DatabaseReference currentUserDB = mDatabase.child(mAuth.getCurrentUser().getUid());
                                             Toast.makeText(CreateAccountActivity.this, " Acount " + email + " was created ", Toast.LENGTH_SHORT).show();
-                                            currentUserDB.child("Type").setValue("0");
+                                            currentUserDB.child("Type").setValue(0);
                                             currentUserDB.child("Email").setValue(email);
                                             currentUserDB.child("Username").setValue(userName);
+                                            currentUserDB.child("Likes").setValue(0);
+                                            currentUserDB.child("Posts").setValue(0);
+                                            currentUserDB.child("RegisterData").setValue(getTime());
+                                            currentUserDB.child("AvatarId").setValue(null);
+                                            currentUserDB.child("AnonymousMode").setValue(false);
                                         } else
                                             Toast.makeText(CreateAccountActivity.this, "error registering user", Toast.LENGTH_SHORT).show();
 
@@ -136,6 +128,12 @@ public class CreateAccountActivity extends AppCompatActivity {
 
         }else
             Toast.makeText(CreateAccountActivity.this, "Enter all data", Toast.LENGTH_SHORT).show();
+    }
+    public String getTime(){
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String time = df.format(c.getTime());
+        return time;
     }
 
 }

@@ -4,9 +4,15 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
     <color name="white">#ffffff</color>
+    <color name="black">#000000</color>
+    <color name="gray">#708090</color>
+    <color name="red">#ff0000</color>
+    <color name="brightRed">#ff9999</color>
+    <color name="feedRed">#e6e6e6</color>
     <color name="feed_bg">#ffffff</color>
     <color name="feed_item_bg">#ffffff</color>
     <color name="feed_item_border">#c2c3c8</color>
     <color name="link">#0a80d1</color>
+    <color name="admin">#FF8466</color>
     <color name="timestamp">#a0a3a7</color>
 </resources>

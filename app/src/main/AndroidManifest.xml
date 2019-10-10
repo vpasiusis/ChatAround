@@ -25,10 +25,16 @@
             android:name=".PostingActivity"
             android:screenOrientation="portrait"></activity>
         <activity
+            android:name=".EventsActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity
             android:name=".SettingsActivity"
             android:screenOrientation="portrait"></activity>
         <activity
-            android:name=".EventsActivity"
+            android:name=".MyPostsActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".ProfileActivity"
             android:screenOrientation="portrait"></activity>
         <activity android:name=".LoginActivity"  android:screenOrientation="portrait">
             <intent-filter>

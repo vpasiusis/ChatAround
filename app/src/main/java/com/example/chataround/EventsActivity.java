@@ -15,12 +15,15 @@ import android.view.MenuItem;
 public class EventsActivity extends AppCompatActivity {
 
     Activity activity;
+    FirebaseController firebaseController;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         setContentView(R.layout.events_activity);
-        Toolbar postingToolbar = (Toolbar) findViewById(R.id.main_toolbar);
-        setSupportActionBar(postingToolbar);
+        Toolbar eventsToolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        eventsToolbar.setTitle("Latest events");
+        firebaseController=FirebaseController.getInstance();
+        setSupportActionBar(eventsToolbar);
         activity = EventsActivity.this;
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
@@ -63,8 +66,7 @@ public class EventsActivity extends AppCompatActivity {
                             // selectedActivity = new FavoritesFragment();
                             break;
                         case R.id.nav_settings:
-                            Intent intent1 = new Intent(activity, SettingsActivity.class);
-                            startActivity(intent1);
+                            firebaseController.updateCurrentUser(false,true,EventsActivity.this);
                             break;
                     }
 
@@ -72,6 +74,5 @@ public class EventsActivity extends AppCompatActivity {
                     return true;
                 }
             };
-
 
 }

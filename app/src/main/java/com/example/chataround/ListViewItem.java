@@ -3,17 +3,16 @@ package com.example.chataround;
 import android.graphics.Bitmap;
 
 import java.io.Serializable;
-import java.util.List;
 
 public class ListViewItem implements Serializable {
-    private String id, name, message, time,imageId;
+    private String id, name, message, time,imageId,avatarId;
     private int comments, likes;
     private Bitmap image;
-    private boolean isLoading=false;
+    private boolean isLiked=false;
 
 
 
-    public ListViewItem(String id, String name, Bitmap image, String message, String imageId, String time, int comments, int likes) {
+    public ListViewItem(String id, String name, Bitmap image, String message, String imageId, String time, int comments, int likes, String avatarId) {
         super();
         this.id = id;
         this.name = name;
@@ -23,11 +22,18 @@ public class ListViewItem implements Serializable {
         this.time = time;
         this.comments = comments;
         this.likes=likes;
+        this.avatarId=avatarId;
     }
     public String getImageId() {
         return imageId;
     }
 
+    public String getAvatarId() {
+        return avatarId;
+    }
+    public void setAvatarId(String avatarId) {
+        this.avatarId = avatarId;
+    }
     public void setImageId(String imageId) {
         this.imageId = imageId;
     }
@@ -54,14 +60,6 @@ public class ListViewItem implements Serializable {
 
     public void setImage(Bitmap image) {
         this.image = image;
-    }
-
-    public boolean getIsLoading(){
-        return isLoading;
-    }
-
-    public void setIsLoading(boolean value){
-        isLoading = value;
     }
 
     public String getMessage() {
@@ -94,5 +92,13 @@ public class ListViewItem implements Serializable {
 
     public int getLikes(){
         return likes;
+    }
+
+    public void setLiked(boolean isLiked){
+        this.isLiked = isLiked;
+    }
+
+    public boolean getLiked(){
+        return isLiked;
     }
 }

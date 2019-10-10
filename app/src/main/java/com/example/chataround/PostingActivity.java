@@ -31,22 +31,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Toast;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.nio.channels.FileLockInterruptionException;
-import java.nio.file.FileSystemNotFoundException;
 
 public class PostingActivity extends AppCompatActivity {
     private EditText editPostText;
     private FirebaseController firebaseController;
     private Activity activity;
     private Button cameraButton;
+    private UserClass user;
     private byte[] image;
     private Uri imageUri;
     @Override
@@ -54,9 +49,13 @@ public class PostingActivity extends AppCompatActivity {
 
         setContentView(R.layout.posting_activity);
         Toolbar postingToolbar = (Toolbar) findViewById(R.id.posting_toolbar);
+        postingToolbar.setTitle("New post");
         setSupportActionBar(postingToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
         activity=PostingActivity.this;
         firebaseController = FirebaseController.getInstance();
+        user=firebaseController.getCurrentUser();
         editPostText = findViewById(R.id.enterTextidpost);
         cameraButton  = (Button)findViewById(R.id.PictureButtonId);
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
@@ -79,7 +78,9 @@ public class PostingActivity extends AppCompatActivity {
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
+        if (item.getItemId() == android.R.id.home) {
+            finish(); // close this activity and return to preview activity (if there is any)
+        }
         if(item.getItemId()==R.id.quit){
             LogOffDialog logOffDialog = new LogOffDialog();
             logOffDialog.show(getSupportFragmentManager(),"Log Off");
@@ -103,8 +104,7 @@ public class PostingActivity extends AppCompatActivity {
                             startActivity(intent2);
                             break;
                         case R.id.nav_settings:
-                            Intent intent1 = new Intent(activity, SettingsActivity.class);
-                            startActivity(intent1);
+                            firebaseController.updateCurrentUser(false,true, PostingActivity.this);
                             break;
                     }
 
@@ -156,17 +156,20 @@ public class PostingActivity extends AppCompatActivity {
 
     public void sendMessage(View view) {
         String text = editPostText.getText().toString().trim();
-        if(!TextUtils.isEmpty(text)) {
+        if(!TextUtils.isEmpty(text)||hasImageSpan(editPostText)) {
+            if(!user.isAnonMode()) {
+                firebaseController.updatePosts(user.getName(), true);
+            }
             if (hasImageSpan(editPostText)) {
                 firebaseController.sendImage(image,text);
-                Intent intent = new Intent(this, MainActivity.class);
-                startActivity(intent);
             } else {
                 firebaseController.sendMessage(text, null);
                 editPostText.setText("");
-                Intent intent = new Intent(this, MainActivity.class);
-                startActivity(intent);
             }
+            Intent intent = new Intent(PostingActivity.this, MainActivity.class);
+            startActivity(intent);
+            overridePendingTransition(0, 0);
+            activity.finish();
         }
         else {
             //check
@@ -186,10 +189,9 @@ public class PostingActivity extends AppCompatActivity {
     }
 
     private void addImageInEditTextUpload(Drawable drawable) {
-
         drawable.setBounds(0, 0, (int)(drawable.getIntrinsicWidth()*0.2), (int)(drawable.getIntrinsicHeight()*0.2));
         int selectionCursorPos = editPostText.getSelectionStart();
-        editPostText.getText().insert(selectionCursorPos, ".");
+        editPostText.getText().insert(selectionCursorPos, " ");
         selectionCursorPos = editPostText.getSelectionStart();
         SpannableStringBuilder builder = new SpannableStringBuilder(editPostText.getText());
         int startPos = selectionCursorPos - ".".length();
@@ -228,4 +230,5 @@ public class PostingActivity extends AppCompatActivity {
             }
         }
     }
+
 }

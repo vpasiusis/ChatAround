@@ -2,119 +2,160 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/feed_bg"
+    android:background="@color/feedRed"
     android:orientation="vertical">
 
-    <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_marginLeft="@dimen/feed_item_margin_sides"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:layout_marginLeft="@dimen/feed_item_margin_top_bottom"
         android:layout_marginTop="@dimen/feed_item_margin_top_bottom"
-        android:layout_marginRight="@dimen/feed_item_margin_sides"
+        android:layout_marginRight="@dimen/feed_item_margin_top_bottom"
         android:layout_marginBottom="@dimen/feed_item_margin_top_bottom"
         android:orientation="vertical">
 
-        <Button
-            android:id="@+id/deleteButton"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:layout_alignParentRight="true"
-            android:background="@drawable/cancel"
-            android:focusable="false"
-            android:focusableInTouchMode="false" />
-
-        <TextView
-            android:id="@+id/itemName"
+        <RelativeLayout
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_toLeftOf="@+id/deleteButton"
-            android:textSize="@dimen/feed_item_name"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/itemTime"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/itemName"
-            android:layout_marginBottom="@dimen/feed_item_padding_time"
-            android:textColor="@color/timestamp"
-            android:textSize="@dimen/feed_item_time" />
-
-        <TextView
-            android:id="@+id/itemMessage"
-            android:layout_below="@+id/itemTime"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/feed_item_message" />
-
-        <android.support.v7.widget.CardView
-            android:id="@+id/cardView"
-            xmlns:card_view="http://schemas.android.com/apk/res-auto"
-            android:layout_width="match_parent"
-            android:layout_height="220dp"
-            android:layout_below="@+id/itemMessage"
+            android:layout_height="fill_parent"
+            android:layout_marginLeft="20dp"
             android:layout_marginTop="10dp"
-            card_view:cardCornerRadius="12dp"
-            android:visibility="visible">
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="10dp"
+            android:background="@color/white"
+            android:orientation="vertical">
 
-            <ProgressBar
-                android:id="@+id/progressBar"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_gravity="center"
-                android:indeterminate="true"
-                android:visibility="gone" />
+            <Button
+                android:id="@+id/deleteButton"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/cancel"
+                android:focusable="false"
+                android:focusableInTouchMode="false" />
 
-            <ImageView
-                android:id="@+id/itemImage"
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/cardViewAvatar"
+                xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_alignParentLeft="true"
+                android:layout_marginStart="1dp"
+                android:layout_marginBottom="10dp"
+                card_view:cardCornerRadius="16dp"
+                android:visibility="visible">
+
+                <ImageView
+                    android:id="@+id/itemAvatar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:layout_alignParentLeft="true"
+                    android:visibility="invisible" />
+                <ImageView
+                    android:id="@+id/defaultitemAvatar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentLeft="true"
+                    android:background="@drawable/ic_person_black_24dp"
+                    android:visibility="invisible" />
+            </android.support.v7.widget.CardView>
+
+
+            <TextView
+                android:id="@+id/itemName"
+                android:layout_width="598dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginStart="5dp"
+                android:layout_marginLeft="7dp"
+                android:layout_marginEnd="18dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="4dp"
+                android:layout_toLeftOf="@+id/deleteButton"
+                android:layout_toRightOf="@+id/cardViewAvatar"
+                android:textSize="@dimen/feed_item_name"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/itemMessage"
+                android:layout_below="@+id/itemName"
+                android:layout_width="fill_parent"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="10dp"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/feed_item_message" />
+
+            <TextView
+                android:id="@+id/itemTime"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/cardView"
+                android:layout_toLeftOf="@+id/commentButton"
+                android:textColor="@color/timestamp"
+                android:textSize="@dimen/feed_item_time" />
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/cardView"
+                xmlns:card_view="http://schemas.android.com/apk/res-auto"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:visibility="visible" />
-        </android.support.v7.widget.CardView>
+                android:layout_height="200dp"
+                android:layout_below="@+id/itemMessage"
+                android:layout_marginBottom="15dp"
+                android:layout_marginTop="5dp"
+                card_view:cardCornerRadius="8dp"
+                android:visibility="visible">
 
-        <Button
-            android:id="@+id/commentButton"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
-            android:layout_below="@+id/cardView"
-            android:layout_marginTop="10dp"
-            android:layout_alignParentLeft="true"
-            android:background="@drawable/comment"
-            android:focusable="false"
-            android:focusableInTouchMode="false" />
+                <ImageView
+                    android:id="@+id/itemImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:visibility="visible" />
+            </android.support.v7.widget.CardView>
 
-        <Button
-            android:id="@+id/likeButton"
-            style="@style/Widget.AppCompat.Button"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
-            android:layout_below="@+id/cardView"
-            android:layout_marginLeft="60dp"
-            android:layout_marginTop="10dp"
-            android:layout_toRightOf="@+id/commentButton"
-            android:background="@drawable/like"
-            android:focusable="false"
-            android:focusableInTouchMode="false" />
+            <Button
+                android:id="@+id/commentButton"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_below="@+id/cardView"
+                android:layout_toLeftOf="@+id/likeButton"
+                android:background="@drawable/comment"
+                android:focusable="false"
+                android:focusableInTouchMode="false" />
 
-        <TextView
-            android:id="@+id/commentCount"
-            android:layout_width="wrap_content"
-            android:layout_below="@+id/cardView"
-            android:layout_toRightOf="@+id/commentButton"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="5dp"
-            android:layout_height="wrap_content"
-            android:text="" />
-        <TextView
-            android:id="@+id/likeCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/cardView"
-            android:layout_marginLeft="5dp"
-            android:layout_toRightOf="@+id/likeButton"
-            android:layout_marginTop="10dp"
-            android:text="" />
-    </RelativeLayout>
+            <Button
+                android:id="@+id/likeButton"
+                style="@style/Widget.AppCompat.Button"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_marginLeft="50dp"
+                android:layout_below="@+id/cardView"
+                android:background="@drawable/like"
+                android:layout_toLeftOf="@+id/likeCount"
+                android:focusable="false"
+                android:focusableInTouchMode="false" />
+
+            <TextView
+                android:id="@+id/commentCount"
+                android:layout_width="wrap_content"
+                android:layout_below="@+id/cardView"
+                android:layout_toRightOf="@+id/commentButton"
+                android:layout_marginLeft="5dp"
+                android:layout_height="wrap_content"
+                android:text="" />
+
+            <TextView
+                android:id="@+id/likeCount"
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/cardView"
+                android:layout_marginLeft="5dp"
+                android:layout_alignParentRight="true"
+                android:text="" />
+        </RelativeLayout>
+
+    </LinearLayout>
 
 </LinearLayout>

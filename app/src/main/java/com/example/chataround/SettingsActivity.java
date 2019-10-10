@@ -1,4 +1,3 @@
-
 package com.example.chataround;
 
 import android.app.Activity;
@@ -12,20 +11,46 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.CompoundButton;
+import android.widget.Switch;
+
 public class SettingsActivity extends AppCompatActivity {
-
-
-    Activity activity;
+    private Activity activity;
+    private FirebaseController firebaseController;
+    private UserClass user;
+    private Switch aSwitch;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         setContentView(R.layout.settings_activity);
-        Toolbar postingToolbar = (Toolbar) findViewById(R.id.posting_toolbar);
-        setSupportActionBar(postingToolbar);
+        Toolbar eventsToolbar = (Toolbar) findViewById(R.id.posting_toolbar);
+        eventsToolbar.setTitle("My settings");
+        firebaseController=FirebaseController.getInstance();
+        user=firebaseController.getCurrentUser();
+        setSupportActionBar(eventsToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
         activity = SettingsActivity.this;
+        aSwitch=findViewById(R.id.switch1);
+        if(user.isAnonMode()){
+            aSwitch.setChecked(true);
+        }else {
+            aSwitch.setChecked(false);
+        }
+        aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    user.setAnonMode(true);
+                    firebaseController.setUserAnon(true);
+                }else {
+                    user.setAnonMode(false);
+                    firebaseController.setUserAnon(false);
+                }
+            }
+        });
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
-        bottomNav.setSelectedItemId(R.id.nav_settings);
         super.onCreate(savedInstanceState);
     }
 
@@ -38,7 +63,9 @@ public class SettingsActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+        }
         if (item.getItemId() == R.id.quit) {
             LogOffDialog logOffDialog = new LogOffDialog();
             logOffDialog.show(getSupportFragmentManager(), "Log Off");
@@ -62,7 +89,7 @@ public class SettingsActivity extends AppCompatActivity {
                             startActivity(intent1);
                             break;
                         case R.id.nav_settings:
-
+                            firebaseController.updateCurrentUser(false,true, SettingsActivity.this);
                             break;
                     }
 
@@ -71,6 +98,4 @@ public class SettingsActivity extends AppCompatActivity {
                 }
             };
 
-
 }
-
